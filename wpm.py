@@ -10,6 +10,10 @@ import curses
 import random
 import time
 
+__author__ = "Christian Stigen Larsen"
+__copyright__ = "Copyright 2017 Christian Stigen Larsen"
+__license__ = "GNU GPL v3 or later"
+
 # TODO:
 # - Word-wrapping
 # - Use urwid for terminal handling instead of curses
