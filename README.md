@@ -6,6 +6,7 @@ A terminal program that measures your typing speed in words per minute (WPM).
 How to run
 ==========
 
+    $ pip install -r requirements.txt
     $ python wpm.py
 
 Author and license

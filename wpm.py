@@ -177,7 +177,7 @@ class GameRound(object):
 
 def main():
     p = argparse.ArgumentParser(epilog=__copyright__)
-    p.add_argument("--load", default="examples.json",
+    p.add_argument("--load", metavar="FILENAME", default="examples.json",
             help="JSON file containing texts to trai on.")
     opts = p.parse_args()
 
