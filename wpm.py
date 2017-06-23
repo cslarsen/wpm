@@ -1,6 +1,10 @@
 #! /usr/bin/env python
 # -*- encoding: utf-8 -*-
 
+"""
+A typing game that measures WPM (words per minute).
+"""
+
 import contextlib
 import curses
 import random
