@@ -61,6 +61,7 @@ class GameRound(object):
                 handle_mouse=False,
                 palette=[
                     ("stats", "bold,light green", "black", "default"),
+                    ("cursor", "bold", "dark green", "underline"),
                     ("normal", "default", "black", "white"),
                     ("done", "bold", "default", "bold"),
                     ("wrong", "white,bold", "dark red", "bold,underline"),
@@ -116,14 +117,15 @@ class GameRound(object):
 
         content = [
             ("done", self.text[:p]),
-            ("wrong", self.text[p:p+i]),
-            ("normal", self.text[p+i:])
+            ("cursor", self.text[p:p+1]),
+            ("wrong", self.text[p+1:p+1+i]),
+            ("normal", self.text[p+1+i:])
         ]
 
         if i == 0:
             # Bug in urwid set_text? Printing an emptry string seems to mess up
             # everything (e.g. ("wrong", "") => rest of line won't print
-            del content[1]
+            del content[2]
 
         self.txt_text.set_text(content)
         self.txt_author.set_text(("author",
