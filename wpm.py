@@ -2,10 +2,12 @@
 # -*- encoding: utf-8 -*-
 
 """
-A typing game that measures WPM (words per minute).
+Measures your typing speed in words per minute (WPM).
 """
 
-import contextlib
+import argparse
+import codecs
+import json
 import random
 import time
 import urwid
@@ -15,19 +17,15 @@ __copyright__ = "Copyright 2017 Christian Stigen Larsen"
 __license__ = "GNU GPL v3 or later"
 __version__ = "1.0"
 
-texts = [
-    "I took a deep breath and listened to the old brag of my heart. I am, I am, I am.",
-    "The most beautiful things in the world cannot be seen or touched, they are felt with the heart.",
-    "Why, sometimes I've believed as many as six impossible things before breakfast.",
-    "We are all in the gutter, but some of us are looking at the stars.",
-    "Sometimes I can hear my bones straining under the weight of all the lives I'm not living.",
-    "But I tried, didn't I? Goddamnit, at least I did that.",
-]
-
+def load(filename):
+    """Loads texts from JSON file."""
+    with codecs.open(filename, encoding="utf-8") as f:
+        return json.load(f)
 
 class GameRound(object):
-    def __init__(self, text):
-        self.text = text
+    def __init__(self, quote):
+        self.quote = quote
+        self.text = self.quote["text"]
         self.start = None
         self.position = 0
         self.incorrect = 0
@@ -36,13 +34,17 @@ class GameRound(object):
 
         self.txt_stats = urwid.Text(self.get_stats(), align="left")
         self.txt_text = urwid.Text("")
+        self.txt_author = urwid.Text("", align="left")
         self.txt_edit = urwid.Text("")
+        self.edit_buffer = ""
         self.txt_status = urwid.Text("")
         self.filler = urwid.Filler(
             urwid.Pile([
                 self.txt_stats,
                 urwid.Divider(),
                 self.txt_text,
+                urwid.Divider(),
+                self.txt_author,
                 urwid.Divider(),
                 self.txt_edit,
                 urwid.Divider(),
@@ -58,12 +60,13 @@ class GameRound(object):
                 screen=urwid.raw_display.Screen(),
                 handle_mouse=False,
                 palette=[
-                    ("stats", "bold,yellow", "black", "default"),
+                    ("stats", "bold,light green", "black", "default"),
                     ("normal", "default", "black", "white"),
                     ("done", "bold", "default", "bold"),
                     ("wrong", "white,bold", "dark red", "bold,underline"),
-                    ("edit", "dark gray", "black", "white"),
+                    ("edit", "bold,dark gray", "black", "white"),
                     ("status", "white,bold", "dark gray", "default"),
+                    ("author", "dark gray", "black", "default")
                 ])
         def update():
             self.update_stats()
@@ -72,7 +75,7 @@ class GameRound(object):
                 loop.event_loop.alarm(0.01, update)
             else:
                 self.txt_status.set_text(("status",
-                    "Press any key to continue, ESC to stop ... "))
+                    "Press any key to continue. ... "))
         update()
         loop.run()
 
@@ -123,7 +126,10 @@ class GameRound(object):
             del content[1]
 
         self.txt_text.set_text(content)
-        self.filler.move_cursor_to_coords((10,10), 2, p)
+        self.txt_author.set_text(("author",
+            u"    — %s, %s" % (self.quote["author"],
+                self.quote["title"].encode("utf-8"))))
+        #self.filler.move_cursor_to_coords((10,10), 2, p)
 
     @property
     def finished(self):
@@ -139,7 +145,7 @@ class GameRound(object):
     @edit_buffer.setter
     def edit_buffer(self, value):
         self._edit = value
-        self.txt_edit.set_text(("edit", self._edit))
+        self.txt_edit.set_text(("edit", "> " + self._edit))
 
     def handle_key(self, key):
         if key == "esc" or self.finished:
@@ -168,6 +174,13 @@ class GameRound(object):
             self.total_incorrect += 1
 
 def main():
+    p = argparse.ArgumentParser(epilog=__copyright__)
+    p.add_argument("--load", default="examples.json",
+            help="JSON file containing texts to trai on.")
+    opts = p.parse_args()
+
+    texts = load(opts.load)
+
     game = GameRound(random.choice(texts))
     game.run()
 
