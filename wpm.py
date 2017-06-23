@@ -6,23 +6,14 @@ A typing game that measures WPM (words per minute).
 """
 
 import contextlib
-import curses
 import random
 import time
+import urwid
 
 __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright 2017 Christian Stigen Larsen"
 __license__ = "GNU GPL v3 or later"
-
-# TODO:
-# - Word-wrapping
-# - Use urwid for terminal handling instead of curses
-# - Add author/title to texts
-# - More texts. Read from somewhere? Fortune?
-# - Keep a running average of progression
-# - Handle CTRL+BACKSPACE, ALT+BACKSPACE that immediately sets incorrect=0
-# - Probably good idea to show what erronous keypressed were made.
-#   Fill up a buffer, whenever you hit space, this buffer is erased
+__version__ = "1.0"
 
 texts = [
     "I took a deep breath and listened to the old brag of my heart. I am, I am, I am.",
@@ -33,55 +24,57 @@ texts = [
     "But I tried, didn't I? Goddamnit, at least I did that.",
 ]
 
-def is_backspace(key):
-    return key == 127 or key == curses.KEY_BACKSPACE or key == curses.KEY_DC
-
-def is_escape(key):
-    # This really isn't a good way to catch the escape char, because it seems
-    # that if you press e.g. DELETE, it will send an escape sequence. Meaning
-    # that the application will exit.
-    return key == 27
-
-@contextlib.contextmanager
-def curses_screen():
-    screen = curses.initscr()
-
-    curses.noecho()
-    curses.cbreak()
-    screen.keypad(True)
-
-    try:
-        yield screen
-    finally:
-        curses.nocbreak()
-        screen.keypad(False)
-        curses.echo()
-        curses.endwin()
 
 class GameRound(object):
-    def __init__(self, window, text):
-        self.window = window
+    def __init__(self, text):
         self.text = text
         self.start = None
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
-        self.edit_buffer = ""
+        self._edit = ""
+
+        self.txt_stats = urwid.Text(self.get_stats(), align="left")
+        self.txt_text = urwid.Text("")
+        self.txt_edit = urwid.Text("")
+        self.txt_status = urwid.Text("")
+        self.filler = urwid.Filler(
+            urwid.Pile([
+                self.txt_stats,
+                urwid.Divider(),
+                self.txt_text,
+                urwid.Divider(),
+                self.txt_edit,
+                urwid.Divider(),
+                self.txt_status,
+            ]),
+            valign="top",
+            height="pack")
 
     def run(self):
-        while True:
-            self.show_stats()
-            self.show_edit_buffer()
-            self.show_text()
-            self.window.refresh()
-
-            if self.finished:
-                self.show_edit_buffer(clear=True)
-                break
-
-            key = self.get_key()
-            if key is not None:
-                self.handle_key(key)
+        loop = urwid.MainLoop(
+                self.filler,
+                unhandled_input=self.handle_key,
+                screen=urwid.raw_display.Screen(),
+                handle_mouse=False,
+                palette=[
+                    ("stats", "bold,yellow", "black", "default"),
+                    ("normal", "default", "black", "white"),
+                    ("done", "bold", "default", "bold"),
+                    ("wrong", "white,bold", "dark red", "bold,underline"),
+                    ("edit", "dark gray", "black", "white"),
+                    ("status", "white,bold", "dark gray", "default"),
+                ])
+        def update():
+            self.update_stats()
+            self.update_text()
+            if not self.finished:
+                loop.event_loop.alarm(0.01, update)
+            else:
+                self.txt_status.set_text(("status",
+                    "Press any key to continue, ESC to stop ... "))
+        update()
+        loop.run()
 
     @property
     def elapsed(self):
@@ -105,54 +98,54 @@ class GameRound(object):
         return float(self.position) / self.elapsed
 
     @property
-    def cursor(self):
-        """Cursor position within text."""
-        return self.position + self.incorrect
-
-    @property
     def accuracy(self):
         n = len(self.text)
         i = self.total_incorrect
         return float(n) / (n+i)
 
-    def show_stats(self):
-        self.window.addstr(0, 0, " "*(curses.COLS-1))
-        self.window.addstr(0, 0, "%5.1f WPM   %4.1f CPS   %.1fs   %.1f%% acc" % (self.wpm,
-            self.cps, self.elapsed, 100.0*self.accuracy))
+    def get_stats(self):
+        return "%3.0f wpm   %2.0f cps   %.1fs   %.1f%% acc" % (self.wpm,
+                self.cps, self.elapsed, 100.0*self.accuracy)
 
-    def show_text(self):
-        self.window.addstr(2, 0, self.text[:self.position], curses.A_BOLD)
-        self.window.addstr(2, self.position, self.text[self.position:])
+    def update_text(self):
+        p = self.position
+        i = self.incorrect
 
-        if self.incorrect > 0:
-            self.window.addstr(2, self.position,
-                    self.text[self.position:self.cursor], curses.color_pair(1))
+        content = [
+            ("done", self.text[:p]),
+            ("wrong", self.text[p:p+i]),
+            ("normal", self.text[p+i:])
+        ]
 
-        # Back to current position in text
-        self.window.move(2, self.cursor)
+        if i == 0:
+            # Bug in urwid set_text? Printing an emptry string seems to mess up
+            # everything (e.g. ("wrong", "") => rest of line won't print
+            del content[1]
 
-    def show_edit_buffer(self, clear=False):
-        self.window.addstr(4, 0, " "*(curses.COLS-1))
-        if not clear:
-            self.window.addstr(4, 0, self.edit_buffer)
-
-    def get_key(self):
-        try:
-            return self.window.getkey()
-        except KeyboardInterrupt:
-            raise
-        except:
-            return None
+        self.txt_text.set_text(content)
+        self.filler.move_cursor_to_coords((10,10), 2, p)
 
     @property
     def finished(self):
         return self.incorrect == 0 and (self.position == len(self.text))
 
-    def handle_key(self, key):
-        if is_escape(ord(key)):
-            raise KeyboardInterrupt()
+    def update_stats(self):
+        self.txt_stats.set_text(("stats", self.get_stats()))
 
-        if is_backspace(ord(key)):
+    @property
+    def edit_buffer(self):
+        return self._edit
+
+    @edit_buffer.setter
+    def edit_buffer(self, value):
+        self._edit = value
+        self.txt_edit.set_text(("edit", self._edit))
+
+    def handle_key(self, key):
+        if key == "esc" or self.finished:
+            raise urwid.ExitMainLoop()
+
+        if key == "backspace":
             if self.incorrect > 0:
                 self.incorrect -= 1
                 self.edit_buffer = self.edit_buffer[:-1]
@@ -163,7 +156,9 @@ class GameRound(object):
             self.start = time.time()
 
         # Correct key at correct location?
-        self.edit_buffer += key
+        if len(key) == 1:
+            self.edit_buffer += key
+
         if self.incorrect == 0 and key == self.text[self.position]:
             self.position += 1
             if key == " ":
@@ -173,27 +168,8 @@ class GameRound(object):
             self.total_incorrect += 1
 
 def main():
-    with curses_screen():
-        curses.start_color()
-        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
-
-        window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
-
-        while True:
-            window.clear()
-            window.timeout(20)
-
-            game = GameRound(window, random.choice(texts))
-            game.run()
-
-            window.addstr(4, 0, "Press any key to continue or ESC to quit")
-
-            window.timeout(-1)
-            if window.getch() == 27:
-                raise KeyboardInterrupt()
+    game = GameRound(random.choice(texts))
+    game.run()
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        pass
+    main()
