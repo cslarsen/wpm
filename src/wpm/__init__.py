@@ -5,12 +5,8 @@
 Measures your typing speed in words per minute (WPM).
 """
 
-import argparse
 import codecs
 import json
-import os
-import random
-import sys
 import time
 import urwid
 
@@ -62,7 +58,7 @@ class GameRound(object):
                 screen=urwid.raw_display.Screen(),
                 handle_mouse=False,
                 palette=[
-                    ("stats", "bold,light green", "default", "default"),
+                    ("stats", "bold,dark green", "default", "default"),
                     ("cursor", "bold", "dark green", "underline"),
                     ("normal", "default", "default", "white"),
                     ("done", "bold", "default", "bold"),
@@ -78,7 +74,7 @@ class GameRound(object):
                 loop.event_loop.alarm(0.01, update)
             else:
                 self.txt_status.set_text(("status",
-                    "Press any key to continue. ... "))
+                    "Press any key to continue ... "))
         update()
         try:
             loop.run()
@@ -138,8 +134,7 @@ class GameRound(object):
         self.txt_text.set_text(content)
         if len(self.quote["author"]) + len(self.quote["title"]) > 0:
             self.txt_author.set_text(("author",
-                u"    — %s, %s" % (self.quote["author"],
-                    self.quote["title"].encode("utf-8"))))
+                u"    — %s, %s" % (self.quote["author"], self.quote["title"])))
         else:
             self.txt_author.set_text("")
 
@@ -184,44 +179,3 @@ class GameRound(object):
         else:
             self.incorrect += 1
             self.total_incorrect += 1
-
-def read_texts():
-    p = argparse.ArgumentParser(epilog=__copyright__)
-    p.add_argument("--load-json", metavar="FILENAME", default=None,
-            help="JSON file containing texts to trai on.")
-    p.add_argument("--load", metavar="FILENAME", default=None,
-            help="A pure text file to train on.")
-    p.add_argument("-V", "--version", default=False, action="store_true",
-            help="Show program version")
-    opts = p.parse_args()
-
-    if opts.version:
-        print("WPM v%s" % __version__)
-        print(__copyright__)
-        print(__license__)
-        sys.exit(0)
-
-    texts = []
-
-    if opts.load_json is not None:
-        texts += load(opts.load_json)
-
-    if opts.load is not None:
-        with codecs.open(opts.load, encoding="utf-8") as f:
-            texts.append({"author": "", "title": "", "text": f.read()})
-
-    if len(texts) == 0:
-        texts = load(os.path.join(os.path.dirname(__file__), "examples.json"))
-
-    return texts
-
-def main():
-    texts = read_texts()
-    game = GameRound(random.choice(texts))
-    game.run()
-
-if __name__ == "__main__":
-    try:
-        main()
-    except urwid.main_loop.ExitMainLoop:
-        pass
