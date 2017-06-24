@@ -1,3 +1,2 @@
 include README.rst
 include LICENSE.txt
-include examples.json
