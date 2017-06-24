@@ -2,22 +2,27 @@ wpm — console app that measures your typing speed
 =================================================
 |versions| |license| |pypi|
 
-WPM is a terminal program that measures your typing speed in words per minute
-(WPM).
+WPM is a simple terminal program that measures your typing speed in words per
+minute (WPM).
 
-The WPM is calculated using the usual formula CPS/5, where CPS is characters
-per second, or the number of correct characters you've typed so far, divided by
-elapsed time.
-
-Compared to sites like typeracer.com, this WPM is a little bit higher, but is a
-very common way to gauge your typing speed.
+The WPM is calculated by taking characters per second (CPS) and dividing by
+five. That gives a slightly higher score than on sites than typeracer.com, but
+is good enough to gauge your typing speed.
 
 How to install
 ==============
 
-::
+The recommended way is to install via PyPi
+
+.. code:: bash
 
     $ pip install wpm
+
+But you can also do a local installation with
+
+.. code:: bash
+
+    $ python setup.py install [--user]
 
 How to run
 ==========
@@ -50,12 +55,10 @@ with the following format
         "author": "Author Name",
         "title": "Title of Work",
         "text": "The text to type here ..."
-      },
-
-      ...
+      }
     ]
 
-You load JSON files by doing
+You load your JSON files with
 
 .. code:: bash
 
