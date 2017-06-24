@@ -13,7 +13,7 @@ setup(
     include_package_data=True,
     install_requires=["urwid"],
     url="https://github.com/cslarsen/wpm",
-    download_url="https://github.com/cslarsen/wpm/tarball/1.0",
+    download_url="https://github.com/cslarsen/wpm/tarball/v1.0",
     license="https://www.gnu.org/licenses/agpl-3.0.html",
     long_description=open("README.rst").read(),
     zip_safe=True,
