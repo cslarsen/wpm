@@ -2,20 +2,68 @@
 
 {
   "author": "Harper Lee",
-  "title": "To Kill a Mockingbird",
-  "text": "Atticus said to Jem one day, \"I'd rather you shot at tin cans in the backyard, but I know you'll go after birds. Shoot all the blue jays you want, if you can hit 'em, but remember it's a sin to kill a mockingbird.\" That was the only time I ever heard Atticus say it was a sin to do something, and I asked Miss Maudie about it.\n\n\"Your father's right,\" she said. \"Mockingbirds don't do one thing except make music for us to enjoy. They don't eat up people's gardens, don't nest in corn cribs, they don't do one thing but sing their hearts out for us. That's why it's a sin to kill a mockingbird.\""
+  "title":  "To Kill a Mockingbird",
+  "text":   "Atticus said to Jem one day, \"I'd rather you shot at tin cans in the backyard, but I know you'll go after birds. Shoot all the blue jays you want, if you can hit 'em, but remember it's a sin to kill a mockingbird.\" That was the only time I ever heard Atticus say it was a sin to do something, and I asked Miss Maudie about it.\n\n\"Your father's right,\" she said. \"Mockingbirds don't do one thing except make music for us to enjoy. They don't eat up people's gardens, don't nest in corn cribs, they don't do one thing but sing their hearts out for us. That's why it's a sin to kill a mockingbird.\""
 },
 
 {
   "author": "Sylvia Plath",
-  "title": "The Bell Jar",
-  "text": "I took a deep breath and listened to the old brag of my heart. I am, I am, I am."
+  "title":  "The Bell Jar",
+  "text":   "I took a deep breath and listened to the old brag of my heart. I am, I am, I am."
 },
 
 {
   "author": "Antoine de Saint-Exupéry",
-  "title": "The Little Prince",
-  "text": "The most beautiful things in the world cannot be seen or touched, they are felt with the heart."
+  "title":  "The Little Prince",
+  "text":   "The most beautiful things in the world cannot be seen or touched, they are felt with the heart."
+},
+
+{
+  "author": "Marcel Proust",
+  "title":  "In Search of Lost Time",
+  "text":   "We believe that we can change the things around us in accordance with our desires - we believe it because otherwise we can see no favourable outcome.  \n We do not think of the outcome which generally comes to pass and is also favourable: we do not succeed in changing things in accordance with our desires, but gradually our desires change.  \n The situation that we hoped to change because it was intolerable becomes unimportant to us. We have failed to surmount the obstacle, as we were absolutely determined to do, but life has taken us round it, led us beyond it, and then if we turn round to gaze into the distance of the past, we can barely see it, so imperceptible has it become."
+},
+
+{
+  "author": "Kurt Vonnegut",
+  "title":  "God Bless You, Mr. Rosewater",
+  "text":   "Hello babies. Welcome to Earth. It's hot in the summer and cold in the winter.  It's round and wet and crowded. On the outside, babies, you've got a hundred years here. There's only one rule that I know of, babies - \"God damn it, you’ve got to be kind.\""
+},
+
+{
+  "author": "Oscar Wilde",
+  "title":  "Lady Windermere's fan",
+  "text":   "We are all in the gutter, but some of us are looking at the stars."
+},
+
+{
+  "author": "Frank Herbert",
+  "title":  "Dune",
+  "text":   "I must not fear. Fear is the mind-killer. Fear is the little-death that brings total obliteration. I will face my fear. I will permit it to pass over me and through me. And when it has gone past I will turn the inner eye to see its path. Where the fear has gone there will be nothing. Only I will remain."
+},
+
+{
+  "author": "Cormac McCarthy",
+  "title":  "The Road",
+  "text":   "Just remember that the things you put into your head are there forever, he said. You might want to think about that.  You forget some things, dont you?  Yes. You forget what you want to remember and you remember what you want to forget."
+},
+
+{
+  "author": "Jack Kerouac",
+  "title":  "On The Road",
+  "text":   "The only people for me are the mad ones, the ones who are mad to live, mad to talk, mad to be saved, desirous of everything at the same time, the ones who never yawn or say a commonplace thing, but burn, burn, burn like fabulous yellow roman candles exploding like spiders across the stars."
+},
+
+{
+  "author": "Gabriel Garcí­a Márquez",
+  "title": "Love in the Time of Cholera",
+  "text": "He allowed himself to be swayed by his conviction that human beings are not born once and for all on the day their mothers give birth to them, but that life obliges them over and over again to give birth to themselves."
+},
+
+{
+  "author": "Bret Easton Ellis",
+  "title": "American Psycho",
+  "text": "There is an idea of a Patrick Bateman, some kind of abstraction, but there is no real me, only an entity, something illusory, and though I can hide my cold gaze and you can shake my hand and feel flesh gripping yours and maybe you can even sense our lifestyles are probably comparable: I simply am not there."
 }
 
 ]
