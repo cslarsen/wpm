@@ -80,7 +80,10 @@ class GameRound(object):
                 self.txt_status.set_text(("status",
                     "Press any key to continue. ... "))
         update()
-        loop.run()
+        try:
+            loop.run()
+        except KeyboardInterrupt:
+            raise urwid.ExitMainLoop()
 
     @property
     def elapsed(self):
@@ -218,4 +221,7 @@ def main():
     game.run()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except urwid.main_loop.ExitMainLoop:
+        pass
