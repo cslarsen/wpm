@@ -10,7 +10,7 @@ check: test
 
 dist:
 	rm -rf dist/*
-	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist bdist_wheel
+	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
 
 publish: dist
 	find dist -type f -exec gpg2 --detach-sign -a {} \;
