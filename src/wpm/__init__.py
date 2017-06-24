@@ -23,7 +23,7 @@ def load(filename):
 class GameRound(object):
     def __init__(self, quote):
         self.quote = quote
-        self.text = self.quote["text"]
+        self.text = self.quote["text"].strip().replace("  ", " ")
         self.start = None
         self.position = 0
         self.incorrect = 0
