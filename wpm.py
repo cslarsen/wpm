@@ -62,14 +62,14 @@ class GameRound(object):
                 screen=urwid.raw_display.Screen(),
                 handle_mouse=False,
                 palette=[
-                    ("stats", "bold,light green", "black", "default"),
+                    ("stats", "bold,light green", "default", "default"),
                     ("cursor", "bold", "dark green", "underline"),
-                    ("normal", "default", "black", "white"),
+                    ("normal", "default", "default", "white"),
                     ("done", "bold", "default", "bold"),
                     ("wrong", "white,bold", "dark red", "bold,underline"),
-                    ("edit", "bold,dark gray", "black", "white"),
+                    ("edit", "bold,dark gray", "default", "white"),
                     ("status", "white,bold", "dark gray", "default"),
-                    ("author", "dark gray", "black", "default")
+                    ("author", "dark gray", "default", "default")
                 ])
         def update():
             self.update_stats()
