@@ -4,7 +4,7 @@ setup(
     name="wpm",
     scripts=["src/scripts/wpm"],
     version="1.3",
-    description="Program for measuring typing speed in words per minute (WPM)",
+    description="Console app for measuring typing speed in words per minute (WPM)",
     author="Christian Stigen Larsen",
     author_email="csl@csl.name",
     packages=["wpm"],
