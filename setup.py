@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="wpm",
     scripts=["src/scripts/wpm"],
-    version="1.3",
+    version="1.4",
     description="Console app for measuring typing speed in words per minute (WPM)",
     author="Christian Stigen Larsen",
     author_email="csl@csl.name",
@@ -13,7 +13,7 @@ setup(
     include_package_data=True,
     install_requires=["urwid"],
     url="https://github.com/cslarsen/wpm",
-    download_url="https://github.com/cslarsen/wpm/tarball/v1.3",
+    download_url="https://github.com/cslarsen/wpm/tarball/v1.4",
     license="https://www.gnu.org/licenses/agpl-3.0.html",
     long_description=open("README.rst").read(),
     zip_safe=True,
