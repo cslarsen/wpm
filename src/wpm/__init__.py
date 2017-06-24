@@ -13,7 +13,7 @@ import urwid
 __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright 2017 Christian Stigen Larsen"
 __license__ = "GNU GPL v3 or later"
-__version__ = "1.1"
+__version__ = "1.2"
 
 def load(filename):
     """Loads texts from JSON file."""
