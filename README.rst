@@ -33,6 +33,8 @@ Just type
 
     $ wpm
 
+To cancel typing, just hit the ESCAPE key.
+
 You can also train a single custom text. In that case, just do
 
 .. code:: bash
