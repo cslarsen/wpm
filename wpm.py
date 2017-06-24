@@ -8,7 +8,9 @@ Measures your typing speed in words per minute (WPM).
 import argparse
 import codecs
 import json
+import os
 import random
+import sys
 import time
 import urwid
 
@@ -131,10 +133,12 @@ class GameRound(object):
             del content[1]
 
         self.txt_text.set_text(content)
-        self.txt_author.set_text(("author",
-            u"    — %s, %s" % (self.quote["author"],
-                self.quote["title"].encode("utf-8"))))
-        #self.filler.move_cursor_to_coords((10,10), 2, p)
+        if len(self.quote["author"]) + len(self.quote["title"]) > 0:
+            self.txt_author.set_text(("author",
+                u"    — %s, %s" % (self.quote["author"],
+                    self.quote["title"].encode("utf-8"))))
+        else:
+            self.txt_author.set_text("")
 
     @property
     def finished(self):
@@ -178,14 +182,38 @@ class GameRound(object):
             self.incorrect += 1
             self.total_incorrect += 1
 
-def main():
+def read_texts():
     p = argparse.ArgumentParser(epilog=__copyright__)
-    p.add_argument("--load", metavar="FILENAME", default="examples.json",
+    p.add_argument("--load-json", metavar="FILENAME", default=None,
             help="JSON file containing texts to trai on.")
+    p.add_argument("--load", metavar="FILENAME", default=None,
+            help="A pure text file to train on.")
+    p.add_argument("-V", "--version", default=False, action="store_true",
+            help="Show program version")
     opts = p.parse_args()
 
-    texts = load(opts.load)
+    if opts.version:
+        print("WPM v%s" % __version__)
+        print(__copyright__)
+        print(__license__)
+        sys.exit(0)
 
+    texts = []
+
+    if opts.load_json is not None:
+        texts += load(opts.load_json)
+
+    if opts.load is not None:
+        with codecs.open(opts.load, encoding="utf-8") as f:
+            texts.append({"author": "", "title": "", "text": f.read()})
+
+    if len(texts) == 0:
+        texts = load(os.path.join(os.path.dirname(__file__), "examples.json"))
+
+    return texts
+
+def main():
+    texts = read_texts()
     game = GameRound(random.choice(texts))
     game.run()
 
