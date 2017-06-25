@@ -9,9 +9,10 @@ per minute (WPM).
   :width: 480
   :target: https://asciinema.org/a/hg2hYkW6pS39qp2fx7ekLLvr8?size=medium
 
-The WPM is calculated by dividing the final characters per second by five. This
-is a well-known formula, but gives slightly higher scores than on sites like
-typeracer.com.
+The WPM is calculated by dividing characters per second by five. This is a
+well-known formula, but gives slightly higher scores than on sites like
+typeracer.com. It is, however, good enough to gauge your typing speed. And it
+works offline, and with your own texts.
 
 How to install
 ==============
