@@ -109,7 +109,7 @@ class GameRound(object):
         return float(n) / (n+i)
 
     def get_stats(self):
-        return "%3.0f wpm   %2.0f cps   %.1fs   %.1f%% acc" % (self.wpm,
+        return "%3.0f wpm   %4.1f cps   %.1fs   %.1f%% acc" % (self.wpm,
                 self.cps, self.elapsed, 100.0*self.accuracy)
 
     def update_text(self):
