@@ -26,7 +26,7 @@ The format is
     if opts.version:
         print("WPM v%s" % wpm.__version__)
         print(wpm.__copyright__)
-        print(wpm.__license__)
+        print("Distributed under the %s" % wpm.__license__)
         sys.exit(0)
 
     return opts
