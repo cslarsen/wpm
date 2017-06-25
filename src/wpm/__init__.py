@@ -161,7 +161,9 @@ class GameRound(object):
         if key == "backspace":
             if self.incorrect > 0:
                 self.incorrect -= 1
-                self.edit_buffer = self.edit_buffer[:-1]
+            elif len(self.edit_buffer) > 0:
+                self.position -= 1
+            self.edit_buffer = self.edit_buffer[:-1]
             return
 
         # Start recording upon first ordinary key press
