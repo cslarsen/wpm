@@ -28,7 +28,8 @@ setup-pypi-publish:
 	$(PYTHON) setup.py sdist upload --sign -r pypi
 
 lint:
-	$(PYFLAKES) *.py
+	@$(PYFLAKES) `find . -name '*.py' -print`
+	@(json_pp < src/wpm/data/examples.json >/dev/null) || echo bad json && echo json ok
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;
