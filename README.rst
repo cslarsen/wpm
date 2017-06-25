@@ -6,7 +6,7 @@ wpm — console app that measures your typing speed
 per minute (WPM).
 
 .. image:: https://asciinema.org/a/hg2hYkW6pS39qp2fx7ekLLvr8.png
-  :width: 640
+  :width: 512
   :target: https://asciinema.org/a/hg2hYkW6pS39qp2fx7ekLLvr8
 
 The WPM is calculated by dividing the final characters per second by five. This
