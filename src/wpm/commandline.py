@@ -1,7 +1,6 @@
 import argparse
 import codecs
 import pkg_resources
-import random
 import sys
 import urwid
 import wpm
@@ -47,7 +46,7 @@ def main():
         texts = wpm.load(filename)
 
     try:
-        game = wpm.GameRound(random.choice(texts))
+        game = wpm.Game(texts)
         game.run()
     except urwid.main_loop.ExitMainLoop:
         pass

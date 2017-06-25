@@ -7,6 +7,7 @@ Measures your typing speed in words per minute (WPM).
 
 import codecs
 import json
+import random
 import time
 import urwid
 
@@ -20,9 +21,11 @@ def load(filename):
     with codecs.open(filename, encoding="utf-8") as f:
         return json.load(f)
 
-class GameRound(object):
-    def __init__(self, quote):
-        self.quote = quote
+class Game(object):
+    def __init__(self, texts):
+        self.texts = texts
+        self.ignore_next_key = False
+        self.quote = random.choice(self.texts)
         self.text = self.quote["text"].strip().replace("  ", " ")
         self.start = None
         self.position = 0
@@ -51,8 +54,17 @@ class GameRound(object):
             valign="top",
             height="pack")
 
+    def update(self):
+        self.update_stats()
+        self.update_text()
+        if not self.finished:
+            self.loop.event_loop.alarm(0.01, self.update)
+        else:
+            self.txt_status.set_text(("status",
+                "Press any key to continue, ESC to quit ..."))
+
     def run(self):
-        loop = urwid.MainLoop(
+        self.loop = urwid.MainLoop(
                 self.filler,
                 unhandled_input=self.handle_key,
                 screen=urwid.raw_display.Screen(),
@@ -67,17 +79,9 @@ class GameRound(object):
                     ("status", "white,bold", "dark gray", "default"),
                     ("author", "dark gray", "default", "default")
                 ])
-        def update():
-            self.update_stats()
-            self.update_text()
-            if not self.finished:
-                loop.event_loop.alarm(0.01, update)
-            else:
-                self.txt_status.set_text(("status",
-                    "Press any key to continue, ESC to quit ..."))
-        update()
         try:
-            loop.run()
+            self.update()
+            self.loop.run()
         except KeyboardInterrupt:
             raise urwid.ExitMainLoop()
 
@@ -154,9 +158,28 @@ class GameRound(object):
         self._edit = value
         self.txt_edit.set_text(("edit", "> " + self._edit))
 
+    def reset(self):
+        self.start = None
+        self.position = 0
+        self.incorrect = 0
+        self.total_incorrect = 0
+        self.edit_buffer = ""
+        self.txt_status.set_text("")
+        self.quote = random.choice(self.texts)
+        self.text = self.quote["text"].strip().replace("  ", " ")
+        self.ignore_next_key = True
+
     def handle_key(self, key):
-        if key == "esc" or self.finished:
+        if self.finished:
+            self.reset()
+            self.update()
+
+        if key == "esc":
             raise urwid.ExitMainLoop()
+
+        if self.ignore_next_key:
+            self.ignore_next_key = False
+            return
 
         if key == "backspace":
             if self.incorrect > 0:
