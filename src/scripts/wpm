@@ -17,7 +17,12 @@ def parse_args():
     p = argparse.ArgumentParser(epilog=wpm.__copyright__)
 
     p.add_argument("--load-json", metavar="FILENAME", default=None,
-            help="JSON file containing texts to trai on.")
+            help="""JSON file containing texts to train on.
+
+The format is
+
+[{"author": "...", "title": "...", "text": "..."}, ...]
+""")
     p.add_argument("--load", metavar="FILENAME", default=None,
             help="A pure text file to train on.")
     p.add_argument("-V", "--version", default=False, action="store_true",
