@@ -76,7 +76,7 @@ class Game(object):
                     ("done", "bold", "default", "bold"),
                     ("wrong", "white,bold", "dark red", "bold,underline"),
                     ("edit", "bold,dark gray", "default", "white"),
-                    ("status", "white,bold", "dark gray", "default"),
+                    ("status", "bold,default", "default", "default"),
                     ("author", "dark gray", "default", "default")
                 ])
         try:
