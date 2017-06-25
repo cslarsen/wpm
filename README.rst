@@ -2,12 +2,12 @@ wpm — console app that measures your typing speed
 =================================================
 |versions| |license| |pypi|
 
-WPM is a simple terminal program that measures your typing speed in words per
-minute (WPM).
+``wpm`` is a simple terminal program that measures your typing speed in words
+per minute (WPM).
 
-The WPM is calculated by taking characters per second (CPS) and dividing by
-five. That gives a slightly higher score than on sites than typeracer.com, but
-is good enough to gauge your typing speed.
+The WPM is calculated by dividing the final characters per second by five. This
+is a well-known formula, but gives slightly higher scores than on sites like
+typeracer.com.
 
 How to install
 ==============
@@ -18,31 +18,31 @@ The recommended way is to install via PyPi
 
     $ pip install wpm
 
-But you can also do a local installation with
+But you can also install from the source with
 
 .. code:: bash
 
     $ python setup.py install [--user]
 
+To just test the app without installing, type ``make run``.
+
 How to run
 ==========
 
-Just type
+Just type ``wpm`` to start training. The timer will start when you press the
+first key. At any time, you can hit ESCAPE to quit.
 
-.. code:: bash
+You can backspace for the current word you're editing, if you make a mistake.
+Mistakes will lower the accuracy score.
 
-    $ wpm
-
-To cancel typing, just hit the ESCAPE key.
-
-You can also train a single custom text. In that case, just do
+If you want to type a custom text, run
 
 .. code:: bash
 
     $ wpm --load yourfile.txt
 
-If you want to bundle up several texts into one file, just create a JSON file
-with the following format
+You can also bundle up several texts into a single JSON file, using ``wpm
+--load-json yourfile.json``. It must have the following format:
 
 .. code:: json
 
@@ -52,19 +52,8 @@ with the following format
         "title": "Title of Work",
         "text": "The text to type here ..."
       },
-
-      {
-        "author": "Author Name",
-        "title": "Title of Work",
-        "text": "The text to type here ..."
-      }
+      ...
     ]
-
-You load your JSON files with
-
-.. code:: bash
-
-    $ wpm --load-json yourfile.json
 
 License
 =======
