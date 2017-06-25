@@ -8,6 +8,9 @@ test:
 
 check: test
 
+run:
+	PYTHONPATH=src python src/scripts/wpm
+
 dist:
 	rm -rf dist/*
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
