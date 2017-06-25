@@ -15,6 +15,9 @@ dist:
 	rm -rf dist/*
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
 
+count:
+	@grep '"author"' src/wpm/data/examples.json | wc -l
+
 publish: dist
 	find dist -type f -exec gpg2 --detach-sign -a {} \;
 	twine upload dist/*
