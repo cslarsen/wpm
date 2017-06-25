@@ -193,6 +193,7 @@ class Game(object):
         # Start recording upon first ordinary key press
         if self.start is None:
             self.start = time.time()
+            self.txt_status.set_text("")
 
         # Correct key at correct location?
         if len(key) == 1:
