@@ -38,7 +38,8 @@ class Game(object):
         self.txt_author = urwid.Text("", align="left")
         self.txt_edit = urwid.Text("")
         self.edit_buffer = ""
-        self.txt_status = urwid.Text("")
+        self.txt_status = urwid.Text(("status",
+            "Start typing or hit SPACE for another text or hit ESC to quit"))
         self.filler = urwid.Filler(
             urwid.Pile([
                 self.txt_stats,
@@ -61,7 +62,7 @@ class Game(object):
             self.loop.event_loop.alarm(0.01, self.update)
         else:
             self.txt_status.set_text(("status",
-                "Press any key to continue, ESC to quit ..."))
+                "Press any key to continue, ESC to quit"))
 
     def run(self):
         self.loop = urwid.MainLoop(
@@ -73,7 +74,7 @@ class Game(object):
                     ("stats", "bold,dark green", "default", "default"),
                     ("cursor", "bold", "dark green", "underline"),
                     ("normal", "default", "default", "white"),
-                    ("done", "bold", "default", "bold"),
+                    ("done", "dark gray", "default", "bold"),
                     ("wrong", "white,bold", "dark red", "bold,underline"),
                     ("edit", "bold,dark gray", "default", "white"),
                     ("status", "bold,default", "default", "default"),
@@ -170,7 +171,7 @@ class Game(object):
         self.ignore_next_key = True
 
     def handle_key(self, key):
-        if self.finished:
+        if self.finished or (self.start is None and key == " "):
             self.reset()
             self.update()
 
