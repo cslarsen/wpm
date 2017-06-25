@@ -1,9 +1,19 @@
 from setuptools import setup
+import os
+import runpy
+
+def get_version():
+    filename = os.path.join(os.path.dirname(__file__), "src", "wpm",
+            "__init__.py")
+    var = runpy.run_path(filename)
+    return var["__version__"]
+
+_VERSION = get_version()
 
 setup(
     name="wpm",
     scripts=["src/scripts/wpm"],
-    version="1.9",
+    version=_VERSION,
     description="Console app for measuring typing speed in words per minute (WPM)",
     author="Christian Stigen Larsen",
     author_email="csl@csl.name",
@@ -13,8 +23,8 @@ setup(
     include_package_data=True,
     install_requires=["urwid"],
     url="https://github.com/cslarsen/wpm",
-    download_url="https://github.com/cslarsen/wpm/tarball/v1.9",
-    license="https://www.gnu.org/licenses/agpl-3.0.html",
+    download_url="https://github.com/cslarsen/wpm/tarball/v%s" % _VERSION,
+    license="https://www.gnu.org/licenses/gpl-3.0.html",
     long_description=open("README.rst").read(),
     zip_safe=True,
     keywords=["wpm", "typing", "typist"],
