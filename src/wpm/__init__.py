@@ -74,7 +74,7 @@ class GameRound(object):
                 loop.event_loop.alarm(0.01, update)
             else:
                 self.txt_status.set_text(("status",
-                    "Press any key to continue ... "))
+                    "Press any key to continue ..."))
         update()
         try:
             loop.run()
