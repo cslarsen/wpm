@@ -7,7 +7,7 @@ per minute (WPM).
 
 .. image:: https://asciinema.org/a/hg2hYkW6pS39qp2fx7ekLLvr8.png
   :width: 512
-  :target: https://asciinema.org/a/hg2hYkW6pS39qp2fx7ekLLvr8
+  :target: https://asciinema.org/a/hg2hYkW6pS39qp2fx7ekLLvr8?size=medium
 
 The WPM is calculated by dividing the final characters per second by five. This
 is a well-known formula, but gives slightly higher scores than on sites like
