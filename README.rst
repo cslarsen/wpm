@@ -29,11 +29,14 @@ To just test the app without installing, type ``make run``.
 How to run
 ==========
 
-Just type ``wpm`` to start training. The timer will start when you press the
+Just type ``wpm`` to start the program. The timer will start when you press the
 first key. At any time, you can hit ESCAPE to quit.
 
 You can backspace for the current word you're editing, if you make a mistake.
 Mistakes will lower the accuracy score.
+
+If you have problems finding the ``wpm`` file, you can also start it by typing
+``python -m wpm``. You can also see options with ``python -m wpm --help``.
 
 If you want to type a custom text, run
 
