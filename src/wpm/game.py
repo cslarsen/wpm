@@ -114,7 +114,11 @@ class Game(object):
         """Characters per second."""
         if self.start is None:
             return 0
-        return float(self.position) / self.elapsed
+        value = float(self.position) / self.elapsed
+        if value > 99:
+            # As for WPM, clamp at 99
+            value = 99
+        return value
 
     @property
     def accuracy(self):
