@@ -7,7 +7,7 @@ per minute (WPM).
 
 .. image:: https://asciinema.org/a/0ba3YAd1CKQhlGNe2ORAFx1mV.png
   :width: 480
-  :target: https://asciinema.org/a/0ba3YAd1CKQhlGNe2ORAFx1mV
+  :target: https://asciinema.org/a/0ba3YAd1CKQhlGNe2ORAFx1mV?size=medium&autoplay=true
 
 The WPM is calculated by dividing characters per second by five and then
 multiplying that with 60. This is a well-known formula, but gives slightly
