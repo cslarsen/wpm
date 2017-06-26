@@ -7,6 +7,7 @@ per minute (WPM).
 
 .. image:: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv.png
   :width: 480 px
+  :height: 230 px
   :alt: Screen recording of WPM in action
   :target: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv?autoplay=true
 
