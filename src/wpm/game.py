@@ -63,7 +63,7 @@ class Game(object):
                 self.scores.append(self.wpm)
                 self.average = sum(self.scores)/float(len(self.scores))
             self.txt_status.set_text(("status",
-                "Press any key to continue, ESC to quit"))
+                "Press any key to continue, SPACE for another text, ESC to quit"))
         self.update_stats()
         self.update_text()
         if not self.finished:
