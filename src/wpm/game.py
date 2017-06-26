@@ -59,8 +59,9 @@ class Game(object):
 
     def update(self):
         if self.finished:
-            self.scores.append(self.wpm)
-            self.average = sum(self.scores)/float(len(self.scores))
+            if self.start is not None:
+                self.scores.append(self.wpm)
+                self.average = sum(self.scores)/float(len(self.scores))
             self.txt_status.set_text(("status",
                 "Press any key to continue, ESC to quit"))
         self.update_stats()
