@@ -5,7 +5,7 @@ wpm — console app that measures your typing speed
 ``wpm`` is a simple terminal program that measures your typing speed in words
 per minute (WPM).
 
-.. image:: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv
+.. image:: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv.png
   :width: 480
   :target: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv?size=medium&autoplay=true
 
