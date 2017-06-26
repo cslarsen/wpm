@@ -27,6 +27,8 @@ class Game(object):
         self.incorrect = 0
         self.total_incorrect = 0
         self._edit = ""
+        self.scores = []
+        self.average = 0
 
         self.txt_stats = urwid.Text(self.get_stats(), align="left")
         self.txt_text = urwid.Text("")
@@ -56,13 +58,15 @@ class Game(object):
         self.tab_spaces = spaces
 
     def update(self):
+        if self.finished:
+            self.scores.append(self.wpm)
+            self.average = sum(self.scores)/float(len(self.scores))
+            self.txt_status.set_text(("status",
+                "Press any key to continue, ESC to quit"))
         self.update_stats()
         self.update_text()
         if not self.finished:
             self.loop.event_loop.alarm(0.01, self.update)
-        else:
-            self.txt_status.set_text(("status",
-                "Press any key to continue, ESC to quit"))
 
     def run(self):
         self.loop = urwid.MainLoop(
@@ -116,8 +120,8 @@ class Game(object):
         return float(n) / (n+i)
 
     def get_stats(self):
-        return "%3.0f wpm   %4.1f cps   %.1fs   %.1f%% acc" % (self.wpm,
-                self.cps, self.elapsed, 100.0*self.accuracy)
+        return "%3.0f wpm   %4.1f cps   %.1fs   %.1f%% acc   %3.0f avg wpm" % (self.wpm,
+                self.cps, self.elapsed, 100.0*self.accuracy, self.average)
 
     def update_text(self):
         p = self.position
