@@ -93,7 +93,7 @@ class Game(object):
 
     @property
     def elapsed(self):
-        """Elapsed round time."""
+        """Elapsed game round time."""
         if self.start is None:
             return 0
         return time.time() - self.start
@@ -129,7 +129,7 @@ class Game(object):
         return float(n) / (n+i)
 
     def get_stats(self):
-        return "%3.0f wpm   %4.1f cps   %.1fs   %.1f%% acc   %3.0f avg wpm" % (self.wpm,
+        return "%3.0f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %3.0f avg wpm" % (self.wpm,
                 self.cps, self.elapsed, 100.0*self.accuracy, self.average)
 
     def update_text(self):
