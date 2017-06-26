@@ -199,9 +199,12 @@ class Game(object):
         if len(key) == 1:
             self.edit_buffer += key
 
+        if key == "enter":
+            key = "\n"
+
         if self.incorrect == 0 and key == self.text[self.position]:
             self.position += 1
-            if key == " ":
+            if key == " " or key == "\n":
                 self.edit_buffer = ""
         else:
             self.incorrect += 1
