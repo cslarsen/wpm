@@ -114,6 +114,8 @@ class Game(object):
 
     @property
     def accuracy(self):
+        if self.start is None:
+            return 0
         n = len(self.text)
         i = self.total_incorrect
         return float(n) / (n+i)
@@ -181,6 +183,13 @@ class Game(object):
             self.update()
 
         if key == "esc":
+            if self.start is not None:
+                # Escape during typing gets you back to the "menu"
+                self.incorrect = 0
+                self.position = len(self.text)
+                self.start = None
+                self.update()
+                return
             raise urwid.ExitMainLoop()
 
         if self.ignore_next_key:
