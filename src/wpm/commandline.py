@@ -39,7 +39,8 @@ def main():
 
     if opts.load is not None:
         with codecs.open(opts.load, encoding="utf-8") as f:
-            texts.append({"author": "", "title": "", "text": f.read()})
+            text = f.read().replace("\r", "").rstrip()
+        texts.append({"author": "", "title": "", "text": text})
 
     if len(texts) == 0:
         filename = pkg_resources.resource_filename("wpm", "data/examples.json")
