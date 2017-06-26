@@ -4,6 +4,7 @@ import pkg_resources
 import sys
 import urwid
 import wpm
+import wpm.game
 
 def parse_args():
     p = argparse.ArgumentParser(prog="wpm", epilog=wpm.__copyright__)
@@ -39,7 +40,7 @@ def main():
     texts = []
 
     if opts.load_json is not None:
-        texts += wpm.load(opts.load_json)
+        texts += wpm.game.load(opts.load_json)
 
     if opts.load is not None:
         with codecs.open(opts.load, encoding="utf-8") as f:
@@ -48,10 +49,10 @@ def main():
 
     if len(texts) == 0:
         filename = pkg_resources.resource_filename("wpm", "data/examples.json")
-        texts = wpm.load(filename)
+        texts = wpm.game.load(filename)
 
     try:
-        game = wpm.Game(texts)
+        game = wpm.game.Game(texts)
         game.set_tab_spaces(opts.tab)
         game.run()
     except urwid.main_loop.ExitMainLoop:
