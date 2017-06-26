@@ -11,6 +11,9 @@ check: test
 run:
 	PYTHONPATH=src python src/scripts/wpm
 
+run3:
+	PYTHONPATH=src python3 src/scripts/wpm
+
 dist:
 	rm -rf dist/*
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
