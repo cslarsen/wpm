@@ -103,7 +103,11 @@ class Game(object):
         """Words per minute."""
         if self.start is None:
             return 0
-        return (60.0 * self.position / 5.0) / self.elapsed
+        value = (60.0 * self.position / 5.0) / self.elapsed
+        if value > 1000:
+            # Happens at start of match. Keep it to three digits.
+            value = 999
+        return value
 
     @property
     def cps(self):
