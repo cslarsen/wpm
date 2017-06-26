@@ -17,8 +17,12 @@ The format is
 """)
     p.add_argument("--load", metavar="FILENAME", default=None,
             help="A pure text file to train on.")
+
     p.add_argument("-V", "--version", default=False, action="store_true",
             help="Show program version")
+
+    p.add_argument("--tab", default=None, type=int,
+            help="If set, expand tabs to this number of spaces")
 
     opts = p.parse_args()
 
@@ -48,6 +52,7 @@ def main():
 
     try:
         game = wpm.Game(texts)
+        game.set_tab_spaces(opts.tab)
         game.run()
     except urwid.main_loop.ExitMainLoop:
         pass

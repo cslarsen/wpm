@@ -55,6 +55,11 @@ class Game(object):
             valign="top",
             height="pack")
 
+        self.tab_spaces = None
+
+    def set_tab_spaces(self, spaces):
+        self.tab_spaces = spaces
+
     def update(self):
         self.update_stats()
         self.update_text()
@@ -201,10 +206,15 @@ class Game(object):
 
         if key == "enter":
             key = "\n"
+        elif key == "tab" and self.tab_spaces is not None:
+            key = " "*self.tab_spaces
+        elif len(key) > 1:
+            return
 
-        if self.incorrect == 0 and key == self.text[self.position]:
-            self.position += 1
-            if key == " " or key == "\n":
+        if (self.incorrect == 0 and
+                self.text[self.position:self.position+len(key)] == key):
+            self.position += len(key)
+            if key.startswith(" ") or key == "\n":
                 self.edit_buffer = ""
         else:
             self.incorrect += 1
