@@ -3,7 +3,7 @@ import os
 import runpy
 
 def get_version():
-    filename = os.path.join(os.path.dirname(__file__), "src", "wpm",
+    filename = os.path.join(os.path.dirname(__file__), "wpm",
             "__init__.py")
     var = runpy.run_path(filename)
     return var["__version__"]
@@ -12,13 +12,13 @@ _VERSION = get_version()
 
 setup(
     name="wpm",
-    scripts=["src/scripts/wpm"],
+    scripts=["scripts/wpm"],
     version=_VERSION,
     description="Console app for measuring typing speed in words per minute (WPM)",
     author="Christian Stigen Larsen",
     author_email="csl@csl.name",
     packages=["wpm"],
-    package_dir={"wpm": "src/wpm"},
+    package_dir={"wpm": "wpm"},
     package_data={"wpm": ["data/examples.json"]},
     include_package_data=True,
     install_requires=["urwid"],

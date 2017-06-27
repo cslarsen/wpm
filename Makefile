@@ -9,17 +9,17 @@ test:
 check: test
 
 run:
-	PYTHONPATH=src python src/scripts/wpm
+	PYTHONPATH=wpm python scripts/wpm
 
 run3:
-	PYTHONPATH=src python3 src/scripts/wpm
+	PYTHONPATH=wpm python3 scripts/wpm
 
 dist:
 	rm -rf dist/*
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
 
 count:
-	@grep '"author"' src/wpm/data/examples.json | wc -l
+	@grep '"author"' wpm/data/examples.json | wc -l
 
 publish: dist
 	find dist -type f -exec gpg2 --detach-sign -a {} \;
@@ -35,7 +35,7 @@ setup-pypi-publish:
 
 lint:
 	@$(PYFLAKES) `find . -name '*.py' -print`
-	@(json_pp < src/wpm/data/examples.json >/dev/null) || echo bad json && echo json ok
+	@(json_pp < wpm/data/examples.json >/dev/null) || echo bad json && echo json ok
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;
