@@ -63,7 +63,7 @@ class Game(object):
                 self.scores.append(self.wpm)
                 self.average = sum(self.scores)/float(len(self.scores))
             self.txt_status.set_text(("status",
-                "Press any key to continue, SPACE for another text, ESC to quit"))
+                "Press any key to continue, CTRL+R to redo, SPACE for another text, ESC to quit"))
         self.update_stats()
         self.update_text()
         if not self.finished:
@@ -174,18 +174,25 @@ class Game(object):
         self._edit = value
         self.txt_edit.set_text(("edit", "> " + self._edit))
 
-    def reset(self):
+    def reset(self, new_quote=True):
         self.start = None
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
         self.edit_buffer = ""
         self.txt_status.set_text("")
-        self.quote = random.choice(self.texts)
-        self.text = self.quote["text"].strip().replace("  ", " ")
+        if new_quote:
+            self.quote = random.choice(self.texts)
+            self.text = self.quote["text"].strip().replace("  ", " ")
         self.ignore_next_key = True
 
     def handle_key(self, key):
+        if (self.finished or self.start is None) and key == "ctrl r":
+            self.reset(new_quote=False)
+            self.update()
+            self.ignore_next_key = False
+            return
+
         if self.finished or (self.start is None and key == " "):
             self.reset()
             self.update()

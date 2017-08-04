@@ -9,10 +9,10 @@ test:
 check: test
 
 run:
-	PYTHONPATH=wpm python scripts/wpm
+	PYTHONPATH=. python wpm
 
 run3:
-	PYTHONPATH=wpm python3 scripts/wpm
+	PYTHONPATH=. python3 wpm
 
 dist:
 	rm -rf dist/*
