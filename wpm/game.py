@@ -17,7 +17,8 @@ def load(filename):
         return json.load(f)
 
 class Game(object):
-    def __init__(self, texts):
+    def __init__(self, texts, stats):
+        self.stats = stats
         self.texts = texts
         self.ignore_next_key = False
         self.quote = random.choice(self.texts)
@@ -60,6 +61,7 @@ class Game(object):
     def update(self):
         if self.finished:
             if self.start is not None:
+                self.stats.add(self.wpm, self.accuracy)
                 self.scores.append(self.wpm)
                 self.average = sum(self.scores)/float(len(self.scores))
             self.txt_status.set_text(("status",
@@ -89,7 +91,8 @@ class Game(object):
             self.update()
             self.loop.run()
         except KeyboardInterrupt:
-            raise urwid.ExitMainLoop()
+            pass
+        raise urwid.ExitMainLoop()
 
     @property
     def elapsed(self):
