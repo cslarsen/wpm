@@ -7,6 +7,7 @@ import urwid
 import wpm
 import wpm.game
 import wpm.stats
+import wpm.addExamples
 
 def parse_args():
     p = argparse.ArgumentParser(prog="wpm", epilog=wpm.__copyright__)
@@ -61,6 +62,10 @@ def main():
 
     opts = parse_args()
     texts = []
+
+    if opts.addtext is True:
+        wpm.addExamples.main()
+        sys.exit(0)
 
     stats_file = os.path.expanduser("~/.wpm")
 
