@@ -30,7 +30,7 @@ class Game(object):
         self._edit = ""
         self.average = self.stats.average(self.stats.keyboard)
 
-        self.txt_stats = urwid.Text(self.get_stats(), align="left")
+        self.txt_stats = urwid.Text(self.get_stats(0), align="left")
         self.txt_text = urwid.Text("")
         self.txt_author = urwid.Text("", align="left")
         self.txt_edit = urwid.Text("")
@@ -59,13 +59,17 @@ class Game(object):
 
     def mark_finished(self):
         if self.finished and self.start is not None:
-            self.stats.add(self.wpm, self.accuracy)
+            elapsed = self.elapsed
+            self.stats.add(self.wpm(elapsed), self.accuracy)
             self.average = self.stats.average()
+            self.loop.event_loop.alarm(0.01, lambda: self.update(elapsed))
         self.txt_status.set_text(("status",
             "Press any key to continue, CTRL+R to redo, SPACE for another text, ESC to quit"))
 
-    def update(self):
-        self.update_stats()
+    def update(self, elapsed=None):
+        if elapsed is None:
+            elapsed = self.elapsed
+        self.txt_stats.set_text(("stats", self.get_stats(elapsed)))
         self.update_text()
         if not self.finished:
             self.loop.event_loop.alarm(0.01, self.update)
@@ -100,23 +104,21 @@ class Game(object):
             return 0
         return time.time() - self.start
 
-    @property
-    def wpm(self):
+    def wpm(self, elapsed):
         """Words per minute."""
         if self.start is None:
             return 0
-        value = (60.0 * self.position / 5.0) / self.elapsed
+        value = (60.0 * self.position / 5.0) / elapsed
         if value > 1000:
             # Happens at start of match. Keep it to three digits.
             value = 999
         return value
 
-    @property
-    def cps(self):
+    def cps(self, elapsed):
         """Characters per second."""
         if self.start is None:
             return 0
-        value = float(self.position) / self.elapsed
+        value = float(self.position) / elapsed
         if value > 99:
             # As for WPM, clamp at 99
             value = 99
@@ -130,10 +132,10 @@ class Game(object):
         i = self.total_incorrect
         return float(n) / (n+i)
 
-    def get_stats(self):
+    def get_stats(self, elapsed):
         return "%5.1f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %5.1f avg wpm" % (
-                self.wpm, self.cps, self.elapsed, 100.0*self.accuracy,
-                self.average)
+                self.wpm(elapsed), self.cps(elapsed), elapsed,
+                100.0*self.accuracy, self.average)
 
     def update_text(self):
         p = self.position
@@ -164,9 +166,6 @@ class Game(object):
     @property
     def finished(self):
         return self.incorrect == 0 and (self.position == len(self.text))
-
-    def update_stats(self):
-        self.txt_stats.set_text(("stats", self.get_stats()))
 
     @property
     def edit_buffer(self):
