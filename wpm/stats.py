@@ -1,4 +1,3 @@
-import collections
 import datetime
 import pickle
 
@@ -6,10 +5,13 @@ class Stats(object):
     """Typing statistics"""
 
     def __init__(self, current_keyboard=None):
-        self.games = collections.defaultdict(list)
         self.keyboard = current_keyboard
+        self.games = {}
 
     def add(self, wpm, accuracy):
+        if self.keyboard not in self.games:
+            self.games[self.keyboard] = []
+
         self.games[self.keyboard].append((
             datetime.datetime.now(),
             wpm,
@@ -35,9 +37,9 @@ class Stats(object):
 
     @staticmethod
     def load(filename):
-        with open(filename, "rt") as f:
+        with open(filename, "rb") as f:
             return pickle.load(f)
 
     def save(self, filename):
-        with open(filename, "wt") as f:
-            pickle.dump(self, f)
+        with open(filename, "wb") as f:
+            pickle.dump(self, f, protocol=0)

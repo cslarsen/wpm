@@ -28,8 +28,7 @@ class Game(object):
         self.incorrect = 0
         self.total_incorrect = 0
         self._edit = ""
-        self.scores = []
-        self.average = 0
+        self.average = self.stats.average(self.stats.keyboard)
 
         self.txt_stats = urwid.Text(self.get_stats(), align="left")
         self.txt_text = urwid.Text("")
@@ -58,14 +57,14 @@ class Game(object):
     def set_tab_spaces(self, spaces):
         self.tab_spaces = spaces
 
+    def mark_finished(self):
+        if self.finished and self.start is not None:
+            self.stats.add(self.wpm, self.accuracy)
+            self.average = self.stats.average()
+        self.txt_status.set_text(("status",
+            "Press any key to continue, CTRL+R to redo, SPACE for another text, ESC to quit"))
+
     def update(self):
-        if self.finished:
-            if self.start is not None:
-                self.stats.add(self.wpm, self.accuracy)
-                self.scores.append(self.wpm)
-                self.average = sum(self.scores)/float(len(self.scores))
-            self.txt_status.set_text(("status",
-                "Press any key to continue, CTRL+R to redo, SPACE for another text, ESC to quit"))
         self.update_stats()
         self.update_text()
         if not self.finished:
@@ -132,8 +131,9 @@ class Game(object):
         return float(n) / (n+i)
 
     def get_stats(self):
-        return "%3.0f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %3.0f avg wpm" % (self.wpm,
-                self.cps, self.elapsed, 100.0*self.accuracy, self.average)
+        return "%5.1f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %5.1f avg wpm" % (
+                self.wpm, self.cps, self.elapsed, 100.0*self.accuracy,
+                self.average)
 
     def update_text(self):
         p = self.position
@@ -203,6 +203,7 @@ class Game(object):
         if key == "esc":
             if self.start is not None:
                 # Escape during typing gets you back to the "menu"
+                self.mark_finished()
                 self.incorrect = 0
                 self.position = len(self.text)
                 self.start = None
@@ -243,6 +244,8 @@ class Game(object):
             self.position += len(key)
             if key.startswith(" ") or key == "\n":
                 self.edit_buffer = ""
+            if self.finished:
+                self.mark_finished()
         else:
             self.incorrect += 1
             self.total_incorrect += 1

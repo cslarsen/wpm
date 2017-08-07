@@ -1,4 +1,5 @@
 PYTHON := python
+PYTHON3 := python3.3
 PYFLAKES := pyflakes
 
 default: test
@@ -9,10 +10,13 @@ test:
 check: test
 
 run:
-	PYTHONPATH=. python wpm
+	PYTHONPATH=. $(PYTHON) wpm
 
 run3:
-	PYTHONPATH=. python3 wpm
+	PYTHONPATH=. $(PYTHON3) wpm
+
+stats:
+	PYTHONPATH=. $(PYTHON) wpm --stats
 
 dist:
 	rm -rf dist/*

@@ -28,10 +28,13 @@ The format is
             help="If set, expand tabs to this number of spaces")
 
     p.add_argument("--keyboard", default=None, type=str,
-            help="If set, saves statistics for current keyboard")
+            help="Sets current keyboard for statistic")
 
     p.add_argument("--stats", default=False, action="store_true",
             help="Shows keyboard statistics")
+
+    p.add_argument("--stats-file", default="~/.wpm", type=str,
+            help="File to save statistics to")
 
     opts = p.parse_args()
 
@@ -41,6 +44,7 @@ The format is
         print("Distributed under the %s" % wpm.__license__)
         sys.exit(0)
 
+    opts.stats_file = os.path.expanduser(opts.stats_file)
     return opts
 
 def averages(games):
@@ -57,21 +61,19 @@ def averages(games):
     return average_wpm, average_acc
 
 def main():
-    import wpm.stats
-
     opts = parse_args()
     texts = []
 
-    stats_file = os.path.expanduser("~/.wpm")
-
-    if not os.path.exists(stats_file):
+    if not os.path.isfile(opts.stats_file):
         stats = wpm.stats.Stats(opts.keyboard)
     else:
-        stats = wpm.stats.Stats.load(stats_file)
+        stats = wpm.stats.Stats.load(opts.stats_file)
+        stats.keyboard = opts.keyboard
 
     if opts.stats:
         for keyboard in sorted(stats.games.keys()):
-            print("Keyboard: %s" % keyboard)
+            print("Keyboard: %s" % (keyboard if keyboard is not None else
+                "Unspecified"))
 
             games = stats.games[keyboard]
             awpm, aacc = averages(games)
@@ -98,9 +100,9 @@ def main():
         texts = wpm.game.load(filename)
 
     try:
-        stats = wpm.stats.Stats(opts.keyboard)
         game = wpm.game.Game(texts, stats)
         game.set_tab_spaces(opts.tab)
         game.run()
     except urwid.main_loop.ExitMainLoop:
-        stats.save(stats_file)
+        pass
+    game.stats.save(opts.stats_file)
