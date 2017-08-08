@@ -71,6 +71,7 @@ def main():
         stats.keyboard = opts.keyboard
 
     if opts.stats:
+        print("Total average: %5.1f" % stats.average())
         for keyboard in sorted(stats.games.keys()):
             print("Keyboard: %s" % (keyboard if keyboard is not None else
                 "Unspecified"))

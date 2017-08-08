@@ -28,7 +28,7 @@ class Game(object):
         self.incorrect = 0
         self.total_incorrect = 0
         self._edit = ""
-        self.average = self.stats.average(self.stats.keyboard)
+        self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
         self.txt_stats = urwid.Text(self.get_stats(0), align="left")
         self.txt_text = urwid.Text("")
@@ -61,7 +61,7 @@ class Game(object):
         if self.finished and self.start is not None:
             elapsed = self.elapsed
             self.stats.add(self.wpm(elapsed), self.accuracy)
-            self.average = self.stats.average()
+            self.average = self.stats.average(self.stats.keyboard, last_n=10)
             self.loop.event_loop.alarm(0.01, lambda: self.update(elapsed))
         self.txt_status.set_text(("status",
             "Press any key to continue, CTRL+R to redo, SPACE for another text, ESC to quit"))
@@ -133,9 +133,10 @@ class Game(object):
         return float(n) / (n+i)
 
     def get_stats(self, elapsed):
-        return "%5.1f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %5.1f avg wpm" % (
+        return "%5.1f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
                 self.wpm(elapsed), self.cps(elapsed), elapsed,
-                100.0*self.accuracy, self.average)
+                100.0*self.accuracy, self.average, "Unspecified" if self.stats.keyboard is
+                None else self.stats.keyboard)
 
     def update_text(self):
         p = self.position
