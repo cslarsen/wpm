@@ -27,7 +27,7 @@ class Stats(object):
             for stamp, wpm, acc in self.games[kbd]:
                 total.append(wpm)
 
-        if last_n is not None:
+        if (last_n is not None) and len(total) >= last_n:
             total = total[-last_n:]
 
         if len(total) > 0:
