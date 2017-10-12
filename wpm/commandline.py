@@ -68,7 +68,8 @@ def main():
         stats = wpm.stats.Stats(opts.keyboard)
     else:
         stats = wpm.stats.Stats.load(opts.stats_file)
-        stats.keyboard = opts.keyboard
+        if opts.keyboard is not None:
+            stats.keyboard = opts.keyboard
 
     if opts.stats:
         print("Total average: %5.1f" % stats.average())
@@ -86,6 +87,9 @@ def main():
                 awpm, aacc = averages(games[-last_n:])
                 print("  last %4d games: %5.1f average wpm, %4.1f%% average accuracy" % (
                     last_n, awpm, 100.0*aacc))
+
+        if stats.keyboard is not None:
+            print("Current keyboard: %s" % stats.keyboard)
         return
 
     if opts.load_json is not None:
