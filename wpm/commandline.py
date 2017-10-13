@@ -116,7 +116,7 @@ def main():
 
     try:
         game = wpm.game.Game(texts, stats)
-        game.set_tab_spaces(opts.tab)
+        game.set_tab_spaces(opts.tabs)
         game.run()
     except urwid.main_loop.ExitMainLoop:
         pass
