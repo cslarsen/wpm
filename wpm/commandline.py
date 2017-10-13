@@ -34,13 +34,13 @@ The format is
     p.add_argument("-V", "--version", default=False, action="store_true",
             help="Show program version")
 
-    p.add_argument("--tab", default=None, type=int,
+    p.add_argument("--tabs", default=None, type=int,
             help="If set, expand tabs to this number of spaces")
 
     p.add_argument("--keyboard", default=None, type=str,
-            help="Sets current keyboard for statistic")
+            help="Records WPM statistics under the given keyboard name")
 
-    p.add_argument("--stats", default=False, action="store_true",
+    p.add_argument("-s", "--stats", default=False, action="store_true",
             help="Shows keyboard statistics")
 
     p.add_argument("--stats-file", default="~/.wpm", type=str,
