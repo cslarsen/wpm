@@ -108,7 +108,7 @@ def main():
         text_id = line[start + len(find):stop]
         ids.add(text_id)
 
-    print("Found %d quotes" % len(quotes))
+    print("Found %d quotes" % len(ids))
 
     # TODO: Do in parallel
     quotes = []
