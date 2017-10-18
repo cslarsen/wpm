@@ -82,10 +82,11 @@ Russel</p>
         "a book",
         "a movie",
         "a song",
+        "a television series",
         "by",
     )
     for p in prefixes:
-        if author.startswith(p):
+        if author.lower().startswith(p.lower()):
             author = author[len(p):].strip()
 
     author = normalize(author)
@@ -135,8 +136,33 @@ def main():
     except KeyboardInterrupt:
         pass
     print("Saving quotes.json")
-    with open("quotes.json", "wt") as f:
-        json.dump(quotes, f)
+
+    with open("../wpm/data/examples.json", "rt") as f:
+        examples = json.load(f)
+
+    oldcount = len(examples)
+
+    # Make quotes unique
+    unique = set()
+    for quote in examples + quotes:
+        author = quote["author"]
+        title = quote["title"]
+        text = quote["text"]
+        unique.add((author, title, text))
+
+    examples = []
+    for author, title, text in unique:
+        examples.append({
+            "author": author,
+            "title": title,
+            "text": text,
+        })
+
+    with open("../wpm/data/examples.json", "wt") as f:
+        json.dump(examples, f)
+
+    print("Added %d quotes for a total of %d" % (oldcount - len(quotes),
+        len(examples)))
 
 if __name__ == "__main__":
     main()
