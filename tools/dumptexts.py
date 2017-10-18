@@ -117,7 +117,7 @@ def main():
                 quotes.append({
                     "author": author,
                     "title": title,
-                    "quote": quote,
+                    "text": quote,
                 })
                 print("** id %s" % text_id)
                 print("\"%s\" by %s" % (title, author))
