@@ -14,4 +14,4 @@ full license text. This software makes use of open source software.
 __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright 2017 Christian Stigen Larsen"
 __license__ = "GNU GPL v3 or later"
-__version__ = "1.26"
+__version__ = "1.27"
