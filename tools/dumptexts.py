@@ -161,8 +161,7 @@ def main():
     with open("../wpm/data/examples.json", "wt") as f:
         json.dump(examples, f)
 
-    print("Added %d quotes for a total of %d" % (oldcount - len(quotes),
-        len(examples)))
+    print("Total quote count in database: %d" % len(examples))
 
 if __name__ == "__main__":
     main()
