@@ -95,6 +95,7 @@ Russel</p>
     return author, title, quote
 
 def main():
+    print("Reading main list of quotes")
     html = loadurl("http://www.typeracerdata.com/texts")
 
     ids = set()
@@ -106,6 +107,8 @@ def main():
         stop = line.index('"', start + len(find))
         text_id = line[start + len(find):stop]
         ids.add(text_id)
+
+    print("Found %d quotes" % len(quotes))
 
     # TODO: Do in parallel
     quotes = []
@@ -122,6 +125,7 @@ def main():
                 print("** id %s" % text_id)
                 print("\"%s\" by %s" % (title, author))
                 print("\"%s\"" % quote)
+                print("")
             except Exception as e:
                 print(e)
                 print("----")
