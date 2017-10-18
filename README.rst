@@ -16,6 +16,9 @@ multiplying that with 60. This is a well-known formula, but gives slightly
 higher scores than on sites like typeracer.com. It is, however, good enough to
 gauge your typing speed. And it works offline, and with your own texts.
 
+This program starts the timer when you push the first key, giving you a more
+exact figure for your typing speed.
+
 How to install
 ==============
 
