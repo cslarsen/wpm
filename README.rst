@@ -22,6 +22,8 @@ A few features of this program
   * Completed text is darkened, so that you learn how to focus ahead
   * Launches quickly from the terminal, for those in-between moments you have
     time to do a little practice
+  * Keeps separate stats for each keyboard (or labels like
+    "dvorak", etc.)
 
 How to install
 ==============
