@@ -96,7 +96,7 @@ Russel</p>
 
     return author, title, quote
 
-def main():
+def main(verbose=False):
     print("Reading main list of quotes")
     html = loadurl("http://www.typeracerdata.com/texts")
 
@@ -117,23 +117,17 @@ def main():
     try:
         for num, text_id in enumerate(ids):
             html = get_text(text_id)
-            try:
-                author, title, quote = process(text_id, html)
-                quotes.append({
-                    "author": author,
-                    "title": title,
-                    "text": quote,
-                })
-                print("** count %d id %s" % (num, text_id))
+            author, title, quote = process(text_id, html)
+            quotes.append({
+                "author": author,
+                "title": title,
+                "text": quote,
+            })
+            print("** count %d id %s" % (num, text_id))
+            if verbose:
                 print("\"%s\" by %s" % (title, author))
                 print("\"%s\"" % quote)
                 print("")
-            except Exception as e:
-                print(e)
-                print("----")
-                print(text_id)
-                print(html)
-                raise
     except KeyboardInterrupt:
         pass
     print("Saving quotes.json")
