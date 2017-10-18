@@ -20,7 +20,7 @@ Features
 --------
 
 - Starts timer when you strike the first key
-- Completed text is _darkned_ so you learn how to focus ahead
+- Completed text is *darker* so you learn how to focus ahead
 - Keeps separate stats for, e.g. type of keyboard, layout etc.
 - Launches quickly in your terminal window for in-between moments
 
