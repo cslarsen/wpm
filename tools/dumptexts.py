@@ -82,6 +82,7 @@ Russel</p>
         "a book",
         "a movie",
         "a song",
+        "a speech",
         "a television series",
         "by",
     )
