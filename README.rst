@@ -16,14 +16,13 @@ multiplying that with 60. This is a well-known formula, but gives slightly
 higher scores than on sites like typeracer.com. It is, however, good enough to
 gauge your typing speed. And it works offline, and with your own texts.
 
-A few features of this program
+Features
+--------
 
-  * Starts timer when you strike the first key
-  * Completed text is darkened, so that you learn how to focus ahead
-  * Launches quickly from the terminal, for those in-between moments you have
-    time to do a little practice
-  * Keeps separate stats for each keyboard (or labels like
-    "dvorak", etc.)
+- Starts timer when you strike the first key
+- Completed text is _darkned_ so you learn how to focus ahead
+- Keeps separate stats for, e.g. type of keyboard, layout etc.
+- Launches quickly in your terminal window for in-between moments
 
 How to install
 ==============
