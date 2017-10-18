@@ -5,11 +5,13 @@
 Dumps texts from typeracerdata.com.
 """
 
-import hashlib
-import os
-import json
-import urllib2
 from HTMLParser import HTMLParser
+from multiprocessing import Pool as ThreadPool
+import argparse
+import hashlib
+import json
+import os
+import urllib2
 
 def normalize(s):
     # Unescape html
@@ -96,9 +98,17 @@ Russel</p>
 
     return author, title, quote
 
-def main(verbose=False):
-    print("Reading main list of quotes")
-    html = loadurl("http://www.typeracerdata.com/texts")
+def readquote(text_id):
+        html = get_text(text_id)
+        author, title, quote = process(text_id, html)
+
+        print("id %s: '%s' by %s" % (text_id, title, author))
+        print("   \"%s\"" % quote)
+
+        return author, title, quote
+
+def read_ids(url="http://www.typeracerdata.com/texts"):
+    html = loadurl(url)
 
     ids = set()
     for line in html.split("\n"):
@@ -110,32 +120,43 @@ def main(verbose=False):
         text_id = line[start + len(find):stop]
         ids.add(text_id)
 
+    return ids
+
+def main(verbose=False, threads=1):
+    print("Reading list of quotes")
+    ids = read_ids()
+
     print("Found %d quotes" % len(ids))
+    print("Downloading each quote w/%d threads" % threads)
 
-    # TODO: Do in parallel
+    if threads > 1:
+        pool = ThreadPool(threads)
+        results = pool.map(readquote, ids)
+        pool.close()
+        pool.join()
+    else:
+        try:
+            results = []
+            for count, id in enumerate(ids):
+                print("%d/%d" % (count, len(ids)))
+                results.append(readquote(id))
+        except KeyboardInterrupt:
+            pass
+
+    print("Adding %d quotes to database" % len(results))
+
     quotes = []
-    try:
-        for num, text_id in enumerate(ids):
-            html = get_text(text_id)
-            author, title, quote = process(text_id, html)
-            quotes.append({
-                "author": author,
-                "title": title,
-                "text": quote,
-            })
-            print("** count %d id %s" % (num, text_id))
-            if verbose:
-                print("\"%s\" by %s" % (title, author))
-                print("\"%s\"" % quote)
-                print("")
-    except KeyboardInterrupt:
-        pass
-    print("Saving quotes.json")
+    for author, title, quote in results:
+        quotes.append({
+            "author": author,
+            "title": title,
+            "text": quote})
 
-    with open("../wpm/data/examples.json", "rt") as f:
+    filename = "../wpm/data/examples.json"
+
+    with open(filename, "rt") as f:
         examples = json.load(f)
-
-    oldcount = len(examples)
+        oldcount = len(examples)
 
     # Make quotes unique
     unique = set()
@@ -153,10 +174,17 @@ def main(verbose=False):
             "text": text,
         })
 
-    with open("../wpm/data/examples.json", "wt") as f:
+    with open(filename, "wt") as f:
         json.dump(examples, f)
 
     print("Total quote count in database: %d" % len(examples))
 
 if __name__ == "__main__":
-    main()
+    p = argparse.ArgumentParser()
+    p.add_argument("-t", "--threads", default=1, type=int,
+            help="Number of concurrent downloads")
+    p.add_argument("-v", "--verbose", default=False,
+            action="store_true")
+
+    opts = p.parse_args()
+    main(opts.verbose, opts.threads)
