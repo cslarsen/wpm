@@ -115,7 +115,7 @@ def main():
     # TODO: Do in parallel
     quotes = []
     try:
-        for text_id in ids:
+        for num, text_id in enumerate(ids):
             html = get_text(text_id)
             try:
                 author, title, quote = process(text_id, html)
@@ -124,7 +124,7 @@ def main():
                     "title": title,
                     "text": quote,
                 })
-                print("** id %s" % text_id)
+                print("** count %d id %s" % (num, text_id))
                 print("\"%s\" by %s" % (title, author))
                 print("\"%s\"" % quote)
                 print("")
