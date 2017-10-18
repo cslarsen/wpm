@@ -81,6 +81,17 @@ def main():
         if opts.keyboard is not None:
             stats.keyboard = opts.keyboard
 
+    if opts.load_json is not None:
+        texts += wpm.game.load(opts.load_json)
+
+    if opts.load is not None:
+        with codecs.open(opts.load, encoding="utf-8") as f:
+            text = f.read().replace("\r", "").rstrip()
+        texts.append({"author": "", "title": "", "text": text})
+
+    if len(texts) == 0:
+        filename = pkg_resources.resource_filename("wpm", "data/examples.json")
+        texts = wpm.game.load(filename)
     if opts.stats:
         print("Total average: %5.1f" % stats.average())
         for keyboard in sorted(stats.games.keys()):
@@ -100,19 +111,9 @@ def main():
 
         if stats.keyboard is not None:
             print("Current keyboard: %s" % stats.keyboard)
+
+        print("Quotes in currently loaded database: %d" % len(texts))
         return
-
-    if opts.load_json is not None:
-        texts += wpm.game.load(opts.load_json)
-
-    if opts.load is not None:
-        with codecs.open(opts.load, encoding="utf-8") as f:
-            text = f.read().replace("\r", "").rstrip()
-        texts.append({"author": "", "title": "", "text": text})
-
-    if len(texts) == 0:
-        filename = pkg_resources.resource_filename("wpm", "data/examples.json")
-        texts = wpm.game.load(filename)
 
     try:
         game = wpm.game.Game(texts, stats)
