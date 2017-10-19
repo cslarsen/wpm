@@ -77,8 +77,7 @@ Russel</p>
 
     author = extract(html, "</p>").strip()
     while author[0] in ", ":
-        author = author[1:]
-    author = author.strip()
+        author = author[1:].strip()
 
     prefixes = (
         "a book",
@@ -87,6 +86,7 @@ Russel</p>
         "a speech",
         "a television series",
         "by",
+        "directed",
     )
     for p in prefixes:
         if author.lower().startswith(p.lower()):
