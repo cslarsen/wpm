@@ -80,13 +80,15 @@ Russel</p>
         author = author[1:].strip()
 
     prefixes = (
-        "a book",
-        "a movie",
-        "a song",
-        "a speech",
-        "a television series",
+        "a",
+        "book",
         "by",
         "directed",
+        "movie",
+        "other",
+        "song",
+        "speech",
+        "television series",
     )
     for p in prefixes:
         if author.lower().startswith(p.lower()):
