@@ -13,21 +13,15 @@ full license text. This software makes use of open source software.
 
 import codecs
 import json
-import random
 import time
 import urwid
 
-def load(filename):
-    """Loads texts from JSON file."""
-    with codecs.open(filename, encoding="utf-8") as f:
-        return json.load(f)
-
 class Game(object):
-    def __init__(self, texts, stats):
+    def __init__(self, quotes, stats):
         self.stats = stats
-        self.texts = texts
+        self.quotes = quotes.random_iterator()
         self.ignore_next_key = False
-        self.quote = random.choice(self.texts)
+        self.quote = self.quotes.next()
         self.text = self.quote["text"].strip().replace("  ", " ")
         self.start = None
         self.position = 0
@@ -42,7 +36,7 @@ class Game(object):
         self.txt_edit = urwid.Text("")
         self.edit_buffer = ""
         self.txt_status = urwid.Text(("status",
-            "Start typing or hit SPACE for another text or hit ESC to quit"))
+            "Browse quotes with arrows left and right (or SPACE)\nQuit with ESCAPE. Any other key to start."))
         self.filler = urwid.Filler(
             urwid.Pile([
                 self.txt_stats,
@@ -183,7 +177,7 @@ class Game(object):
         self._edit = value
         self.txt_edit.set_text(("edit", "> " + self._edit))
 
-    def reset(self, new_quote=True):
+    def reset(self, new_quote=True, direction=1):
         self.start = None
         self.position = 0
         self.incorrect = 0
@@ -191,7 +185,10 @@ class Game(object):
         self.edit_buffer = ""
         self.txt_status.set_text("")
         if new_quote:
-            self.quote = random.choice(self.texts)
+            if direction >= 0:
+                self.quote = self.quotes.next()
+            else:
+                self.quote = self.quotes.previous()
             self.text = self.quote["text"].strip().replace("  ", " ")
         self.ignore_next_key = True
 
@@ -202,8 +199,8 @@ class Game(object):
             self.ignore_next_key = False
             return
 
-        if self.finished or (self.start is None and key == " "):
-            self.reset()
+        if self.finished or (self.start is None and key in (" ", "right", "left")):
+            self.reset(direction=-1 if key == "left" else 1)
             self.update()
 
         if key == "esc":

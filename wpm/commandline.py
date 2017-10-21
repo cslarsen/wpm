@@ -11,11 +11,11 @@ full license text. This software makes use of open source software.
 import argparse
 import codecs
 import os
-import pkg_resources
 import sys
 import urwid
 import wpm
 import wpm.game
+import wpm.quotes
 import wpm.stats
 
 def parse_args():
@@ -72,7 +72,7 @@ def averages(games):
 
 def main():
     opts = parse_args()
-    texts = []
+    quotes = []
 
     if not os.path.isfile(opts.stats_file):
         stats = wpm.stats.Stats(opts.keyboard)
@@ -82,16 +82,16 @@ def main():
             stats.keyboard = opts.keyboard
 
     if opts.load_json is not None:
-        texts += wpm.game.load(opts.load_json)
+        quotes = wpm.quotes.Quotes.load_json(opts.load_json)
 
     if opts.load is not None:
         with codecs.open(opts.load, encoding="utf-8") as f:
             text = f.read().replace("\r", "").rstrip()
-        texts.append({"author": "", "title": "", "text": text})
+        quotes.append({"author": "", "title": "", "text": text})
 
-    if len(texts) == 0:
-        filename = pkg_resources.resource_filename("wpm", "data/examples.json")
-        texts = wpm.game.load(filename)
+    if len(quotes) == 0:
+        quotes = wpm.quotes.Quotes.load()
+
     if opts.stats:
         print("Total average: %5.1f" % stats.average())
         for keyboard in sorted(stats.games.keys()):
@@ -112,11 +112,11 @@ def main():
         if stats.keyboard is not None:
             print("Current keyboard: %s" % stats.keyboard)
 
-        print("Quotes in currently loaded database: %d" % len(texts))
+        print("Quotes in currently loaded database: %d" % len(quotes))
         return
 
     try:
-        game = wpm.game.Game(texts, stats)
+        game = wpm.game.Game(quotes, stats)
         game.set_tab_spaces(opts.tabs)
         game.run()
     except urwid.main_loop.ExitMainLoop:
