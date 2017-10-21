@@ -12,6 +12,7 @@ class RandomIterator(object):
         self.quotes = quotes
         self.indices = list(range(len(self.quotes)))
         self.index = 0
+        random.shuffle(self.indices)
 
     def _current(self):
         i = self.indices[self.index]
