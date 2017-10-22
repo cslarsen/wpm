@@ -102,7 +102,8 @@ class Game(object):
         """Elapsed game round time."""
         if self.start is None:
             return 0
-        return time.time() - self.start
+        else:
+            return time.time() - self.start
 
     def wpm(self, elapsed):
         """Words per minute."""
@@ -147,8 +148,7 @@ class Game(object):
             # Bug in urwid set_text? Printing an emptry string seems to mess up
             # everything (e.g. ("wrong", "") => rest of line won't print
             del content[2]
-
-        if self.incorrect > 0:
+        elif self.incorrect > 0:
             del content[1]
 
         self.txt_text.set_text(content)
