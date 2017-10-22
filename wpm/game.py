@@ -108,29 +108,23 @@ class Game(object):
         """Words per minute."""
         if self.start is None:
             return 0
-        value = (60.0 * self.position / 5.0) / elapsed
-        if value > 1000:
-            # Happens at start of match. Keep it to three digits.
-            value = 999
-        return value
+        else:
+            return min((60.0 * self.position / 5.0) / elapsed, 999)
 
     def cps(self, elapsed):
         """Characters per second."""
         if self.start is None:
             return 0
-        value = float(self.position) / elapsed
-        if value > 99:
-            # As for WPM, clamp at 99
-            value = 99
-        return value
+        else:
+            return min(float(self.position) / elapsed, 99)
 
     @property
     def accuracy(self):
         if self.start is None:
             return 0
-        n = len(self.text)
-        i = self.total_incorrect
-        return float(n) / (n+i)
+        else:
+            n = len(self.text)
+            return float(n) / (n + self.total_incorrect)
 
     def get_stats(self, elapsed):
         return "%5.1f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
