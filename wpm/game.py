@@ -45,7 +45,7 @@ class Screen(object):
             curses.init_pair(3, 237, 0)
 
             # Normal text
-            curses.init_pair(4, 255, 0)
+            curses.init_pair(4, 195, 0)
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -64,7 +64,7 @@ class Screen(object):
 
     def update(self, head, quote, position, incorrect, typed):
         # Show header
-        self.window.addstr(0, 0, head + " "*(curses.COLS - 1 - len(head)),
+        self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
                 curses.color_pair(2))
 
         # Done text
@@ -85,7 +85,7 @@ class Screen(object):
 
         # Show typed text
         typed = "> " + typed
-        self.window.addstr(10, 0, typed + " "*(curses.COLS - 1 - len(typed)))
+        self.window.addstr(10, 0, typed + " "*(curses.COLS - len(typed)))
 
         # Move cursor to current position in text before refreshing
         self.window.move(2, cursor)
