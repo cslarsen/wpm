@@ -15,13 +15,14 @@ import codecs
 import contextlib
 import curses
 import json
+import os
 import time
 
 def is_escape(key):
     return key == 27 or key == ""
 
 def is_backspace(key):
-    return key == 127 or key == curses.KEY_BACKSPACE or key == curses.KEY_DC
+    return key in (127, curses.KEY_BACKSPACE, curses.KEY_DC, "")
 
 class Screen(object):
     def __init__(self):
@@ -32,7 +33,23 @@ class Screen(object):
         curses.cbreak()
 
         curses.start_color()
-        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+
+        if os.getenv("TERM") == "xterm-256color":
+            # Incorrect
+            curses.init_pair(1, 197, 52)
+
+            # Status
+            curses.init_pair(2, 51, 24)
+
+            # Done text
+            curses.init_pair(3, 237, 0)
+
+            # Normal text
+            curses.init_pair(4, 255, 0)
+        else:
+            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+            curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+            curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
         self.window.timeout(20)
@@ -47,13 +64,14 @@ class Screen(object):
 
     def update(self, head, quote, position, incorrect, typed):
         # Show header
-        # TODO: Set color
-        self.window.addstr(0, 0, head + " "*(curses.COLS - 1 - len(head)))
+        self.window.addstr(0, 0, head + " "*(curses.COLS - 1 - len(head)),
+                curses.color_pair(2))
 
-        # Show the text itself. TODO: Update only the characters, and let the
-        # rest of the text stay on screen as it is.
-        self.window.addstr(2, 0, quote[:position], curses.A_BOLD)
-        self.window.addstr(2, position, quote[position:])
+        # Done text
+        self.window.addstr(2, 0, quote[:position], curses.color_pair(3))
+
+        # Rest of text
+        self.window.addstr(2, position, quote[position:], curses.color_pair(4))
 
         cursor = position + incorrect
 
