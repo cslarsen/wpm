@@ -19,6 +19,7 @@ import os
 import time
 
 def is_escape(key):
+    # TODO: Escape detection doesn't work very well with curses right now
     return key == 27 or key == ""
 
 def is_backspace(key):
@@ -42,10 +43,13 @@ class Screen(object):
             curses.init_pair(2, 51, 24)
 
             # Done text
-            curses.init_pair(3, 237, 0)
+            curses.init_pair(3, 240, 0)
 
             # Normal text
             curses.init_pair(4, 230, 0)
+
+            # Edit text
+            curses.init_pair(5, 244, 0)
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -62,34 +66,52 @@ class Screen(object):
         except:
             return None
 
-    def update(self, head, quote, position, incorrect, typed):
+    def update(self, browse, head, quote, position, incorrect, author, title,
+            typed):
+        # TODO: While typing, only need to update previous character, for
+        # speed.
+
         # Show header
         self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
                 curses.color_pair(2))
 
-        # Done text
-        self.window.addstr(2, 0, quote[:position], curses.color_pair(3))
+        if browse:
+            self.window.addstr(2, 0, quote, curses.color_pair(4))
+            cursor = 0
+        elif position < len(quote):
+            cursor = position + incorrect
 
-        # Rest of text
-        self.window.addstr(2, position, quote[position:], curses.color_pair(4))
+            # Done text
+            self.window.addstr(2, 0, quote[:position], curses.color_pair(3))
 
-        cursor = position + incorrect
+            # Rest of text
+            self.window.addstr(2, position, quote[position:], curses.color_pair(4))
 
-        if incorrect > 0:
-            self.window.addstr(2, position, quote[position:cursor],
-                    curses.color_pair(1))
+            if incorrect > 0:
+                self.window.addstr(2, position, quote[position:cursor],
+                        curses.color_pair(1))
+        else:
+            cursor = 0
 
         # Show author
-        #self.txt_author.set_text(("author",
-            #u"    — %s, %s" % (self.quote["author"], self.quote["title"])))
+        credit = "    - %s, %s" % (author, title)
+        # TODO: Doesn't handle unicode!
+        self.window.addstr(8, 0, credit + " "*(curses.COLS - len(credit)),
+                curses.color_pair(4))
 
         # Show typed text
+        if browse:
+            typed = ""
         typed = "> " + typed
-        self.window.addstr(10, 0, typed + " "*(curses.COLS - len(typed)))
+        self.window.addstr(10, 0, typed + " "*(curses.COLS - len(typed)),
+                curses.color_pair(5))
 
         # Move cursor to current position in text before refreshing
         self.window.move(2, cursor)
         self.window.refresh()
+
+    def clear(self):
+        self.window.clear()
 
     def deinit(self):
         curses.nocbreak()
@@ -101,7 +123,6 @@ class Game(object):
     def __init__(self, quotes, stats):
         self.stats = stats
         self.quotes = quotes.random_iterator()
-        self.ignore_next_key = False
         self.quote = self.quotes.next()
         self.text = self.quote["text"].strip().replace("  ", " ")
         self.start = None
@@ -133,10 +154,10 @@ class Game(object):
             self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
     def run(self):
-        text = self.quote["text"]
         while True:
-            self.screen.update(self.get_stats(self.elapsed), text,
-                    self.position, self.incorrect, self._edit)
+            self.screen.update(not self.typing, self.get_stats(self.elapsed),
+                    self.text, self.position, self.incorrect,
+                    self.quote["author"], self.quote["title"], self._edit)
             key = self.screen.getkey()
             if key is not None:
                 self.handle_key(key)
@@ -181,47 +202,36 @@ class Game(object):
     def finished(self):
         return self.incorrect == 0 and (self.position == len(self.text))
 
-    def reset(self, new_quote=True, direction=1):
+    def reset(self, direction=0):
         self.start = None
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
         self._edit = ""
-        if new_quote:
-            if direction >= 0:
+        if direction:
+            if direction > 0:
                 self.quote = self.quotes.next()
             else:
                 self.quote = self.quotes.previous()
             self.text = self.quote["text"].strip().replace("  ", " ")
-        self.ignore_next_key = True
+            self.screen.clear()
+
+    @property
+    def typing(self):
+        return not (self.finished or self.start is None)
 
     def handle_key(self, key):
         if is_escape(key):
-            raise KeyboardInterrupt()
-
-        if (self.finished or self.start is None) and key == "ctrl r":
-            self.reset(new_quote=False)
-            self.update()
-            self.ignore_next_key = False
-            return
-
-        if self.finished or (self.start is None and key in (" ", "right", "left")):
-            self.reset(direction=-1 if key == "left" else 1)
-            self.update()
-
-        if is_escape(key):
             if self.start is not None:
                 # Escape during typing gets you back to the "menu"
-                self.mark_finished()
-                self.incorrect = 0
-                self.position = len(self.text)
-                self.start = None
-                self.update()
+                self.reset()
                 return
-            raise KeyboardInterrupt()
+            else:
+                raise KeyboardInterrupt()
 
-        if self.ignore_next_key:
-            self.ignore_next_key = False
+        # Browse
+        if not self.typing and key in (" ", curses.KEY_LEFT, curses.KEY_RIGHT):
+            self.reset(direction=-1 if key == curses.KEY_LEFT else 1)
             return
 
         if is_backspace(key):
