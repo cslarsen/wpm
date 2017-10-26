@@ -12,7 +12,6 @@ import argparse
 import codecs
 import os
 import sys
-import urwid
 import wpm
 import wpm.game
 import wpm.quotes
@@ -116,9 +115,9 @@ def main():
         return
 
     try:
-        game = wpm.game.Game(quotes, stats)
-        game.set_tab_spaces(opts.tabs)
-        game.run()
-    except urwid.main_loop.ExitMainLoop:
+        with wpm.game.Game(quotes, stats) as game:
+            game.set_tab_spaces(opts.tabs)
+            game.run()
+    except KeyboardInterrupt:
         pass
     game.stats.save(opts.stats_file)

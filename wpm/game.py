@@ -12,9 +12,72 @@ full license text. This software makes use of open source software.
 """
 
 import codecs
+import contextlib
+import curses
 import json
 import time
-import urwid
+
+def is_escape(key):
+    return key == 27 or key == ""
+
+def is_backspace(key):
+    return key == 127 or key == curses.KEY_BACKSPACE or key == curses.KEY_DC
+
+class Screen(object):
+    def __init__(self):
+        self.screen = curses.initscr()
+        self.screen.keypad(True)
+
+        curses.noecho()
+        curses.cbreak()
+
+        curses.start_color()
+        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+
+        self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
+        self.window.timeout(20)
+
+    def getkey(self):
+        try:
+            return self.window.getkey()
+        except KeyboardInterrupt:
+            raise
+        except:
+            return None
+
+    def update(self, head, quote, position, incorrect, typed):
+        # Show header
+        # TODO: Set color
+        self.window.addstr(0, 0, head + " "*(curses.COLS - 1 - len(head)))
+
+        # Show the text itself. TODO: Update only the characters, and let the
+        # rest of the text stay on screen as it is.
+        self.window.addstr(2, 0, quote[:position], curses.A_BOLD)
+        self.window.addstr(2, position, quote[position:])
+
+        cursor = position + incorrect
+
+        if incorrect > 0:
+            self.window.addstr(2, position, quote[position:cursor],
+                    curses.color_pair(1))
+
+        # Show author
+        #self.txt_author.set_text(("author",
+            #u"    — %s, %s" % (self.quote["author"], self.quote["title"])))
+
+        # Show typed text
+        typed = "> " + typed
+        self.window.addstr(10, 0, typed + " "*(curses.COLS - 1 - len(typed)))
+
+        # Move cursor to current position in text before refreshing
+        self.window.move(2, cursor)
+        self.window.refresh()
+
+    def deinit(self):
+        curses.nocbreak()
+        self.screen.keypad(False)
+        curses.echo()
+        curses.endwin()
 
 class Game(object):
     def __init__(self, quotes, stats):
@@ -29,30 +92,18 @@ class Game(object):
         self.total_incorrect = 0
         self._edit = ""
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
-
-        self.txt_stats = urwid.Text(self.get_stats(0), align="left")
-        self.txt_text = urwid.Text("")
-        self.txt_author = urwid.Text("", align="left")
-        self.txt_edit = urwid.Text("")
-        self.edit_buffer = ""
-        self.txt_status = urwid.Text(("status",
-            "Browse quotes with arrows left and right (or SPACE)\nQuit with ESCAPE. Any other key to start."))
-        self.filler = urwid.Filler(
-            urwid.Pile([
-                self.txt_stats,
-                urwid.Divider(),
-                self.txt_text,
-                urwid.Divider(),
-                self.txt_author,
-                urwid.Divider(),
-                self.txt_edit,
-                urwid.Divider(),
-                self.txt_status,
-            ]),
-            valign="top",
-            height="pack")
-
         self.tab_spaces = None
+        self.screen = Screen()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, tb):
+        self.screen.deinit()
+        if type is not None:
+            return False
+        else:
+            return self
 
     def set_tab_spaces(self, spaces):
         self.tab_spaces = spaces
@@ -62,40 +113,15 @@ class Game(object):
             elapsed = self.elapsed
             self.stats.add(self.wpm(elapsed), self.accuracy)
             self.average = self.stats.average(self.stats.keyboard, last_n=10)
-            self.loop.event_loop.alarm(0.01, lambda: self.update(elapsed))
-        self.txt_status.set_text(("status",
-            "Press any key to continue, CTRL+R to redo, SPACE for another text, ESC to quit"))
-
-    def update(self, elapsed=None):
-        if elapsed is None:
-            elapsed = self.elapsed
-        self.txt_stats.set_text(("stats", self.get_stats(elapsed)))
-        self.update_text()
-        if not self.finished:
-            self.loop.event_loop.alarm(0.01, self.update)
 
     def run(self):
-        self.loop = urwid.MainLoop(
-                self.filler,
-                unhandled_input=self.handle_key,
-                screen=urwid.raw_display.Screen(),
-                handle_mouse=False,
-                palette=[
-                    ("stats", "bold,dark green", "default", "default"),
-                    ("cursor", "bold", "dark green", "underline"),
-                    ("normal", "default", "default", "white"),
-                    ("done", "dark gray", "default", "bold"),
-                    ("wrong", "white,bold", "dark red", "bold,underline"),
-                    ("edit", "bold,dark gray", "default", "white"),
-                    ("status", "bold,default", "default", "default"),
-                    ("author", "dark gray", "default", "default")
-                ])
-        try:
-            self.update()
-            self.loop.run()
-        except KeyboardInterrupt:
-            pass
-        raise urwid.ExitMainLoop()
+        text = self.quote["text"]
+        while True:
+            self.screen.update(self.get_stats(self.elapsed), text,
+                    self.position, self.incorrect, self._edit)
+            key = self.screen.getkey()
+            if key is not None:
+                self.handle_key(key)
 
     @property
     def elapsed(self):
@@ -128,56 +154,21 @@ class Game(object):
             return float(n) / (n + self.total_incorrect)
 
     def get_stats(self, elapsed):
-        return "%5.1f wpm   %4.1f cps   %5.1fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
+        return "%5.1f wpm   %4.1f cps   %5.2fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
                 self.wpm(elapsed), self.cps(elapsed), elapsed,
                 100.0*self.accuracy, self.average, "Unspecified" if self.stats.keyboard is
                 None else self.stats.keyboard)
 
-    def update_text(self):
-        p = self.position
-        i = self.incorrect
-
-        content = [
-            ("done", self.text[:p]),
-            ("cursor", self.text[p:p+1]),
-            ("wrong", self.text[p:p+1+i]),
-            ("normal", self.text[p+1+i:])
-        ]
-
-        if i == 0:
-            # Bug in urwid set_text? Printing an emptry string seems to mess up
-            # everything (e.g. ("wrong", "") => rest of line won't print
-            del content[2]
-        elif self.incorrect > 0:
-            del content[1]
-
-        self.txt_text.set_text(content)
-        if len(self.quote["author"]) + len(self.quote["title"]) > 0:
-            self.txt_author.set_text(("author",
-                u"    — %s, %s" % (self.quote["author"], self.quote["title"])))
-        else:
-            self.txt_author.set_text("")
-
     @property
     def finished(self):
         return self.incorrect == 0 and (self.position == len(self.text))
-
-    @property
-    def edit_buffer(self):
-        return self._edit
-
-    @edit_buffer.setter
-    def edit_buffer(self, value):
-        self._edit = value
-        self.txt_edit.set_text(("edit", "> " + self._edit))
 
     def reset(self, new_quote=True, direction=1):
         self.start = None
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
-        self.edit_buffer = ""
-        self.txt_status.set_text("")
+        self._edit = ""
         if new_quote:
             if direction >= 0:
                 self.quote = self.quotes.next()
@@ -187,6 +178,9 @@ class Game(object):
         self.ignore_next_key = True
 
     def handle_key(self, key):
+        if is_escape(key):
+            raise KeyboardInterrupt()
+
         if (self.finished or self.start is None) and key == "ctrl r":
             self.reset(new_quote=False)
             self.update()
@@ -197,7 +191,7 @@ class Game(object):
             self.reset(direction=-1 if key == "left" else 1)
             self.update()
 
-        if key == "esc":
+        if is_escape(key):
             if self.start is not None:
                 # Escape during typing gets you back to the "menu"
                 self.mark_finished()
@@ -206,32 +200,31 @@ class Game(object):
                 self.start = None
                 self.update()
                 return
-            raise urwid.ExitMainLoop()
+            raise KeyboardInterrupt()
 
         if self.ignore_next_key:
             self.ignore_next_key = False
             return
 
-        if key == "backspace":
+        if is_backspace(key):
             if self.incorrect > 0:
                 self.incorrect -= 1
-            elif len(self.edit_buffer) > 0:
+            elif len(self._edit) > 0:
                 self.position -= 1
-            self.edit_buffer = self.edit_buffer[:-1]
+            self._edit = self._edit[:-1]
             return
 
         # Start recording upon first ordinary key press
         if self.start is None:
             self.start = time.time()
-            self.txt_status.set_text("")
 
         # Correct key at correct location?
         if len(key) == 1:
-            self.edit_buffer += key
+            self._edit += key
 
-        if key == "enter":
+        if key == curses.KEY_ENTER:
             key = "\n"
-        elif key == "tab" and self.tab_spaces is not None:
+        elif key == "\t" and self.tab_spaces is not None:
             key = " "*self.tab_spaces
         elif len(key) > 1:
             return
@@ -240,7 +233,7 @@ class Game(object):
                 self.text[self.position:self.position+len(key)] == key):
             self.position += len(key)
             if key.startswith(" ") or key == "\n":
-                self.edit_buffer = ""
+                self._edit = ""
             if self.finished:
                 self.mark_finished()
         else:
