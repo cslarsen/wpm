@@ -45,7 +45,7 @@ class Screen(object):
             curses.init_pair(3, 240, bg)
 
             # Normal text
-            curses.init_pair(4, 230, bg)
+            curses.init_pair(4, 195, bg)
 
             # UNUSED
             curses.init_pair(5, 244, bg)
