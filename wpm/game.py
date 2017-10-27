@@ -33,6 +33,8 @@ class Screen(object):
         curses.start_color()
 
         if os.getenv("TERM") == "xterm-256color":
+            bg = 234
+
             # Incorrect
             curses.init_pair(1, 197, 52)
 
@@ -40,19 +42,23 @@ class Screen(object):
             curses.init_pair(2, 51, 24)
 
             # Done text
-            curses.init_pair(3, 240, 0)
+            curses.init_pair(3, 240, bg)
 
             # Normal text
-            curses.init_pair(4, 230, 0)
+            curses.init_pair(4, 230, bg)
 
             # Edit text
-            curses.init_pair(5, 244, 0)
+            curses.init_pair(5, 244, bg)
 
             # Author
-            curses.init_pair(6, 230, 0)
+            curses.init_pair(6, 230, bg)
 
             # Edit text
-            curses.init_pair(7, 242, 0)
+            curses.init_pair(7, 242, bg)
+
+            # Background color
+            curses.init_pair(8, bg, bg)
+
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -61,6 +67,7 @@ class Screen(object):
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
         self.window.keypad(True)
         self.window.timeout(20)
+        self.window.bkgd(" ", curses.color_pair(8))
 
     def is_escape(self, key):
         return ord(key) == curses.ascii.ESC
