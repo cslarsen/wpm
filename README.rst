@@ -8,7 +8,7 @@ per minute (WPM).
 Features
 --------
 
-- Uses only standard Python library, supporting Python 2.7, 3 and PyPy
+- Uses only the standard Python library, supporting Python 2.7, 3 and PyPy
 - Timer starts when you strike the first key
 - Over 3700 quotes in the database, shamelessly stolen from typeracerdata.com
 - Completed text is *darkened*, helping you to focus ahead
