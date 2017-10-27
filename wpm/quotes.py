@@ -5,6 +5,7 @@ import codecs
 import json
 import pkg_resources
 import random
+import gzip
 
 class RandomIterator(object):
     """Random, bi-directional iterator."""
@@ -45,7 +46,7 @@ class Quotes(object):
 
     @staticmethod
     def _database_filename():
-        return pkg_resources.resource_filename("wpm", "data/examples.json")
+        return pkg_resources.resource_filename("wpm", "data/examples.json.gz")
 
     @staticmethod
     def load_json(filename=None):
@@ -70,9 +71,9 @@ class Quotes(object):
         if filename is None:
             filename = Quotes._database_filename()
 
-        with codecs.open(filename, mode="r", encoding="utf-8") as f:
+        with gzip.open(filename) as f:
             return Quotes(json.load(f))
 
     def save(self, filename):
-        with codecs.open(filename, mode="w", encoding="utf-8") as f:
+        with gzip.open(filename, mode="wb") as f:
             json.dump(self.quotes, f)
