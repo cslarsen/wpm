@@ -5,11 +5,14 @@ wpm — console app that measures your typing speed
 ``wpm`` is a simple terminal program that measures your typing speed in words
 per minute (WPM).
 
-.. image:: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv.png
+It uses only standard Python library (curses), has very low keyboard latency
+and works at least with Python 2.7, 3+ and PyPy.
+
+.. image:: https://asciinema.org/a/vJCg0dtITUAvLOD9XUY4FaYxt.png
   :width: 480 px
   :height: 230 px
   :alt: Screen recording of WPM in action
-  :target: https://asciinema.org/a/mocEjD9jS7NlhvoYq7wxAZVDv?autoplay=true&size=medium
+  :target: https://asciinema.org/a/vJCg0dtITUAvLOD9XUY4FaYxt?size=medium
 
 The WPM is calculated by dividing characters per second by five and then
 multiplying that with 60. This is a well-known formula, but gives slightly
@@ -19,10 +22,25 @@ gauge your typing speed. And it works offline, and with your own texts.
 Features
 --------
 
-- Starts timer when you strike the first key
+- Timer starts when you strike the first key
+- Over 3700 quotes in database, stolen from typeracerdata.com
 - Completed text is *darker* so you learn how to focus ahead
 - Keeps separate stats for, e.g. type of keyboard, layout etc.
 - Launches quickly in your terminal window for in-between moments
+- Extremely low latency!
+
+How to get the lowest typing latency
+------------------------------------
+
+On my machine, wpm *easily* beats typeracer.com on latency. For the absolutely
+best experience, I recommend the following: Use Terminal.app that comes with
+macOS, don't use tmux or screen, and run with pypy. Try it, and you'll
+definitely feel that every single key you strike is instantly updated on the
+screen.
+
+This comment is not meant to disregard TypeRacer, which I do love. But it's
+nice to have a little terminal program to practice whenever you have a minute
+to spare (for example, while compiling).
 
 How to install
 ==============
@@ -85,7 +103,7 @@ full license text. This software makes use of open source software.
     :target: http://www.gnu.org/licenses/old-licenses/gpl-3.en.html
     :alt: Project License
 
-.. |versions| image:: https://img.shields.io/badge/python-2.7%2B%2C%203%2B-blue.svg
+.. |versions| image:: https://img.shields.io/badge/python-2.7%2B%2C%203%2B%2C%20pypy-blue.svg
     :target: https://pypi.python.org/pypi/wpm/
     :alt: Supported Python versions
 
