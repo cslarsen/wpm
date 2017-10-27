@@ -82,7 +82,7 @@ class Screen(object):
                 else 3))
 
             # Show author
-            credit = u"    — %s, %s" % (author, title)
+            credit = u"    - %s, %s" % (author, title)
             self.window.addstr(4 + (len(quote) // cols), 0,
                     credit.encode("utf-8"), curses.color_pair(5))
             typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
