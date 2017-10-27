@@ -23,6 +23,7 @@ def is_escape(key):
     return key == 27 or key == ""
 
 def is_backspace(key):
+    # TODO: Same with backspace and arrow keys
     return key in (127, curses.KEY_BACKSPACE, curses.KEY_DC, "")
 
 class Screen(object):
@@ -129,16 +130,22 @@ class Screen(object):
 class Game(object):
     def __init__(self, quotes, stats):
         self.stats = stats
-        self.quotes = quotes.random_iterator()
-        self.quote = self.quotes.next()
-        self.text = self.quote["text"].strip().replace("  ", " ")
-        self.start = None
+        self.average = self.stats.average(self.stats.keyboard, last_n=10)
+        self.tab_spaces = None
+
+        # Stats
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
+
+        self.start = None
+        self.stop = None
+
         self._edit = ""
-        self.average = self.stats.average(self.stats.keyboard, last_n=10)
-        self.tab_spaces = None
+        self.quotes = quotes.random_iterator()
+        self.quote = self.quotes.next()
+        self.text = self.quote["text"].strip().replace("  ", " ")
+
         self.screen = Screen()
 
     def __enter__(self):
@@ -155,27 +162,21 @@ class Game(object):
         self.tab_spaces = spaces
 
     def mark_finished(self):
-        if self.finished and self.start is not None:
-            elapsed = self.elapsed
-            self.stats.add(self.wpm(elapsed), self.accuracy)
-            self.average = self.stats.average(self.stats.keyboard, last_n=10)
+        self.stop = time.time()
+        self.stats.add(self.wpm(self.elapsed), self.accuracy)
+        self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
     def run(self):
         while True:
-            self.screen.update(not self.typing, self.get_stats(self.elapsed),
+            is_typing = self.start is not None and self.stop is None
+
+            self.screen.update(not is_typing, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
                     self.quote["author"], self.quote["title"], self._edit)
+
             key = self.screen.getkey()
             if key is not None:
                 self.handle_key(key)
-
-    @property
-    def elapsed(self):
-        """Elapsed game round time."""
-        if self.start is None:
-            return 0
-        else:
-            return time.time() - self.start
 
     def wpm(self, elapsed):
         """Words per minute."""
@@ -192,6 +193,19 @@ class Game(object):
             return min(float(self.position) / elapsed, 99)
 
     @property
+    def elapsed(self):
+        """Elapsed game round time."""
+        if self.start is None:
+            # Typing has not started
+            return 0
+        elif self.stop is None:
+            # Currently typing
+            return time.time() - self.start
+        else:
+            # Done typing
+            return self.stop - self.start
+
+    @property
     def accuracy(self):
         if self.start is None:
             return 0
@@ -200,21 +214,28 @@ class Game(object):
             return float(n) / (n + self.total_incorrect)
 
     def get_stats(self, elapsed):
-        return "%5.1f wpm   %4.1f cps   %5.2fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
-                self.wpm(elapsed), self.cps(elapsed), elapsed,
-                100.0*self.accuracy, self.average, "Unspecified" if self.stats.keyboard is
-                None else self.stats.keyboard)
+        keyboard = self.stats.keyboard
+        if keyboard is None:
+            keyboard = "Unspecified"
 
-    @property
-    def finished(self):
-        return self.incorrect == 0 and (self.position == len(self.text))
+        return "%5.1f wpm   %4.1f cps   %5.2fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
+                self.wpm(elapsed),
+                self.cps(elapsed),
+                elapsed,
+                100.0*self.accuracy,
+                self.average,
+                keyboard)
 
     def reset(self, direction=0):
         self.start = None
+        self.stop = None
+
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
+
         self._edit = ""
+
         if direction:
             if direction > 0:
                 self.quote = self.quotes.next()
@@ -223,22 +244,19 @@ class Game(object):
             self.text = self.quote["text"].strip().replace("  ", " ")
             self.screen.clear()
 
-    @property
-    def typing(self):
-        return not (self.finished or self.start is None)
-
     def handle_key(self, key):
-        if is_escape(key):
-            if self.start is not None:
-                # Escape during typing gets you back to the "menu"
-                self.reset()
+        # Browse mode
+        if self.start is None or (self.start is not None and self.stop is not
+                None):
+            if key in (" ", curses.KEY_LEFT, curses.KEY_RIGHT):
+                self.reset(direction=-1 if key == curses.KEY_LEFT else 1)
                 return
-            else:
+            elif is_escape(key):
+                # Exit program
                 raise KeyboardInterrupt()
 
-        # Browse
-        if not self.typing and key in (" ", curses.KEY_LEFT, curses.KEY_RIGHT):
-            self.reset(direction=-1 if key == curses.KEY_LEFT else 1)
+        if is_escape(key):
+            self.reset()
             return
 
         if is_backspace(key):
@@ -246,30 +264,30 @@ class Game(object):
                 self.incorrect -= 1
             elif len(self._edit) > 0:
                 self.position -= 1
-            self._edit = self._edit[:-1]
+                self._edit = self._edit[:-1]
             return
 
         # Start recording upon first ordinary key press
         if self.start is None:
             self.start = time.time()
 
-        # Correct key at correct location?
-        if len(key) == 1:
-            self._edit += key
-
         if key == curses.KEY_ENTER:
             key = "\n"
         elif key == "\t" and self.tab_spaces is not None:
             key = " "*self.tab_spaces
-        elif len(key) > 1:
-            return
 
-        if (self.incorrect == 0 and
-                self.text[self.position:self.position+len(key)] == key):
-            self.position += len(key)
-            if key.startswith(" ") or key == "\n":
+        self._edit += key
+
+        # Did the user strike the correct key?
+        if self.incorrect == 0 and self.text[self.position] == key:
+            self.position += 1
+
+            # Reset edit buffer on a correctly finished word
+            if key == " " or key == "\n":
                 self._edit = ""
-            if self.finished:
+
+            # Finished typing?
+            if self.position == len(self.text):
                 self.mark_finished()
         else:
             self.incorrect += 1
