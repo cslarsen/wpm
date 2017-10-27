@@ -260,6 +260,14 @@ class Game(object):
                 self._edit = self._edit[:-1]
             return
 
+        # Try again?
+        if self.stop is not None:
+            self.reset()
+            self.screen.clear()
+            self.screen.update(1, self.get_stats(self.elapsed),
+                    self.text, self.position, self.incorrect,
+                    self.quote["author"], self.quote["title"], self._edit)
+
         # Start recording upon first ordinary key press
         if self.start is None:
             self.start = time.time()
