@@ -22,7 +22,7 @@ import time
 class Screen(object):
     def __init__(self):
         # Make delay slower
-        os.environ.setdefault("ESCDELAY", "25")
+        os.environ.setdefault("ESCDELAY", "15")
 
         self.screen = curses.initscr()
         self.screen.keypad(True)
