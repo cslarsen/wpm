@@ -5,12 +5,10 @@ wpm — a terminal app that measures your typing speed
 ``wpm`` is a simple terminal program that measures your typing speed in words
 per minute (WPM).
 
-It uses only standard Python library (curses), has very low keyboard latency
-and works at least with Python 2.7, 3+ and PyPy.
-
 Features
 --------
 
+- Uses only standard Python library, supporting Python 2.7, 3 and PyPy
 - Timer starts when you strike the first key
 - Over 3700 quotes in the database, shamelessly stolen from typeracerdata.com
 - Completed text is *darkened*, helping you to focus ahead
