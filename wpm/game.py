@@ -47,6 +47,9 @@ class Screen(object):
 
             # Edit text
             curses.init_pair(5, 244, 0)
+
+            # Author
+            curses.init_pair(6, 230, 0)
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -91,7 +94,7 @@ class Screen(object):
             # Show author
             credit = u"    - %s, %s" % (author, title)
             self.window.addstr(4 + (len(quote) // cols), 0,
-                    credit.encode("utf-8"), curses.color_pair(5))
+                    credit.encode("utf-8"), curses.color_pair(6))
             typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
         elif position < len(quote):
             cursor = position + incorrect
