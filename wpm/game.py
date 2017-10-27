@@ -75,30 +75,17 @@ class Screen(object):
         # Show header
         self.window.addstr(0, 0, head, curses.color_pair(2))
         self.window.clrtoeol()
+        cursor = 0
 
         if browse:
             self.window.addstr(2, 0, quote, curses.color_pair(4))
-            cursor = 0
         elif position < len(quote):
             cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
             self.window.chgat(2 + (cursor // curses.COLS), ((cursor - 1) %
                     curses.COLS), 1, color)
-            if incorrect > 0:
-                self.window.chgat(2 + ((cursor+1) // curses.COLS), (cursor %
-                    curses.COLS), 1, curses.color_pair(4))
-
-            # Done text
-            #self.window.addstr(2, 0, quote[:position], curses.color_pair(3))
-
-            # Rest of text
-            #self.window.addstr(2, position, quote[position:], curses.color_pair(4))
-
-            #if incorrect > 0:
-                #self.window.addstr(2, position, quote[position:cursor],
-                        #curses.color_pair(1))
-        else:
-            cursor = 0
+            self.window.chgat(2 + ((cursor + 1) // curses.COLS), (cursor %
+                curses.COLS), 1, curses.color_pair(4))
 
         # Show author
         credit = "    - %s, %s" % (author, title)
@@ -108,7 +95,7 @@ class Screen(object):
 
         # Show typed text
         if browse:
-            typed = ""
+            typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
         else:
             typed = "> " + typed
         self.window.addstr(10, 0, typed, curses.color_pair(5))
@@ -262,8 +249,7 @@ class Game(object):
         if is_backspace(key):
             if self.incorrect > 0:
                 self.incorrect -= 1
-            elif len(self._edit) > 0:
-                self.position -= 1
+            if len(self._edit) > 0:
                 self._edit = self._edit[:-1]
             return
 
