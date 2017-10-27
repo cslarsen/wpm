@@ -132,7 +132,7 @@ class Game(object):
         self._edit = ""
         self.quotes = quotes.random_iterator()
         self.quote = self.quotes.next()
-        self.text = self.quote["text"].strip().replace("  ", " ")
+        self.text = self.quote["text"]
 
         self.screen = Screen()
 
@@ -233,7 +233,7 @@ class Game(object):
                 self.quote = self.quotes.next()
             else:
                 self.quote = self.quotes.previous()
-            self.text = self.quote["text"].strip().replace("  ", " ")
+            self.text = self.quote["text"]
             self.screen.clear()
 
     def handle_key(self, key):
