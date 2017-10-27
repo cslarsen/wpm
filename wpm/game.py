@@ -249,7 +249,9 @@ class Game(object):
         if is_backspace(key):
             if self.incorrect > 0:
                 self.incorrect -= 1
-            if len(self._edit) > 0:
+                self._edit = self._edit[:-1]
+            elif len(self._edit) > 0:
+                self.position -= 1
                 self._edit = self._edit[:-1]
             return
 
