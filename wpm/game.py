@@ -102,23 +102,25 @@ class Screen(object):
         elif position < len(quote):
             cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
-
-            self.window.chgat(2 + ((cursor - 1) // cols), ((cursor - 1) %
-                cols), 1, color)
-            self.window.chgat(2 + ((cursor + 1) // cols), ((cursor + 1) %
-                cols), 1, curses.color_pair(4))
-
             typed = "> " + typed
 
+            self.window.chgat(2 + ((cursor - 1) // cols),
+                                  ((cursor - 1) % cols), 1, color)
+
+            self.window.chgat(2 + ((cursor + 1) // cols),
+                                  ((cursor + 1) % cols), 1,
+                                  curses.color_pair(4))
+
         # Show typed text
-        self.window.addstr(y + 7, 0, typed + " "*(cols -
-            len(typed)), curses.color_pair(7))
+        self.window.addstr(y + 7, 0, typed + " "*(cols - len(typed)),
+                curses.color_pair(7))
 
         # Move cursor to current position in text before refreshing
         if browse <= 1:
             self.window.move(2 + (cursor // cols), cursor % cols)
         else:
             self.window.move(y + 7, curses.COLS - 1)
+
         self.window.refresh()
 
     def clear(self):
