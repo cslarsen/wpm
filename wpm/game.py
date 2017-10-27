@@ -237,6 +237,9 @@ class Game(object):
             self.screen.clear()
 
     def handle_key(self, key):
+        if key == curses.KEY_RESIZE:
+            return
+
         # Browse mode
         if self.start is None or (self.start is not None and self.stop is not
                 None):
