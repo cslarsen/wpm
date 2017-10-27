@@ -78,14 +78,13 @@ class Screen(object):
                 curses.color_pair(2))
 
         if browse:
-            self.window.addstr(2, 0, quote, curses.color_pair(4))
+            self.window.addstr(2, 0, quote, curses.color_pair(4 if browse==1
+                else 3))
 
             # Show author
             credit = u"    — %s, %s" % (author, title)
-
-            # TODO: Doesn't handle unicode!
             self.window.addstr(4 + (len(quote) // cols), 0,
-                    credit.encode("utf-8"), curses.color_pair(4))
+                    credit.encode("utf-8"), curses.color_pair(5))
             typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
         elif position < len(quote):
             cursor = position + incorrect
@@ -103,7 +102,8 @@ class Screen(object):
         self.window.clrtoeol()
 
         # Move cursor to current position in text before refreshing
-        self.window.move(2 + (cursor // cols), cursor % cols)
+        if browse <= 1:
+            self.window.move(2 + (cursor // cols), cursor % cols)
         self.window.refresh()
 
     def clear(self):
@@ -158,7 +158,11 @@ class Game(object):
         while True:
             is_typing = self.start is not None and self.stop is None
 
-            self.screen.update(not is_typing, self.get_stats(self.elapsed),
+            browse = int(not is_typing)
+            if self.stop is not None:
+                browse = 2
+
+            self.screen.update(browse, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
                     self.quote["author"], self.quote["title"], self._edit)
 
