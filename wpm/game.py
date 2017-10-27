@@ -18,16 +18,11 @@ import json
 import os
 import time
 
-def is_escape(key):
-    # TODO: Escape detection doesn't work very well with curses right now
-    return key == 27 or key == ""
-
-def is_backspace(key):
-    # TODO: Same with backspace and arrow keys
-    return key in (127, curses.KEY_BACKSPACE, curses.KEY_DC, "")
-
 class Screen(object):
     def __init__(self):
+        # Make delay slower
+        os.environ.setdefault("ESCDELAY", "25")
+
         self.screen = curses.initscr()
         self.screen.keypad(True)
 
@@ -57,7 +52,17 @@ class Screen(object):
             curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
+        self.window.keypad(True)
         self.window.timeout(20)
+
+    def is_escape(self, key):
+        if key == chr(27):
+            return True
+        return False
+        #return ord(key) == 27
+
+    def is_backspace(self, key):
+        return key == "KEY_BACKSPACE"
 
     def getkey(self):
         try:
@@ -243,18 +248,18 @@ class Game(object):
         # Browse mode
         if self.start is None or (self.start is not None and self.stop is not
                 None):
-            if key in (" ", curses.KEY_LEFT, curses.KEY_RIGHT):
-                self.reset(direction=-1 if key == curses.KEY_LEFT else 1)
+            if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
+                self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
-            elif is_escape(key):
+            elif self.screen.is_escape(key):
                 # Exit program
                 raise KeyboardInterrupt()
 
-        if is_escape(key):
+        if self.screen.is_escape(key):
             self.reset()
             return
 
-        if is_backspace(key):
+        if self.screen.is_backspace(key):
             if self.incorrect > 0:
                 self.incorrect -= 1
                 self._edit = self._edit[:-1]
