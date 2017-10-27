@@ -1,4 +1,5 @@
 PYTHON := python
+PYPY := pypy
 PYTHON3 := python3.6
 PYFLAKES := pyflakes
 
@@ -14,6 +15,9 @@ run:
 
 run3:
 	PYTHONPATH=. $(PYTHON3) wpm
+
+runpypy:
+	PYTHONPATH=. $(PYPY) wpm
 
 stats:
 	PYTHONPATH=. $(PYTHON) wpm --stats
