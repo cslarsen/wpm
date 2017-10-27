@@ -1,5 +1,5 @@
-wpm — console app that measures your typing speed
-=================================================
+wpm — a terminal app that measures your typing speed
+====================================================
 |versions| |license| |pypi|
 
 ``wpm`` is a simple terminal program that measures your typing speed in words
