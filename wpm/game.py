@@ -47,14 +47,14 @@ class Screen(object):
             # Normal text
             curses.init_pair(4, 230, bg)
 
-            # Edit text
+            # UNUSED
             curses.init_pair(5, 244, bg)
 
             # Author
             curses.init_pair(6, 240, bg)
 
-            # Edit text
-            curses.init_pair(7, 244, bg)
+            # Edit text and info
+            curses.init_pair(7, 244, 233)
 
             # Background color
             curses.init_pair(8, bg, bg)
@@ -131,19 +131,19 @@ class Screen(object):
                                   curses.color_pair(4))
 
         # Show typed text
-        self.window.addstr(y + 7, 0, typed + " "*(cols - len(typed)),
+        self.window.addstr(y + 6, 0, typed + " "*(cols - len(typed)),
                 curses.color_pair(7))
 
         # If done, highlight score
         if browse >= 2:
-            self.window.chgat(y + 7, 11, len(str("%.1f" % wpm)),
+            self.window.chgat(y + 6, 11, len(str("%.1f" % wpm)),
                     curses.color_pair(9))
 
         # Move cursor to current position in text before refreshing
         if browse <= 1:
             self.window.move(2 + (cursor // cols), cursor % cols)
         else:
-            self.window.move(y + 7, curses.COLS - 1)
+            self.window.move(y + 6, curses.COLS - 1)
 
         self.window.refresh()
 
