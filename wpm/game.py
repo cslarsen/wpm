@@ -51,7 +51,7 @@ class Screen(object):
             curses.init_pair(5, 244, bg)
 
             # Author
-            curses.init_pair(6, 230, bg)
+            curses.init_pair(6, 240, bg)
 
             # Edit text
             curses.init_pair(7, 244, bg)
