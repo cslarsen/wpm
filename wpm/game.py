@@ -54,7 +54,7 @@ class Screen(object):
             curses.init_pair(6, 230, bg)
 
             # Edit text
-            curses.init_pair(7, 242, bg)
+            curses.init_pair(7, 244, bg)
 
             # Background color
             curses.init_pair(8, bg, bg)
