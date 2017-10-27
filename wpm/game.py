@@ -88,7 +88,7 @@ class Screen(object):
             return None
 
     def update(self, browse, head, quote, position, incorrect, author, title,
-            typed):
+            typed, wpm):
         cursor = 0
         cols = curses.COLS
         quote = quote.encode("utf-8")
@@ -105,7 +105,11 @@ class Screen(object):
             # Show author
             credit = (u"    - %s, %s" % (author, title)).encode("utf-8")
             self.window.addstr(y + 4, 0, credit, curses.color_pair(6))
-            typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
+            if browse >= 2:
+                typed = "You scored %.1f wpm! " % wpm
+            else:
+                typed = ""
+            typed += "Use arrows or space to browse quotes, esc to quit, or start typing."
         elif position < len(quote):
             cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
@@ -188,7 +192,8 @@ class Game(object):
 
             self.screen.update(browse, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
-                    self.quote["author"], self.quote["title"], self._edit)
+                    self.quote["author"], self.quote["title"], self._edit,
+                    self.wpm(self.elapsed))
 
             key = self.screen.getkey()
             if key is not None:
