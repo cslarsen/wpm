@@ -59,6 +59,9 @@ class Screen(object):
             # Background color
             curses.init_pair(8, bg, bg)
 
+            # Score highlight
+            curses.init_pair(9, 230, 202)
+
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -106,7 +109,12 @@ class Screen(object):
             credit = (u"    - %s, %s" % (author, title)).encode("utf-8")
             self.window.addstr(y + 4, 0, credit, curses.color_pair(6))
             if browse >= 2:
-                typed = "You scored %.1f wpm! " % wpm
+                stop = "."
+                if wpm > 100:
+                    stop = "!"
+                if wpm > 140:
+                    stop = "!!"
+                typed = "You scored %.1f wpm%s " % (wpm, stop)
             else:
                 typed = ""
             typed += "Use arrows or space to browse quotes, esc to quit, or start typing."
@@ -125,6 +133,11 @@ class Screen(object):
         # Show typed text
         self.window.addstr(y + 7, 0, typed + " "*(cols - len(typed)),
                 curses.color_pair(7))
+
+        # If done, highlight score
+        if browse >= 2:
+            self.window.chgat(y + 7, 11, len(str("%.1f" % wpm)),
+                    curses.color_pair(9))
 
         # Move cursor to current position in text before refreshing
         if browse <= 1:
