@@ -33,7 +33,7 @@ class Screen(object):
         curses.start_color()
 
         if os.getenv("TERM") == "xterm-256color":
-            bg = 234
+            bg = 233
 
             # Incorrect
             curses.init_pair(1, 197, 52)
