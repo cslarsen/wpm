@@ -14,6 +14,7 @@ full license text. This software makes use of open source software.
 import codecs
 import contextlib
 import curses
+import curses.ascii
 import json
 import os
 import time
@@ -56,13 +57,14 @@ class Screen(object):
         self.window.timeout(20)
 
     def is_escape(self, key):
-        if key == chr(27):
-            return True
-        return False
-        #return ord(key) == 27
+        return ord(key) == curses.ascii.ESC
 
     def is_backspace(self, key):
-        return key == "KEY_BACKSPACE"
+        if len(key) > 1:
+            return key == "KEY_BACKSPACE"
+        elif ord(key) in (curses.ascii.BS, curses.ascii.DEL):
+            return True
+        return False
 
     def getkey(self):
         try:
