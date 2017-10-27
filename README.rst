@@ -8,26 +8,33 @@ per minute (WPM).
 It uses only standard Python library (curses), has very low keyboard latency
 and works at least with Python 2.7, 3+ and PyPy.
 
+Features
+--------
+
+- Timer starts when you strike the first key
+- Over 3700 quotes in the database, shamelessly stolen from typeracerdata.com
+- Completed text is *darkened*, helping you to focus ahead
+- Keeps separate stats for, e.g. type of keyboard, layout etc.
+- Launches quickly in your terminal window for "in-between moments"
+- Extremely low typing latency!
+
+Demo
+----
+
 .. image:: https://asciinema.org/a/vJCg0dtITUAvLOD9XUY4FaYxt.png
   :width: 480 px
   :height: 230 px
   :alt: Screen recording of WPM in action
   :target: https://asciinema.org/a/vJCg0dtITUAvLOD9XUY4FaYxt?size=medium
 
+Calculating WPM
+---------------
+
 The WPM is calculated by dividing characters per second by five and then
 multiplying that with 60. This is a well-known formula, but gives slightly
 higher scores than on sites like typeracer.com. It is, however, good enough to
 gauge your typing speed. And it works offline, and with your own texts.
 
-Features
---------
-
-- Timer starts when you strike the first key
-- Over 3700 quotes in database, stolen from typeracerdata.com
-- Completed text is *darker* so you learn how to focus ahead
-- Keeps separate stats for, e.g. type of keyboard, layout etc.
-- Launches quickly in your terminal window for in-between moments
-- Extremely low latency!
 
 How to get the lowest typing latency
 ------------------------------------
