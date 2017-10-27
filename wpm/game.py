@@ -73,7 +73,9 @@ class Screen(object):
         self.window.bkgd(" ", curses.color_pair(8))
 
     def is_escape(self, key):
-        return ord(key) == curses.ascii.ESC
+        if len(key) == 1:
+            return ord(key) == curses.ascii.ESC
+        return False
 
     def is_backspace(self, key):
         if len(key) > 1:
@@ -311,7 +313,8 @@ class Game(object):
             self.screen.clear()
             self.screen.update(1, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
-                    self.quote["author"], self.quote["title"], self._edit)
+                    self.quote["author"], self.quote["title"], self._edit,
+                    self.wpm(self.elapsed))
 
         # Start recording upon first ordinary key press
         if self.start is None:
