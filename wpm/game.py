@@ -69,32 +69,34 @@ class Screen(object):
 
     def update(self, browse, head, quote, position, incorrect, author, title,
             typed):
-        # TODO: While typing, only need to update previous character, for
-        # speed.
+        cursor = 0
+        cols = curses.COLS
+        quote = quote.encode("utf-8")
 
         # Show header
         self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
                 curses.color_pair(2))
-        cursor = 0
-        cols = curses.COLS
 
         if browse:
             self.window.addstr(2, 0, quote, curses.color_pair(4))
 
             # Show author
-            credit = "    - %s, %s" % (author, title)
+            credit = u"    — %s, %s" % (author, title)
+
             # TODO: Doesn't handle unicode!
-            self.window.addstr(4 + (len(quote) // cols), 0, credit,
-                    curses.color_pair(4))
+            self.window.addstr(4 + (len(quote) // cols), 0,
+                    credit.encode("utf-8"), curses.color_pair(4))
             typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
         elif position < len(quote):
-            typed = "> " + typed
             cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
+
             self.window.chgat(2 + ((cursor - 1) // cols), ((cursor - 1) %
                 cols), 1, color)
             self.window.chgat(2 + ((cursor + 1) // cols), ((cursor + 1) %
                 cols), 1, curses.color_pair(4))
+
+            typed = "> " + typed
 
         # Show typed text
         self.window.addstr(10, 0, typed, curses.color_pair(5))
