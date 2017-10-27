@@ -60,7 +60,7 @@ class Screen(object):
             curses.init_pair(8, bg, bg)
 
             # Score highlight
-            curses.init_pair(9, 230, 202)
+            curses.init_pair(9, 230, 197)
 
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
