@@ -73,13 +73,21 @@ class Screen(object):
         # speed.
 
         # Show header
-        self.window.addstr(0, 0, head, curses.color_pair(2))
-        self.window.clrtoeol()
+        self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
+                curses.color_pair(2))
         cursor = 0
 
         if browse:
             self.window.addstr(2, 0, quote, curses.color_pair(4))
+
+            # Show author
+            credit = "    - %s, %s" % (author, title)
+            # TODO: Doesn't handle unicode!
+            self.window.addstr(4 + (len(quote) // curses.COLS), 0, credit,
+                    curses.color_pair(4))
+            typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
         elif position < len(quote):
+            typed = "> " + typed
             cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
             self.window.chgat(2 + (cursor // curses.COLS), ((cursor - 1) %
@@ -87,17 +95,7 @@ class Screen(object):
             self.window.chgat(2 + ((cursor + 1) // curses.COLS), (cursor %
                 curses.COLS), 1, curses.color_pair(4))
 
-        # Show author
-        credit = "    - %s, %s" % (author, title)
-        # TODO: Doesn't handle unicode!
-        self.window.addstr(4 + (len(quote) // curses.COLS), 0, credit,
-                curses.color_pair(4))
-
         # Show typed text
-        if browse:
-            typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
-        else:
-            typed = "> " + typed
         self.window.addstr(10, 0, typed, curses.color_pair(5))
         self.window.clrtoeol()
 
