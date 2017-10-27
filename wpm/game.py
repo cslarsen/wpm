@@ -50,6 +50,9 @@ class Screen(object):
 
             # Author
             curses.init_pair(6, 230, 0)
+
+            # Edit text
+            curses.init_pair(7, 242, 0)
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -82,6 +85,7 @@ class Screen(object):
         cursor = 0
         cols = curses.COLS
         quote = quote.encode("utf-8")
+        y = (len(quote) // cols)
 
         # Show header
         self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
@@ -92,9 +96,8 @@ class Screen(object):
                 else 3))
 
             # Show author
-            credit = u"    - %s, %s" % (author, title)
-            self.window.addstr(4 + (len(quote) // cols), 0,
-                    credit.encode("utf-8"), curses.color_pair(6))
+            credit = (u"    - %s, %s" % (author, title)).encode("utf-8")
+            self.window.addstr(y + 4, 0, credit, curses.color_pair(6))
             typed = "Use arrows or space to browse quotes, esc to quit, or start typing"
         elif position < len(quote):
             cursor = position + incorrect
@@ -108,12 +111,14 @@ class Screen(object):
             typed = "> " + typed
 
         # Show typed text
-        self.window.addstr(10, 0, typed, curses.color_pair(5))
-        self.window.clrtoeol()
+        self.window.addstr(y + 7, 0, typed + " "*(cols -
+            len(typed)), curses.color_pair(7))
 
         # Move cursor to current position in text before refreshing
         if browse <= 1:
             self.window.move(2 + (cursor // cols), cursor % cols)
+        else:
+            self.window.move(y + 7, curses.COLS - 1)
         self.window.refresh()
 
     def clear(self):
