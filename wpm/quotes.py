@@ -2,10 +2,11 @@
 # -*- encoding: utf-8 -*-
 
 import codecs
+import gzip
 import json
+import os
 import pkg_resources
 import random
-import gzip
 
 class RandomIterator(object):
     """Random, bi-directional iterator."""
@@ -19,6 +20,14 @@ class RandomIterator(object):
         i = self.indices[self.index]
         return self.quotes[i]
 
+    @property
+    def database(self):
+        return self.quotes.database
+
+    @property
+    def text_id(self):
+        return self.indices[self.index]
+
     def next(self):
         self.index = (self.index + 1) % len(self.quotes)
         if self.index == 0:
@@ -31,8 +40,9 @@ class RandomIterator(object):
 
 
 class Quotes(object):
-    def __init__(self, quotes=None):
+    def __init__(self, quotes=None, database=None):
         self.quotes = quotes
+        self.database = database
 
     def __len__(self):
         return len(self.quotes)
@@ -70,9 +80,12 @@ class Quotes(object):
     def load(filename=None):
         if filename is None:
             filename = Quotes._database_filename()
+            database = "default"
+        else:
+            database = os.path.splitext(os.path.basename(filename))[0]
 
         with gzip.open(filename) as f:
-            return Quotes(json.load(f))
+            return Quotes(json.load(f), database)
 
     def save(self, filename):
         with gzip.open(filename, mode="wb") as f:

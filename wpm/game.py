@@ -194,7 +194,8 @@ class Game(object):
 
     def mark_finished(self):
         self.stop = time.time()
-        self.stats.add(self.wpm(self.elapsed), self.accuracy)
+        self.stats.add(self.wpm(self.elapsed), self.accuracy,
+                self.quotes.text_id, self.quotes.database)
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
     def run(self):

@@ -76,7 +76,14 @@ def main():
     if not os.path.isfile(opts.stats_file):
         stats = wpm.stats.Stats(opts.keyboard)
     else:
-        stats = wpm.stats.Stats.load(opts.stats_file)
+        try:
+            stats = wpm.stats.Stats.load(opts.stats_file)
+        except Exception as e:
+            print("Unsupported format. Renaming %s to %s" % (opts.stats_file,
+                opts.stats_file + ".old"))
+            os.rename(opts.stats_file, opts.stats_file + ".old")
+            stats = wpm.stats.Stats()
+
         if opts.keyboard is not None:
             stats.keyboard = opts.keyboard
 
