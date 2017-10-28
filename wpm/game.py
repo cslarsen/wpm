@@ -255,7 +255,7 @@ class Game(object):
         if keyboard is None:
             keyboard = "Unspecified"
 
-        return "%5.1f wpm   %4.1f cps   %5.2fs   %5.1f%% acc   %5.1f avg wpm   kbd: %s" % (
+        return "%5.1f wpm %4.1f cps %5.2fs %5.1f%% acc %5.1f avg wpm - %s" % (
                 self.wpm(elapsed),
                 self.cps(elapsed),
                 elapsed,
