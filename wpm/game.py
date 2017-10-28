@@ -281,8 +281,14 @@ class Game(object):
             self.text = self.quote["text"]
             self.screen.clear()
 
+    def resize(self):
+        y, x = self.screen.window.getmaxyx()
+        self.screen.clear()
+        curses.resizeterm(y, x)
+
     def handle_key(self, key):
-        if key == curses.KEY_RESIZE:
+        if key == "KEY_RESIZE":
+            self.resize()
             return
 
         # Browse mode
