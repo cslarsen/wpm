@@ -62,6 +62,9 @@ class Screen(object):
             # Score highlight
             curses.init_pair(9, 230, 197)
 
+            # Incorrect in edit box
+            curses.init_pair(10, 197, bg)
+
         else:
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
             curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -99,7 +102,8 @@ class Screen(object):
         quote = quote.encode("utf-8")
         y = (len(quote) // cols)
 
-        # Show header
+        # Always render header (TODO: We could only render the changed parts
+        # during typing, to save some time)
         self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
                 curses.color_pair(2))
 
@@ -130,9 +134,17 @@ class Screen(object):
                                   ((cursor + 1) % cols), 1,
                                   curses.color_pair(4))
 
-        # Show typed text
+
+        # Show typed text or info
         self.window.addstr(y + 6, 0, typed + " "*(cols - len(typed)),
                 curses.color_pair(7))
+
+        if incorrect > 0:
+            # Highlight first bad stroke
+            self.window.chgat(y + 6,
+                    len(typed) - incorrect,
+                    1,
+                    curses.color_pair(10))
 
         # If done, highlight score
         if browse >= 2:
