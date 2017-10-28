@@ -93,7 +93,7 @@ class Screen(object):
             return None
 
     def update(self, browse, head, quote, position, incorrect, author, title,
-            typed, wpm):
+            typed, wpm, average):
         cursor = 0
         cols = curses.COLS
         quote = quote.encode("utf-8")
@@ -112,14 +112,12 @@ class Screen(object):
             self.window.addstr(y + 4, 0, credit, curses.color_pair(6))
             if browse >= 2:
                 stop = "."
-                if wpm > 100:
+                if wpm > average:
                     stop = "!"
-                if wpm > 140:
-                    stop = "!!"
                 typed = "You scored %.1f wpm%s " % (wpm, stop)
             else:
                 typed = ""
-            typed += "Use arrows or space to browse quotes, esc to quit, or start typing."
+            typed += "Use arrows/space to browse, esc to quit, or start typing."
         elif position < len(quote):
             cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
@@ -145,7 +143,7 @@ class Screen(object):
         if browse <= 1:
             self.window.move(2 + (cursor // cols), cursor % cols)
         else:
-            self.window.move(y + 6, curses.COLS - 1)
+            self.window.move(2, 0)
 
         self.window.refresh()
 
@@ -209,7 +207,7 @@ class Game(object):
             self.screen.update(browse, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
                     self.quote["author"], self.quote["title"], self._edit,
-                    self.wpm(self.elapsed))
+                    self.wpm(self.elapsed), self.average)
 
             key = self.screen.getkey()
             if key is not None:
@@ -321,7 +319,7 @@ class Game(object):
             self.screen.update(1, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
                     self.quote["author"], self.quote["title"], self._edit,
-                    self.wpm(self.elapsed))
+                    self.wpm(self.elapsed), self.average)
 
         # Start recording upon first ordinary key press
         if self.start is None:

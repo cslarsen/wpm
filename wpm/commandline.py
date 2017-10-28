@@ -60,6 +60,7 @@ def averages(games):
     wpms = []
     accs = []
 
+    # TODO: Fix this
     for timestamp, wpm, acc in games:
         wpms.append(wpm)
         accs.append(acc)
