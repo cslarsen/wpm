@@ -61,9 +61,12 @@ def averages(games):
     accs = []
 
     # TODO: Fix this
-    for timestamp, wpm, acc in games:
+    for game in games:
+        wpm = game[1]
         wpms.append(wpm)
-        accs.append(acc)
+
+        accuracy = game[2]
+        accs.append(accuracy)
 
     average_wpm = sum(wpms) / len(wpms)
     average_acc = sum(accs) / len(accs)
