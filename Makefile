@@ -26,9 +26,6 @@ dist:
 	rm -rf dist/*
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
 
-count:
-	@grep '"author"' wpm/data/examples.json | wc -l
-
 publish: dist
 	find dist -type f -exec gpg2 --detach-sign -a {} \;
 	twine upload dist/*
@@ -43,7 +40,6 @@ setup-pypi-publish:
 
 lint:
 	@$(PYFLAKES) `find . -name '*.py' -print`
-	@(json_pp < wpm/data/examples.json >/dev/null) || echo bad json && echo json ok
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;
