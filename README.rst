@@ -97,6 +97,36 @@ You can also bundle up several texts into a single JSON file, using ``wpm
       ...
     ]
 
+Format of race history
+----------------------
+
+wpm will save scores in a CSV file in `~/.wpm.csv`. This file can be loaded
+directly into Excel. It uses the same format as TypeRacer, with the addition of
+a few extra columns at the end. That means is should be possible to use
+existing TypeRacer score history tools with this file with minor modifications.
+
+The column order is:
+
+    race:      int   - race number, always increasing and tied to timestamp
+    wpm:       float - the average WPM for that quote that single time
+    accuracy:  float - 0 to 1
+    rank:      int   - always 1
+    racers:    int   - always 1
+    text_id:   int   - item number of text in given database
+    timestamp: str   - UTC timestamp in strptime format "%Y-%m-%d %H:%M:%S.%f"
+    database:  str   - either "default" or the basename of the file used
+    keyboard:  str   - a user-supplied, arbitrary for that score
+
+Should there be any problem saving or loading the score history, it will copy
+the existing file into `~/.wpm.csv.backup`.
+
+If you use `--keyboard=...` to specify a keyboard, the next time wpm is
+launched, it will assume that this is the keyboard you are still using. Just
+specify `--keyboard=...` again. The keyboard setting is really just a string
+label you can use to tag races. For example, you could call the keyboard
+`realforce-colemak` or `cherry-red-qwerty` and use that as a basis to perform
+statistical analysis on your typing performance with various setups.
+
 License
 =======
 

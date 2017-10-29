@@ -43,8 +43,8 @@ The format is
     p.add_argument("-s", "--stats", default=False, action="store_true",
             help="Shows keyboard statistics")
 
-    p.add_argument("--stats-file", default="~/.wpm", type=str,
-            help="File to save statistics to")
+    p.add_argument("--stats-file", default="~/.wpm.csv", type=str,
+            help="File to record score history to (CSV format)")
 
     opts = p.parse_args()
 
