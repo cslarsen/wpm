@@ -122,20 +122,19 @@ class Screen(object):
         cursor = 0
         cols = curses.COLS
         quote = quote.encode("utf-8")
-        lengths = word_wrap(quote, cols)
+        lengths = word_wrap(quote, cols - 1)
         sx, sy = screen_coords(lengths, position)
         h = len(lengths)
 
         # Show header
-        self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
+        self.window.addstr(0, 0, head + " "*(cols - len(head)),
                 curses.color_pair(2))
 
         if browse:
             # Display quote
             color = curses.color_pair(4 if browse == 1 else 3)
             for y, length in enumerate(lengths, 2):
-                self.window.addstr(y, 0,
-                        quote[:length], color)
+                self.window.addstr(y, 0, quote[:length], color)
                 quote = quote[1+length:]
 
             # Show author
@@ -154,11 +153,10 @@ class Screen(object):
             typed = "> " + typed
 
             sx, sy = screen_coords(lengths, position + incorrect - 1)
-            self.window.chgat(2 + sy, min(max(sx, 0), cols - 1), 1, color)
+            self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
             sx, sy = screen_coords(lengths, position + incorrect + 1)
-            self.window.chgat(2 + sy, min(sx + 1, cols - 1),
-                    curses.color_pair(4))
+            self.window.chgat(2 + sy, sx, curses.color_pair(4))
 
         # Show typed text
         self.window.addstr(5 + h, 0, typed + " "*(cols - len(typed)),
