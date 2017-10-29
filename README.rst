@@ -37,10 +37,10 @@ How to get the lowest typing latency
 ------------------------------------
 
 On my machine, wpm *easily* beats typeracer.com on latency. For the absolutely
-best experience, I recommend the following: Use Terminal.app that comes with
-macOS, don't use tmux or screen, and run with pypy. Try it, and you'll
-definitely feel that every single key you strike is instantly updated on the
-screen.
+best experience, I recommend the following: Use the Terminal.app that comes
+with macOS (and not iTerm), don't use tmux or screen, and run with pypy. Try
+it, and you'll definitely feel that every single key you strike is instantly
+updated on the screen.
 
 This comment is not meant to disregard TypeRacer, which I do love. But it's
 nice to have a little terminal program to practice whenever you have a minute
