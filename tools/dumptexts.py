@@ -154,10 +154,9 @@ def main(verbose=False, threads=1):
 
     with open(filename, "rt") as f:
         examples = json.load(f)
-        oldcount = len(examples)
 
     with open(filename, "wt") as f:
-        json.dump(set(example + quotes), f)
+        json.dump(set(examples + quotes), f)
 
     print("Total quote count in database: %d" % len(examples))
 

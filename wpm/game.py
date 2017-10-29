@@ -11,11 +11,8 @@ Distributed under the GNU GPL v3 or later. See the file LICENSE.txt for the
 full license text. This software makes use of open source software.
 """
 
-import codecs
-import contextlib
 import curses
 import curses.ascii
-import json
 import os
 import time
 import wpm.error
@@ -155,7 +152,6 @@ class Screen(object):
 
     def update(self, browse, head, quote, position, incorrect, author, title,
             typed, wpm, average):
-        cursor = 0
         cols = curses.COLS
         lengths = word_wrap(quote, cols - 1)
         sx, sy = screen_coords(lengths, position)
