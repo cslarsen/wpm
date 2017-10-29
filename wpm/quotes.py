@@ -55,7 +55,7 @@ class Quotes(object):
         author = quote["author"]
         title = quote["title"]
         text = quote["text"]
-        self.quotes[index] = (author, title, quote)
+        self.quotes[index] = [author, title, quote]
 
     def random_iterator(self):
         return RandomIterator(self)
