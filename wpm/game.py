@@ -121,7 +121,6 @@ class Screen(object):
             typed, wpm, average):
         cursor = 0
         cols = curses.COLS
-        quote = quote.encode("utf-8")
         lengths = word_wrap(quote, cols - 1)
         sx, sy = screen_coords(lengths, position)
         h = len(lengths)
