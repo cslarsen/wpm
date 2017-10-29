@@ -159,11 +159,11 @@ class Screen(object):
             self.window.chgat(2 + sy, sx, curses.color_pair(4))
 
         # Show typed text
-        self.window.addstr(5 + h, 0, typed + " "*(cols - len(typed)),
+        self.window.addstr(6 + h, 0, typed + " "*(cols - len(typed)),
                 curses.color_pair(7))
         if browse > 1:
             # If done, highlight score
-            self.window.chgat(5 + h, 11,
+            self.window.chgat(6 + h, 11,
                 len(str("%.1f" % wpm)), curses.color_pair(9))
 
         # Move cursor to current position in text before refreshing
