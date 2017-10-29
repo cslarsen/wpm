@@ -19,6 +19,31 @@ import json
 import os
 import time
 
+def word_wrap(s, w):
+    """Returns lengths of lines that can be printed without wrapping."""
+    lengths = []
+    while len(s) >= w:
+        end = s[:w+1].rindex(" ")
+
+        # We can't divide the input nicely, so just display it as-is
+        if end == -1:
+            return len(s)
+
+        lengths.append(end)
+        s = s[end+1:]
+
+    if len(s) > 0:
+        lengths.append(len(s))
+
+    return lengths
+
+def screen_coords(lens, pos):
+    for y, l in enumerate(lens):
+        if pos <= l:
+            break
+        pos -= (l+1)
+    return pos, y
+
 class Screen(object):
     def __init__(self):
         # Make delay slower
@@ -97,19 +122,25 @@ class Screen(object):
         cursor = 0
         cols = curses.COLS
         quote = quote.encode("utf-8")
-        y = (len(quote) // cols)
+        lengths = word_wrap(quote, cols)
+        sx, sy = screen_coords(lengths, position)
+        h = len(lengths)
 
         # Show header
         self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
                 curses.color_pair(2))
 
         if browse:
-            self.window.addstr(2, 0, quote, curses.color_pair(4 if browse==1
-                else 3))
+            # Display quote
+            color = curses.color_pair(4 if browse == 1 else 3)
+            for y, length in enumerate(lengths, 2):
+                self.window.addstr(y, 0,
+                        quote[:length], color)
+                quote = quote[1+length:]
 
             # Show author
             credit = (u"    - %s, %s" % (author, title)).encode("utf-8")
-            self.window.addstr(y + 4, 0, credit, curses.color_pair(6))
+            self.window.addstr(3 + h, 0, credit, curses.color_pair(6))
             if browse >= 2:
                 stop = "."
                 if wpm > average:
@@ -119,29 +150,28 @@ class Screen(object):
                 typed = ""
             typed += "Use arrows/space to browse, esc to quit, or start typing."
         elif position < len(quote):
-            cursor = position + incorrect
             color = curses.color_pair(3 if incorrect == 0 else 1)
             typed = "> " + typed
 
-            self.window.chgat(2 + ((cursor - 1) // cols),
-                                  ((cursor - 1) % cols), 1, color)
+            sx, sy = screen_coords(lengths, position + incorrect - 1)
+            self.window.chgat(2 + sy, min(max(sx, 0), cols - 1), 1, color)
 
-            self.window.chgat(2 + ((cursor + 1) // cols),
-                                  ((cursor + 1) % cols), 1,
-                                  curses.color_pair(4))
+            sx, sy = screen_coords(lengths, position + incorrect + 1)
+            self.window.chgat(2 + sy, min(sx + 1, cols - 1),
+                    curses.color_pair(4))
 
         # Show typed text
-        self.window.addstr(y + 6, 0, typed + " "*(cols - len(typed)),
+        self.window.addstr(5 + h, 0, typed + " "*(cols - len(typed)),
                 curses.color_pair(7))
-
-        # If done, highlight score
-        if browse >= 2:
-            self.window.chgat(y + 6, 11, len(str("%.1f" % wpm)),
-                    curses.color_pair(9))
+        if browse > 1:
+            # If done, highlight score
+            self.window.chgat(5 + h, 11,
+                len(str("%.1f" % wpm)), curses.color_pair(9))
 
         # Move cursor to current position in text before refreshing
-        if browse <= 1:
-            self.window.move(2 + (cursor // cols), cursor % cols)
+        if browse < 1:
+            sx, sy = screen_coords(lengths, position + incorrect)
+            self.window.move(2 + sy, min(sx, cols - 1))
         else:
             self.window.move(2, 0)
 
