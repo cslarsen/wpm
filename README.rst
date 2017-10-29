@@ -23,7 +23,7 @@ Demo
   :width: 480 px
   :height: 230 px
   :alt: Screen recording of WPM in action
-  :target: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf?size=medium
+  :target: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf?size=medium&autoplay=1
 
 Calculating WPM
 ---------------
