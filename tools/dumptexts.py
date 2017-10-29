@@ -148,10 +148,7 @@ def main(verbose=False, threads=1):
 
     quotes = []
     for author, title, quote in results:
-        quotes.append({
-            "author": author,
-            "title": title,
-            "text": quote})
+        quotes.append([author, title, quote])
 
     filename = "../wpm/data/examples.json"
 
@@ -159,24 +156,8 @@ def main(verbose=False, threads=1):
         examples = json.load(f)
         oldcount = len(examples)
 
-    # Make quotes unique
-    unique = set()
-    for quote in examples + quotes:
-        author = quote["author"]
-        title = quote["title"]
-        text = quote["text"]
-        unique.add((author, title, text))
-
-    examples = []
-    for author, title, text in unique:
-        examples.append({
-            "author": author,
-            "title": title,
-            "text": text,
-        })
-
     with open(filename, "wt") as f:
-        json.dump(examples, f)
+        json.dump(set(example + quotes), f)
 
     print("Total quote count in database: %d" % len(examples))
 

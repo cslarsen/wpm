@@ -98,7 +98,7 @@ def main():
     if opts.load is not None:
         with codecs.open(opts.load, encoding="utf-8") as f:
             text = f.read().replace("\r", "").rstrip()
-        quotes.append({"author": "", "title": "", "text": text})
+        quotes.append(["", "", text])
 
     if len(quotes) == 0:
         quotes = wpm.quotes.Quotes.load()

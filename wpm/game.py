@@ -238,7 +238,7 @@ class Game(object):
         self._edit = ""
         self.quotes = quotes.random_iterator()
         self.quote = self.quotes.next()
-        self.text = self.quote["text"]
+        self.text = self.quote[2]
 
         self.screen = Screen()
 
@@ -271,7 +271,7 @@ class Game(object):
 
             self.screen.update(browse, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
-                    self.quote["author"], self.quote["title"], self._edit,
+                    self.quote[0], self.quote[1], self._edit,
                     self.wpm(self.elapsed), self.average)
 
             key = self.screen.getkey()
@@ -341,7 +341,7 @@ class Game(object):
                 self.quote = self.quotes.next()
             else:
                 self.quote = self.quotes.previous()
-            self.text = self.quote["text"]
+            self.text = self.quote[2]
             self.screen.clear()
 
     def resize(self):
@@ -383,7 +383,7 @@ class Game(object):
             self.screen.clear()
             self.screen.update(1, self.get_stats(self.elapsed),
                     self.text, self.position, self.incorrect,
-                    self.quote["author"], self.quote["title"], self._edit,
+                    self.quote[0], self.quote[1], self._edit,
                     self.wpm(self.elapsed), self.average)
 
         # Start recording upon first ordinary key press

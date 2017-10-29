@@ -48,14 +48,14 @@ class Quotes(object):
         return len(self.quotes)
 
     def __getitem__(self, index):
-        author, title, quote = self.quotes[index]
-        return {"author": author, "title": title, "text": quote}
+        return self.quotes[index]
 
-    def __setitem__(self, index, quote):
-        author = quote["author"]
-        title = quote["title"]
-        text = quote["text"]
-        self.quotes[index] = [author, title, quote]
+    def __setitem__(self, index, item):
+        if not isinstance(item, list):
+            raise ValueError("Expected a list")
+        if len(item) != 3 or not all(map(isinstance(x, str) for x in item)):
+            raise ValueError("Expected a list of three strings")
+        self.quotes[index] = item
 
     def random_iterator(self):
         return RandomIterator(self)
@@ -72,15 +72,7 @@ class Quotes(object):
         with codecs.open(filename, encoding="utf-8") as f:
             quotes = json.load(f)
 
-        unique = set()
-
-        for quote in quotes:
-            author = quote["author"]
-            title = quote["title"]
-            text = quote["text"]
-            unique.add((author, title, text))
-
-        return Quotes(list(unique))
+        return Quotes(list(set(quotes)))
 
     @staticmethod
     def load(filename=None):
