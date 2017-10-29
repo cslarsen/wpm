@@ -51,6 +51,12 @@ class Quotes(object):
         author, title, quote = self.quotes[index]
         return {"author": author, "title": title, "text": quote}
 
+    def __setitem__(self, index, quote):
+        author = quote["author"]
+        title = quote["title"]
+        text = quote["text"]
+        self.quotes[index] = (author, title, quote)
+
     def random_iterator(self):
         return RandomIterator(self)
 
