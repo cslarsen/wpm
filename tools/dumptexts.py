@@ -90,9 +90,8 @@ Russel</p>
         "speech",
         "television series",
     )
-    for p in prefixes:
-        if author.lower().startswith(p.lower()):
-            author = author[len(p):].strip()
+    while author.lower().split(" ")[0] in prefixes:
+        author = " ".join(author.split(" ")[1:])
 
     author = normalize(author)
     title = normalize(title)
