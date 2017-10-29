@@ -87,6 +87,9 @@ class Quotes(object):
         with gzip.open(filename) as f:
             return Quotes(json.load(f), database)
 
-    def save(self, filename):
+    def save(self, filename=None):
+        if filename is None:
+            filename = Quotes._database_filename()
+
         with gzip.open(filename, mode="wb") as f:
             json.dump(self.quotes, f)
