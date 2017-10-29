@@ -53,7 +53,7 @@ class Quotes(object):
     def __setitem__(self, index, item):
         if not isinstance(item, list):
             raise ValueError("Expected a list")
-        if len(item) != 3 or not all(map(isinstance(x, str) for x in item)):
+        if len(item) != 3:
             raise ValueError("Expected a list of three strings")
         self.quotes[index] = item
 
