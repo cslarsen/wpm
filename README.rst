@@ -19,11 +19,11 @@ Features
 Demo
 ----
 
-.. image:: https://asciinema.org/a/vJCg0dtITUAvLOD9XUY4FaYxt.png
+.. image:: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf.png
   :width: 480 px
   :height: 230 px
   :alt: Screen recording of WPM in action
-  :target: https://asciinema.org/a/vJCg0dtITUAvLOD9XUY4FaYxt?size=medium
+  :target: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf?size=medium
 
 Calculating WPM
 ---------------
