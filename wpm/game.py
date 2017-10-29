@@ -18,6 +18,7 @@ import curses.ascii
 import json
 import os
 import time
+import wpm.error
 
 def word_wrap(s, w):
     """Returns lengths of lines that can be printed without wrapping."""
@@ -50,11 +51,20 @@ class Screen(object):
         os.environ.setdefault("ESCDELAY", "15")
 
         self.screen = curses.initscr()
-        self.screen.keypad(True)
 
+        if curses.LINES < 16:
+            curses.endwin()
+            raise wpm.error.WpmError(
+                    "wpm requires at least 16 lines in your display")
+
+        if curses.COLS < 40:
+            curses.endwin()
+            raise wpm.error.WpmError(
+                    "wpm requires at least 40 columns in your display")
+
+        self.screen.keypad(True)
         curses.noecho()
         curses.cbreak()
-
         curses.start_color()
 
         if os.getenv("TERM") == "xterm-256color":

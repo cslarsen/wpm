@@ -13,6 +13,7 @@ import codecs
 import os
 import sys
 import wpm
+import wpm.error
 import wpm.game
 import wpm.quotes
 import wpm.stats
@@ -130,5 +131,8 @@ def main():
             game.set_tab_spaces(opts.tabs)
             game.run()
     except KeyboardInterrupt:
-        pass
-    game.stats.save(opts.stats_file)
+        game.stats.save(opts.stats_file)
+        sys.exit(0)
+    except wpm.error.WpmError as e:
+        print(e)
+        sys.exit(1)
