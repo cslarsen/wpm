@@ -20,8 +20,8 @@ Demo
 ----
 
 .. image:: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf.png
-  :width: 480 px
-  :height: 230 px
+  :width: 320 px
+  :height: 153 px
   :alt: Screen recording of WPM in action
   :target: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf?size=medium
 
