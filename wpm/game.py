@@ -20,7 +20,7 @@ import wpm.error
 def word_wrap(s, w):
     """Returns lengths of lines that can be printed without wrapping."""
     lengths = []
-    while len(s) >= w:
+    while len(s) > w:
         end = s[:w+1].rindex(" ")
 
         # We can't divide the input nicely, so just display it as-is
