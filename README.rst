@@ -13,8 +13,7 @@ Features
 - Timer starts when you strike the first key
 - Completed text is *darkened*, helping you to focus ahead
 - Keeps separate stats for, e.g. type of keyboard, layout etc.
-- Saves race scores in an CSV file that is compatible with both Excel and that
-  of TypeRacer (it has a few extra columns as the end)
+- Saves race scores in a CSV file that is compatible with Excel and TypeRacer
 - Launches quickly in your terminal window for "in-between moments"
 
 Demo
