@@ -52,15 +52,15 @@ class Screen(object):
 
         self.screen = curses.initscr()
 
-        if curses.LINES < 16:
+        if curses.LINES < 12:
             curses.endwin()
             raise wpm.error.WpmError(
-                    "wpm requires at least 16 lines in your display")
+                    "wpm requires at least 12 lines in your display")
 
-        if curses.COLS < 40:
+        if curses.COLS < 51:
             curses.endwin()
             raise wpm.error.WpmError(
-                    "wpm requires at least 40 columns in your display")
+                    "wpm requires at least 51 columns in your display")
 
         self.screen.keypad(True)
         curses.noecho()
