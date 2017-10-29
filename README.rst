@@ -107,19 +107,19 @@ existing TypeRacer score history tools with this file with minor modifications.
 
 The column order is:
 
-+-------------+----------+---------------------------------------------------------+
-| Column      | Datatype | Explanation                                             |
-+=============+==========+=========================================================+
-| race        | int      | Race number, always increasing and tied to timestamp    |
-| wpm         | float    | The average WPM for that quote that single time         |
-| accuracy    | float    | 0 to 1                                                  |
-| rank        | int      | Always 1                                                |
-| racers      | int      | Always 1                                                |
-| text_id     | int      | Item number of text in given database                   |
-| timestamp   | str      | UTC timestamp in strptime format "%Y-%m-%d %H:%M:%S.%f" |
-| database    | str      | Either "default" or the basename of the file used       |
-| keyboard    | str      | A user supplied, arbitrary for that score               |
-+-------------+----------+---------------------------------------------------------+
+========== ======== =======================================================
+Column     Datatype Explanation
+---------- -------- -------------------------------------------------------
+race       int      Race number, always increasing and tied to timestamp
+wpm        float    The average WPM for that quote that single time
+accuracy   float    0 to 1
+rank       int      Always 1
+racers     int      Always 1
+text_id    int      Item number of text in given database
+timestamp  str      UTC timestamp in strptime format `%Y-%m-%d %H:%M:%S.%f`
+database   str      Either "default" or the basename of the file used
+keyboard   str      A user supplied, arbitrary for that score
+========== ======== =======================================================
 
 Should there be any problem saving or loading the score history, it will copy
 the existing file into `~/.wpm.csv.backup`.
