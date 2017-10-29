@@ -25,7 +25,7 @@ def word_wrap(s, w):
 
         # We can't divide the input nicely, so just display it as-is
         if end == -1:
-            return len(s)
+            return [len(s)]
 
         lengths.append(end)
         s = s[end+1:]
