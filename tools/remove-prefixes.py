@@ -13,6 +13,7 @@ for i, quote in enumerate(quotes):
         "game",
         "movie",
         "other",
+        "poem",
         "song",
         "speech",
         "television series",
