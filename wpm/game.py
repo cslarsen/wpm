@@ -150,6 +150,16 @@ class Screen(object):
         except:
             return None
 
+    def column(self, y, x, width, text, attr=None, left=True):
+        lengths = word_wrap(text, width)
+        for y, length in enumerate(lengths, y):
+            if left:
+                self.window.addstr(y, x, text[:length], attr)
+            else:
+                self.window.addstr(y, x - length, text[:length], attr)
+            text = text[1+length:]
+        return len(lengths)
+
     def update(self, browse, head, quote, position, incorrect, author, title,
             typed, wpm, average):
         cols = curses.COLS
@@ -170,8 +180,10 @@ class Screen(object):
 
             # Show author
             credit = (u"- %s, %s" % (author, title)).encode("utf-8")
-            self.window.addstr(3 + h, cols - len(credit) - 12,
-                    credit, curses.color_pair(6))
+            hh = self.column(3+h, cols - 10, cols//2, credit,
+                    curses.color_pair(6), False)
+            #self.window.addstr(3 + h, cols - len(credit) - 8,
+                    #credit, curses.color_pair(6))
             if browse >= 2:
                 stop = "."
                 if wpm > average:
