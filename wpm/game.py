@@ -169,8 +169,9 @@ class Screen(object):
                 quote = quote[1+length:]
 
             # Show author
-            credit = (u"    - %s, %s" % (author, title)).encode("utf-8")
-            self.window.addstr(3 + h, 0, credit, curses.color_pair(6))
+            credit = (u"- %s, %s" % (author, title)).encode("utf-8")
+            self.window.addstr(3 + h, cols - len(credit) - 12,
+                    credit, curses.color_pair(6))
             if browse >= 2:
                 stop = "."
                 if wpm > average:
