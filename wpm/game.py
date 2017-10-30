@@ -13,6 +13,7 @@ full license text. This software makes use of open source software.
 
 import curses
 import curses.ascii
+import locale
 import os
 import time
 import wpm.error
@@ -46,7 +47,7 @@ class Screen(object):
     def __init__(self):
         # Make delay slower
         os.environ.setdefault("ESCDELAY", "15")
-
+        locale.setlocale(locale.LC_ALL, "")
         self.screen = curses.initscr()
 
         if curses.LINES < 12:
@@ -179,9 +180,9 @@ class Screen(object):
                 quote = quote[1+length:]
 
             # Show author
-            credit = (u"- %s, %s" % (author, title)).encode("utf-8")
-            self.cheight = 4 + h + self.column(3+h, cols - 10, cols//2, credit,
-                    curses.color_pair(6), False)
+            credit = u"— %s, %s" % (author, title)
+            self.cheight = 4 + h + self.column(3+h, cols - 10, cols//2,
+                    credit.encode("utf-8"), curses.color_pair(6), False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
                         else ".")
