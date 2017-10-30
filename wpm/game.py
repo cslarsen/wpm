@@ -180,15 +180,11 @@ class Screen(object):
 
             # Show author
             credit = (u"- %s, %s" % (author, title)).encode("utf-8")
-            hh = self.column(3+h, cols - 10, cols//2, credit,
+            cheight = 4 + h + self.column(3+h, cols - 10, cols//2, credit,
                     curses.color_pair(6), False)
-            #self.window.addstr(3 + h, cols - len(credit) - 8,
-                    #credit, curses.color_pair(6))
             if browse >= 2:
-                stop = "."
-                if wpm > average:
-                    stop = "!"
-                typed = "You scored %.1f wpm%s " % (wpm, stop)
+                typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
+                        else ".")
             else:
                 typed = ""
             typed += "Use arrows/space to browse, esc to quit, or start typing."
@@ -203,13 +199,13 @@ class Screen(object):
             self.window.chgat(2 + sy, sx, curses.color_pair(4))
 
         # Show typed text
-        if (6 + h) < curses.LINES:
-            self.window.move(6 + h, 0)
+        if cheight < curses.LINES:
+            self.window.move(cheight, 0)
             self.window.clrtoeol()
-            self.window.addstr(6 + h, 0, typed, curses.color_pair(7))
+            self.window.addstr(cheight, 0, typed, curses.color_pair(7))
         if browse > 1:
             # If done, highlight score
-            self.window.chgat(6 + h, 11,
+            self.window.chgat(cheight, 11,
                 len(str("%.1f" % wpm)), curses.color_pair(9))
 
         # Move cursor to current position in text before refreshing
