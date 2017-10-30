@@ -155,9 +155,9 @@ class Screen(object):
         lengths = word_wrap(text, width)
         for y, length in enumerate(lengths, y):
             if left:
-                self.window.addstr(y, x, text[:length], attr)
+                self.window.addstr(y, x, text[:length].encode("utf-8"), attr)
             else:
-                self.window.addstr(y, x - length, text[:length], attr)
+                self.window.addstr(y, x - length, text[:length].encode("utf-8"), attr)
             text = text[1+length:]
         return len(lengths)
 
@@ -181,8 +181,8 @@ class Screen(object):
 
             # Show author
             credit = u"— %s, %s" % (author, title)
-            self.cheight = 4 + h + self.column(3+h, cols - 10, cols//2,
-                    credit.encode("utf-8"), curses.color_pair(6), False)
+            self.cheight = 4 + h + self.column(3+h, cols - 10, cols//2, credit,
+                    curses.color_pair(6), False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
                         else ".")
