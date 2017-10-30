@@ -22,6 +22,9 @@ runpypy:
 stats:
 	PYTHONPATH=. $(PYTHON) wpm --stats
 
+remove-prefixes:
+	PYTHONPATH=. $(PYTHON) tools/remove-prefixes.py
+
 dist:
 	rm -rf dist/*
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist

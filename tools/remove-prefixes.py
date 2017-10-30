@@ -8,6 +8,7 @@ for i, quote in enumerate(quotes):
         "a",
         "book",
         "by",
+        "developed",
         "directed",
         "game",
         "movie",
