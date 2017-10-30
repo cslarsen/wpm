@@ -192,11 +192,12 @@ class Screen(object):
             color = curses.color_pair(3 if incorrect == 0 else 1)
             typed = "> " + typed
 
-            sx, sy = screen_coords(lengths, position + incorrect - 1)
-            self.window.chgat(2 + sy, max(sx, 0), 1, color)
+            if position + incorrect < len(quote):
+                sx, sy = screen_coords(lengths, position + incorrect - 1)
+                self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
-            sx, sy = screen_coords(lengths, position + incorrect + 1)
-            self.window.chgat(2 + sy, sx, curses.color_pair(4))
+                sx, sy = screen_coords(lengths, position + incorrect + 1)
+                self.window.chgat(2 + sy, sx, curses.color_pair(4))
 
         # Show typed text
         if self.cheight < curses.LINES:
@@ -400,8 +401,6 @@ class Game(object):
         elif key == "\t" and self.tab_spaces is not None:
             key = " "*self.tab_spaces
 
-        self._edit += key
-
         # Did the user strike the correct key?
         if self.incorrect == 0 and self.text[self.position] == key:
             self.position += 1
@@ -409,10 +408,13 @@ class Game(object):
             # Reset edit buffer on a correctly finished word
             if key == " " or key == "\n":
                 self._edit = ""
+            else:
+                self._edit += key
 
             # Finished typing?
             if self.position == len(self.text):
                 self.mark_finished()
-        else:
+        elif self.incorrect + self.position < len(self.text):
             self.incorrect += 1
             self.total_incorrect += 1
+            self._edit += key
