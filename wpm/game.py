@@ -418,4 +418,6 @@ class Game(object):
         elif self.incorrect + self.position < len(self.text):
             self.incorrect += 1
             self.total_incorrect += 1
+            if key == "\n":
+                key = " "
             self._edit += key
