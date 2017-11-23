@@ -72,7 +72,15 @@ class Quotes(object):
         with codecs.open(filename, encoding="utf-8") as f:
             quotes = json.load(f)
 
-        return Quotes(list(set(quotes)))
+        # Flatten
+        out = []
+        for quote in quotes:
+            author = quote["author"]
+            title = quote["title"]
+            text = quote["text"]
+            out.append((author, title, text))
+
+        return Quotes(list(set(out)))
 
     @staticmethod
     def load(filename=None):
