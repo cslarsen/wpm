@@ -100,6 +100,8 @@ def main():
             text = f.read().replace("\r", "").rstrip()
         quotes.append(["", "", text])
 
+        quotes = wpm.quotes.Quotes(quotes)
+
     if len(quotes) == 0:
         quotes = wpm.quotes.Quotes.load()
 
