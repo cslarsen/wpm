@@ -1,10 +1,11 @@
-wpm — a terminal app that measures your typing speed
-====================================================
+wpm — measure and improve your typing speed
+===========================================
 |versions| |license| |pypi|
 
-``wpm`` is a simple terminal program that measures your typing speed in words
-per minute (WPM). It works with Python 2.7, 3.x and PyPy and only requires
-standard Python libraries.
+``wpm`` is a UNIX terminal program for measuring and improving your typing
+speed, which is measured in words per minute (WPM). It depends only on standard
+Python libraries, particularly curses, and thus works with Python 2.7, 3+, PyPy
+and probably others.
 
 Features
 --------
@@ -38,15 +39,9 @@ gauge your typing speed. And it works offline, and with your own texts.
 How to get the lowest typing latency
 ------------------------------------
 
-On my machine, wpm *easily* beats typeracer.com on latency. For the absolutely
-best experience, I recommend the following: Use the Terminal.app that comes
-with macOS (and not iTerm), don't use tmux or screen, and run with pypy. Try
-it, and you'll definitely feel that every single key you strike is instantly
-updated on the screen.
-
-This comment is not meant to disregard TypeRacer, which I do love. But it's
-nice to have a little terminal program to practice whenever you have a minute
-to spare (for example, while compiling).
+Run outside of tmux, and use a really speedy terminal window. On my macOS
+system, I found the best latency using the built-in Terminal.app, which easily
+beats iTerm. I also found the Kitty terminal to provide very low latency.
 
 How to install
 ==============
