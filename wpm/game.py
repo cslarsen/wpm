@@ -65,7 +65,7 @@ class Screen(object):
         curses.cbreak()
         curses.start_color()
 
-        if os.getenv("TERM") == "xterm-256color":
+        if os.getenv("TERM").endswith("256color"):
             bg = 233
 
             # Incorrect
