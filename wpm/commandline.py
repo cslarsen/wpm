@@ -15,6 +15,7 @@ import sys
 import wpm
 import wpm.error
 import wpm.game
+import wpm.graph
 import wpm.quotes
 import wpm.stats
 
@@ -45,6 +46,9 @@ The format is
 
     p.add_argument("--stats-file", default="~/.wpm.csv", type=str,
             help="File to record score history to (CSV format)")
+
+    p.add_argument("-g", "--graph", default="~/.wpm.csv", type=str,
+            help="Plot wpm scores as a line graph")
 
     opts = p.parse_args()
 
