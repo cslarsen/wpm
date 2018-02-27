@@ -129,7 +129,7 @@ statistical analysis on your typing performance with various setups.
 License
 =======
 
-Copyright 2017 Christian Stigen Larsen
+Copyright 2018 Christian Stigen Larsen
 
 Distributed under the GNU GPL v3 or later. See the file LICENSE.txt for the
 full license text. This software makes use of open source software.
