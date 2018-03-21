@@ -35,6 +35,8 @@ multiplying that with 60. This is a well-known formula, but gives slightly
 higher scores than on sites like typeracer.com. It is, however, good enough to
 gauge your typing speed. And it works offline, and with your own texts.
 
+Regarding TypeRacer, I really suggest everyone check it out. I use this program
+merely to practice my typing before heading over to typeracer.com.
 
 How to get the lowest typing latency
 ------------------------------------
@@ -107,17 +109,17 @@ Column     Datatype Explanation
 ---------- -------- -------------------------------------------------------
 race       int      Race number, always increasing and tied to timestamp
 wpm        float    The average WPM for that quote that single time
-accuracy   float    0 to 1
+accuracy   float    From 0 to 1, where 1 means no mistakes
 rank       int      Always 1
 racers     int      Always 1
 text_id    int      Item number of text in given database
 timestamp  str      UTC timestamp in strptime format `%Y-%m-%d %H:%M:%S.%f`
 database   str      Either "default" or the basename of the file used
-keyboard   str      A user supplied, arbitrary for that score
+keyboard   str      A user supplied tag for that score
 ========== ======== =======================================================
 
 Should there be any problem saving or loading the score history, it will copy
-the existing file into `~/.wpm.csv.backup`.
+the existing file into `~/.wpm.csv.backup` and create a new one.
 
 If you use `--keyboard=...` to specify a keyboard, the next time wpm is
 launched, it will assume that this is the keyboard you are still using. Just
@@ -129,7 +131,7 @@ statistical analysis on your typing performance with various setups.
 License
 =======
 
-Copyright 2017 Christian Stigen Larsen
+Copyright 2017, 2018 Christian Stigen Larsen
 
 Distributed under the GNU GPL v3 or later. See the file LICENSE.txt for the
 full license text. This software makes use of open source software.
