@@ -10,6 +10,7 @@ full license text. This software makes use of open source software.
 
 import argparse
 import codecs
+import math
 import os
 import sys
 import wpm
@@ -74,6 +75,23 @@ def averages(games):
 
     return average_wpm, average_acc
 
+def stddevs(games):
+    awpm, aacc = averages(games)
+    n = len(games)
+
+    if n <= 1:
+        return 0, 0
+
+    swpm = 0
+    sacc = 0
+    for game in games:
+        wpm = game[1]
+        acc = game[2]
+        swpm += (wpm - awpm)**2.0
+        sacc += (acc - aacc)**2.0
+
+    return math.sqrt(swpm/(n-1)), math.sqrt(sacc/(n-1))
+
 def main():
     opts = parse_args()
     quotes = []
@@ -102,30 +120,37 @@ def main():
 
         quotes = wpm.quotes.Quotes(quotes)
 
-    if len(quotes) == 0:
+    if len(quotes) == 0 and not opts.stats:
         quotes = wpm.quotes.Quotes.load()
 
     if opts.stats:
-        print("Total average: %5.1f" % stats.average())
+        table = []
         for keyboard in sorted(stats.games.keys()):
-            print("Keyboard: %s" % (keyboard if keyboard is not None else
-                "Unspecified"))
+            name = keyboard if keyboard is not None else "Unspecified"
 
             games = stats.games[keyboard]
             awpm, aacc = averages(games)
-            print("   all %4d games: %5.1f average wpm, %4.1f%% average accuracy" % (
-                len(games), awpm, 100.0*aacc))
+            swpm, sacc = stddevs(games)
 
-            last_n = 10
-            if len(games) >= last_n:
-                awpm, aacc = averages(games[-last_n:])
-                print("  last %4d games: %5.1f average wpm, %4.1f%% average accuracy" % (
-                    last_n, awpm, 100.0*aacc))
+            for last_n in [0, 10, 100, 1000]:
+                if len(games) >= last_n:
+                    if last_n == 0:
+                        label = len(games)
+                    else:
+                        label = "n-%d" % last_n
 
-        if stats.keyboard is not None:
-            print("Current keyboard: %s" % stats.keyboard)
+                    awpm, aacc = averages(games[-last_n:])
+                    swpm, sacc = stddevs(games[-last_n:])
 
-        print("Quotes in currently loaded database: %d" % len(quotes))
+                    table.append([name, label, awpm, swpm, 100.0*aacc, 100.0*sacc])
+
+        width = max(max(len(e[0]) for e in table), 11)
+        print("Keyboard      Games   WPM avg/stddev     Accuracy avg/stddev")
+        print("------------------------------------------------------------")
+        for entry in table:
+            label, count, wpm_avg, wpm_sd, acc_avg, acc_sd = entry
+            print("%-*s   %5s      %5.1f %5.1f     %4.1f%% %5.1f%%" % (width, label,
+                count, wpm_avg, wpm_sd, acc_avg, acc_sd))
         return
 
     try:
