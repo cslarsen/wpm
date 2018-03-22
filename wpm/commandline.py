@@ -145,12 +145,12 @@ def main():
                     table.append([name, label, awpm, swpm, 100.0*aacc, 100.0*sacc])
 
         width = max(max(len(e[0]) for e in table), 11)
-        print("Keyboard      Games   WPM avg/stddev     Accuracy avg/stddev")
-        print("------------------------------------------------------------")
+        print("Keyboard      Games    WPM avg stddev     Accuracy avg stddev")
+        print("-------------------------------------------------------------")
         for entry in table:
             label, count, wpm_avg, wpm_sd, acc_avg, acc_sd = entry
-            print("%-*s   %5s      %5.1f %5.1f     %4.1f%% %5.1f%%" % (width, label,
-                count, wpm_avg, wpm_sd, acc_avg, acc_sd))
+            print("%-*s   %5s      %5.1f  %5.1f            %4.1f%% %5.1f%%" %
+                    (width, label, count, wpm_avg, wpm_sd, acc_avg, acc_sd))
         return
 
     try:
