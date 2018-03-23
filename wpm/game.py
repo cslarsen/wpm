@@ -15,6 +15,7 @@ import curses
 import curses.ascii
 import locale
 import os
+import sys
 import time
 import wpm.error
 
@@ -49,6 +50,7 @@ class Screen(object):
         os.environ.setdefault("ESCDELAY", "15")
         locale.setlocale(locale.LC_ALL, "")
         self.screen = curses.initscr()
+        self.screen.nodelay(True)
 
         if curses.LINES < 12:
             curses.endwin()
@@ -143,12 +145,39 @@ class Screen(object):
             return True
         return False
 
-    def getkey(self):
+    def get_key(self):
+        # Install a suitable get_key based on Python version
+        if sys.version_info[0:2] >= (3, 3):
+            self.get_key = self.getkey_py33
+        else:
+            self.get_key = self.getkey_py27
+        return self.get_key()
+
+    def getkey_py33(self):
+        try:
+            # Curses in Python 3.3 handles unicode via get_wch
+            key = self.window.get_wch()
+            if type(key) == int:
+                if key == curses.KEY_LEFT:
+                    return "KEY_LEFT"
+                elif key == curses.KEY_RIGHT:
+                    return "KEY_RIGHT"
+                elif key == curses.KEY_RESIZE:
+                    return "KEY_RESIZE"
+                else:
+                    return None
+            return key
+        except curses.error:
+            return None
+        except KeyboardInterrupt:
+            raise
+
+    def getkey_py27(self):
         try:
             return self.window.getkey()
         except KeyboardInterrupt:
             raise
-        except:
+        except curses.error:
             return None
 
     def column(self, y, x, width, text, attr=None, left=True):
@@ -290,7 +319,7 @@ class Game(object):
                     self.quote.author, self.quote.title, self._edit,
                     self.wpm(self.elapsed), self.average)
 
-            key = self.screen.getkey()
+            key = self.screen.get_key()
             if key is not None:
                 self.handle_key(key)
 
