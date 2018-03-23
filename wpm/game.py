@@ -243,6 +243,7 @@ class Game(object):
         self.stop = None
 
         self._edit = ""
+        self.num_quotes = len(quotes)
         self.quotes = quotes.random_iterator()
         self.quote = self.quotes.next()
         self.text = self.quote[2]
@@ -258,6 +259,16 @@ class Game(object):
             return False
         else:
             return self
+
+    def jump_to(self, text_id):
+        """Skips until then given text id is found."""
+        pos = 0
+        while self.quotes.text_id != text_id:
+            self.quote = self.quotes.next()
+            self.text = self.quote[2]
+            pos += 1
+            if pos > self.num_quotes:
+                raise KeyError("Text ID not found: %s" % text_id)
 
     def set_tab_spaces(self, spaces):
         self.tab_spaces = spaces
