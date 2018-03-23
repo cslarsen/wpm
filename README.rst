@@ -10,7 +10,7 @@ and probably others.
 Features
 --------
 
-- Over 3700 quotes in the database, shamelessly stolen from typeracerdata.com
+- Over 4900 quotes in the database, shamelessly stolen from typeracerdata.com
 - Extremely low typing latency!
 - Timer starts when you strike the first key
 - Completed text is *darkened*, helping you to focus ahead
