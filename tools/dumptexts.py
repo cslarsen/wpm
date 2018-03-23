@@ -8,6 +8,7 @@ Dumps texts from typeracerdata.com.
 from HTMLParser import HTMLParser
 from multiprocessing import Pool as ThreadPool
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -106,7 +107,7 @@ def readquote(text_id):
         print("id %s: '%s' by %s" % (text_id, title, author))
         print("   \"%s\"" % quote)
 
-        return author, title, quote
+        return author, title, quote, text_id
 
 def read_ids(url="http://www.typeracerdata.com/texts"):
     html = loadurl(url)
@@ -118,10 +119,13 @@ def read_ids(url="http://www.typeracerdata.com/texts"):
             continue
         start = line.index(find)
         stop = line.index('"', start + len(find))
-        text_id = line[start + len(find):stop]
+        text_id = int(line[start + len(find):stop])
         ids.add(text_id)
 
     return ids
+
+def make_tuple(quotes):
+    return tuple(set(map(tuple, quotes)))
 
 def main(verbose=False, threads=1):
     print("Reading list of quotes")
@@ -138,34 +142,40 @@ def main(verbose=False, threads=1):
     else:
         try:
             results = []
-            for count, id in enumerate(ids):
+            for count, text_id in enumerate(ids):
                 print("%d/%d" % (count, len(ids)))
-                results.append(readquote(id))
+                results.append(readquote(text_id))
         except KeyboardInterrupt:
             pass
 
     print("Adding %d quotes to database" % len(results))
 
     quotes = []
-    for author, title, quote in results:
-        quotes.append([author, title, quote])
+    examples = []
+    for author, title, quote, text_id in results:
+        quotes.append([author, title, quote, text_id])
 
-    filename = "../wpm/data/examples.json"
+    filename = "../wpm/data/examples.json.gz"
 
-    with open(filename, "rt") as f:
-        examples = json.load(f)
+    try:
+        with gzip.open(filename) as f:
+            examples = json.load(f)
+    except Exception as e:
+        print("Could not load %s: %s" % (filename, e))
 
-    with open(filename, "wt") as f:
-        json.dump(set(examples + quotes), f)
+    quotes = make_tuple(examples + quotes)
 
-    print("Total quote count in database: %d" % len(examples))
+    with gzip.open(filename, mode="wb") as f:
+        json.dump(quotes, f)
+
+    print("Total quote count in database: %d" % len(quotes))
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("-t", "--threads", default=1, type=int,
+    p.add_argument("-j", "--jobs", default=1, type=int,
             help="Number of concurrent downloads")
     p.add_argument("-v", "--verbose", default=False,
             action="store_true")
 
     opts = p.parse_args()
-    main(opts.verbose, opts.threads)
+    main(opts.verbose, opts.jobs)
