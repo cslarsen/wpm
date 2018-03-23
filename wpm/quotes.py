@@ -8,6 +8,14 @@ import os
 import pkg_resources
 import random
 
+class Quote(object):
+    def __init__(self, author, title, text, text_id):
+        self.author = author
+        self.text = text
+        self.title = title
+        self.text_id = text_id
+
+
 class RandomIterator(object):
     """Random, bi-directional iterator."""
     def __init__(self, quotes):
@@ -16,9 +24,23 @@ class RandomIterator(object):
         self.index = 0
         random.shuffle(self.indices)
 
+    def __len__(self):
+        return len(self.quotes)
+
     def _current(self):
-        i = self.indices[self.index]
-        return self.quotes[i]
+        index = self.indices[self.index]
+
+        quote = self.quotes[index]
+        author = quote[0]
+        title = quote[1]
+        text = quote[2]
+
+        if len(quote) > 3:
+            text_id = quote[3]
+        else:
+            text_id = index
+
+        return Quote(author, title, text, text_id)
 
     @property
     def database(self):
@@ -74,11 +96,12 @@ class Quotes(object):
 
         # Flatten
         out = []
-        for quote in quotes:
+        for text_id, quote in enumerate(quotes):
             author = quote["author"]
             title = quote["title"]
             text = quote["text"]
-            out.append((author, title, text))
+            text_id = int(quote.get("text_id", text_id))
+            out.append((author, title, text, text_id))
 
         return Quotes(list(set(out)))
 
@@ -91,7 +114,9 @@ class Quotes(object):
             database = os.path.splitext(os.path.basename(filename))[0]
 
         with gzip.open(filename) as f:
-            return Quotes(json.load(f), database)
+            quotes = json.load(f)
+            quotes = tuple(map(tuple, quotes))
+            return Quotes(quotes, database)
 
     def save(self, filename=None):
         if filename is None:

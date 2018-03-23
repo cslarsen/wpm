@@ -246,7 +246,6 @@ class Game(object):
         self.num_quotes = len(quotes)
         self.quotes = quotes.random_iterator()
         self.quote = self.quotes.next()
-        self.text = self.quote[2]
 
         self.screen = Screen()
 
@@ -263,9 +262,8 @@ class Game(object):
     def jump_to(self, text_id):
         """Skips until then given text id is found."""
         pos = 0
-        while self.quotes.text_id != text_id:
+        while self.quote.text_id != text_id:
             self.quote = self.quotes.next()
-            self.text = self.quote[2]
             pos += 1
             if pos > self.num_quotes:
                 raise KeyError("Text ID not found: %s" % text_id)
@@ -276,7 +274,7 @@ class Game(object):
     def mark_finished(self):
         self.stop = time.time()
         self.stats.add(self.wpm(self.elapsed), self.accuracy,
-                self.quotes.text_id, self.quotes.database)
+                self.quote.text_id, self.quotes.database)
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
     def run(self):
@@ -288,8 +286,8 @@ class Game(object):
                 browse = 2
 
             self.screen.update(browse, self.get_stats(self.elapsed),
-                    self.text, self.position, self.incorrect,
-                    self.quote[0], self.quote[1], self._edit,
+                    self.quote.text, self.position, self.incorrect,
+                    self.quote.author, self.quote.title, self._edit,
                     self.wpm(self.elapsed), self.average)
 
             key = self.screen.getkey()
@@ -328,7 +326,7 @@ class Game(object):
         if self.start is None:
             return 0
         else:
-            n = len(self.text)
+            n = len(self.quote.text)
             return float(n) / (n + self.total_incorrect)
 
     def get_stats(self, elapsed):
@@ -359,7 +357,6 @@ class Game(object):
                 self.quote = self.quotes.next()
             else:
                 self.quote = self.quotes.previous()
-            self.text = self.quote[2]
             self.screen.clear()
 
     def resize(self):
@@ -400,8 +397,8 @@ class Game(object):
             self.reset()
             self.screen.clear()
             self.screen.update(1, self.get_stats(self.elapsed),
-                    self.text, self.position, self.incorrect,
-                    self.quote[0], self.quote[1], self._edit,
+                    self.quote.text, self.position, self.incorrect,
+                    self.quote.author, self.quote.title, self._edit,
                     self.wpm(self.elapsed), self.average)
 
         # Start recording upon first ordinary key press
@@ -414,7 +411,7 @@ class Game(object):
             key = " "*self.tab_spaces
 
         # Did the user strike the correct key?
-        if self.incorrect == 0 and self.text[self.position] == key:
+        if self.incorrect == 0 and self.quote.text[self.position] == key:
             self.position += 1
 
             # Reset edit buffer on a correctly finished word
@@ -424,9 +421,9 @@ class Game(object):
                 self._edit += key
 
             # Finished typing?
-            if self.position == len(self.text):
+            if self.position == len(self.quote.text):
                 self.mark_finished()
-        elif self.incorrect + self.position < len(self.text):
+        elif self.incorrect + self.position < len(self.quote.text):
             self.incorrect += 1
             self.total_incorrect += 1
             if key == "\n":

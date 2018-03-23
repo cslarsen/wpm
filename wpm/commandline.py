@@ -47,8 +47,8 @@ The format is
     p.add_argument("--stats-file", default="~/.wpm.csv", type=str,
             help="File to record score history to (CSV format)")
 
-    p.add_argument("--text-id", default=None, type=int,
-            help="If specified, jumps to given text id on start.")
+    p.add_argument("--id", "-i", default=None, type=int,
+            help="If specified, jumps to given text ID on start.")
 
     opts = p.parse_args()
 
@@ -159,12 +159,11 @@ def main():
     try:
         with wpm.game.Game(quotes, stats) as game:
             game.set_tab_spaces(opts.tabs)
-            if opts.text_id is not None:
+            if opts.id is not None:
                 try:
-                    game.jump_to(opts.text_id)
+                    game.jump_to(opts.id)
                 except KeyError as e:
-                    raise wpm.error.WpmError("Text ID %d not found" %
-                            opts.text_id)
+                    raise wpm.error.WpmError("Text ID %d not found" % opts.id)
                     sys.exit(1)
             game.run()
     except KeyboardInterrupt:
