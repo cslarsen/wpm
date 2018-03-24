@@ -11,6 +11,7 @@ full license text. This software makes use of open source software.
 import collections
 import csv
 import datetime
+import math
 import os
 
 class Timestamp(object):
@@ -25,12 +26,68 @@ class Timestamp(object):
         return datetime.datetime.utcnow()
 
 
+class GameResult(object):
+    def __init__(self, game):
+        race, wpm, accuracy, rank, racers, text_id, timestamp, database = game
+        self.race = race
+        self.wpm = wpm
+        self.accuracy = accuracy
+        self.rank = rank
+        self.racers = racers
+        self.text_id = text_id
+        self.timestamp = timestamp
+        self.database = database
+
+
+class GameResults(object):
+    def __init__(self, keyboard, games):
+        self.keyboard = keyboard
+        self.games = games
+
+    @property
+    def results(self):
+        for game in self.games:
+            yield GameResult(game)
+
+    def __len__(self):
+        return len(self.games)
+
+    def averages(self):
+        wpms = 0
+        accs = 0
+
+        for result in self.results:
+            wpms += result.wpm
+            accs += result.accuracy
+
+        return wpms / len(self), accs / len(self)
+
+    def stddevs(self):
+        n = len(self)
+
+        if n <= 1:
+            return 0.0, 0.0
+
+        wpm_sd = 0
+        acc_sd = 0
+
+        wpm_avg, acc_avg = self.averages()
+
+        for result in self.results:
+            wpm_sd += (result.wpm - wpm_avg)**2.0
+            acc_sd += (result.accuracy - acc_avg)**2.0
+
+        return math.sqrt(wpm_sd/(n-1)), math.sqrt(acc_sd/(n-1))
+
+
 class Stats(object):
     """Typing statistics"""
-
     def __init__(self, current_keyboard=None):
         self.keyboard = current_keyboard
         self.games = collections.defaultdict(list)
+
+    def results(self, keyboard, last_n=0):
+        return GameResults(keyboard, self.games[keyboard][-last_n:])
 
     def add(self, wpm, accuracy, text_id, database):
         race = 0

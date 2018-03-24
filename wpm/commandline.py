@@ -10,7 +10,6 @@ full license text. This software makes use of open source software.
 
 import argparse
 import codecs
-import math
 import os
 import sys
 import wpm
@@ -23,11 +22,11 @@ def parse_args():
     p = argparse.ArgumentParser(prog="wpm", epilog=wpm.__copyright__)
 
     p.add_argument("--load-json", metavar="FILENAME", default=None,
-            help="""JSON file containing texts to train on.
+            help="""JSON file containing quotes.
 
 The format is
 
-[{"author": "...", "title": "...", "text": "..."}, ...]
+[{"author": "...", "title": "...", "text": "...", "id": ...}, ...]
 """)
     p.add_argument("--load", metavar="FILENAME", default=None,
             help="A pure text file to train on.")
@@ -60,40 +59,6 @@ The format is
 
     opts.stats_file = os.path.expanduser(opts.stats_file)
     return opts
-
-def averages(games):
-    wpms = []
-    accs = []
-
-    # TODO: Fix this
-    for game in games:
-        wpm = game[1]
-        wpms.append(wpm)
-
-        accuracy = game[2]
-        accs.append(accuracy)
-
-    average_wpm = sum(wpms) / len(wpms)
-    average_acc = sum(accs) / len(accs)
-
-    return average_wpm, average_acc
-
-def stddevs(games):
-    awpm, aacc = averages(games)
-    n = len(games)
-
-    if n <= 1:
-        return 0, 0
-
-    swpm = 0
-    sacc = 0
-    for game in games:
-        wpm = game[1]
-        acc = game[2]
-        swpm += (wpm - awpm)**2.0
-        sacc += (acc - aacc)**2.0
-
-    return math.sqrt(swpm/(n-1)), math.sqrt(sacc/(n-1))
 
 def main():
     opts = parse_args()
@@ -128,21 +93,20 @@ def main():
         for keyboard in sorted(stats.games.keys()):
             name = keyboard if keyboard is not None else "Unspecified"
 
-            games = stats.games[keyboard]
-            awpm, aacc = averages(games)
-            swpm, sacc = stddevs(games)
-
             for last_n in [0, 10, 100, 1000]:
-                if len(games) >= last_n:
+                results = stats.results(keyboard, last_n=last_n)
+
+                if len(results) >= last_n:
                     if last_n == 0:
-                        label = len(games)
+                        label = len(results)
                     else:
                         label = "n-%d" % last_n
 
-                    awpm, aacc = averages(games[-last_n:])
-                    swpm, sacc = stddevs(games[-last_n:])
+                    wpm_avg, acc_avg = results.averages()
+                    wpm_sd, acc_sd = results.stddevs()
 
-                    table.append([name, label, awpm, swpm, 100.0*aacc, 100.0*sacc])
+                    table.append([name, label, wpm_avg, wpm_sd, 100.0*acc_avg,
+                        100.0*acc_sd])
 
         width = max(max(len(e[0]) for e in table), 11)
         print("Keyboard      Games    WPM avg stddev     Accuracy avg stddev")
