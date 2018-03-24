@@ -105,22 +105,8 @@ class Stats(object):
             database))
 
     def average(self, keyboard=None, last_n=None):
-        total = []
-
-        for kbd in self.games.keys():
-            if keyboard is not None:
-                if kbd != keyboard:
-                    continue
-            for game in self.games[kbd]:
-                total.append(game[1])
-
-        if (last_n is not None) and len(total) >= last_n:
-            total = total[-last_n:]
-
-        if len(total) > 0:
-            return sum(total) / len(total)
-        else:
-            return 0
+        wpm_avg, acc_avg = self.results(keyboard, last_n).averages()
+        return wpm_avg
 
     def __len__(self):
         return len(self.games)
