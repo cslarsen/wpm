@@ -59,6 +59,9 @@ The recommended way is to install via PyPi
 
     $ pip install wpm
 
+The above usually requires ``sudo``. If you don't want to install it
+system-wide, you can use ``pip install wpm --user``.
+
 Remember to check for upgrades with ``pip install --upgrade wpm``. You can also
 install it from the source repository with
 
@@ -96,12 +99,12 @@ You can also bundle up several texts into a single JSON file, using ``wpm
         "author": "Author Name",
         "title": "Title of Work",
         "text": "The text to type here ..."
-        "text_id": 123,
+        "id": 123,
       },
       ...
     ]
 
-The ``text_id`` is an optional integer. If you leave it out, an increasing,
+The ``id`` is an optional integer. If you leave it out, an increasing,
 zero-based integer will be used.
 
 Format of race history
