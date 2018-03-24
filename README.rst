@@ -37,7 +37,8 @@ higher scores than on sites like typeracer.com. It is, however, good enough to
 gauge your typing speed. And it works offline, and with your own texts.
 
 Regarding TypeRacer, I really suggest everyone check it out. I use this program
-merely to practice my typing before heading over to typeracer.com.
+merely to warm up before heading over to typeracer.com, where you can race
+against others.
 
 How to get the lowest typing latency
 ------------------------------------
