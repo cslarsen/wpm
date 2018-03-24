@@ -123,9 +123,6 @@ def main():
 
         quotes = wpm.quotes.Quotes(quotes)
 
-    if len(quotes) == 0 and not opts.stats:
-        quotes = wpm.quotes.Quotes.load()
-
     if opts.stats:
         table = []
         for keyboard in sorted(stats.games.keys()):
@@ -157,6 +154,9 @@ def main():
         return
 
     try:
+        if len(quotes) == 0:
+            quotes = wpm.quotes.Quotes.load()
+
         with wpm.game.Game(quotes, stats) as game:
             game.set_tab_spaces(opts.tabs)
             if opts.id is not None:
