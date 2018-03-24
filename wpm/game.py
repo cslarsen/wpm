@@ -72,72 +72,37 @@ class Screen(object):
         self.screen.keypad(True)
         curses.noecho()
         curses.cbreak()
+
         curses.start_color()
-
-        if os.getenv("TERM").endswith("256color"):
-            bg = self.config.background_color_256
-
-            # Incorrect
-            curses.init_pair(1, *self.config.incorrect_color_256)
-
-            # Status
-            curses.init_pair(2, *self.config.status_color_256)
-
-            # Done text
-            curses.init_pair(3, *self.config.correct_color_256)
-
-            # Normal text
-            curses.init_pair(4, *self.config.quote_color_256)
-
-            # UNUSED
-            curses.init_pair(5, 244, bg)
-
-            # Author
-            curses.init_pair(6, *self.config.author_color_256)
-
-            # Edit text and info
-            curses.init_pair(7, *self.config.prompt_color_256)
-
-            # Background color
-            curses.init_pair(8, bg, bg)
-
-            # Score highlight
-            curses.init_pair(9, *self.config.score_highlight_color_256)
-
-        else:
-            bg = self.config.background_color
-
-            # Incorrect
-            curses.init_pair(1, *self.config.incorrect_color)
-
-            # Status
-            curses.init_pair(2, *self.config.status_color)
-
-            # Done text
-            curses.init_pair(3, *self.config.correct_color)
-
-            # Normal text
-            curses.init_pair(4, *self.config.quote_color)
-
-            # UNUSED
-            curses.init_pair(5, curses.COLOR_WHITE, bg)
-
-            # Author
-            curses.init_pair(6, *self.config.author_color)
-
-            # Edit text and info
-            curses.init_pair(7, *self.config.prompt_color)
-
-            # Background color
-            curses.init_pair(8, bg, bg)
-
-            # Score highlight
-            curses.init_pair(9, *self.config.score_highlight_color)
+        self.set_colors()
 
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
         self.window.keypad(True)
         self.window.timeout(self.config.window_timeout)
         self.window.bkgd(" ", curses.color_pair(8))
+
+    def set_colors(self):
+        if os.getenv("TERM").endswith("256color"):
+            bg = self.config.background_color_256
+            curses.init_pair(1, *self.config.incorrect_color_256)
+            curses.init_pair(2, *self.config.status_color_256)
+            curses.init_pair(3, *self.config.correct_color_256)
+            curses.init_pair(4, *self.config.quote_color_256)
+            curses.init_pair(5, 244, bg) # UNUSED
+            curses.init_pair(6, *self.config.author_color_256)
+            curses.init_pair(7, *self.config.prompt_color_256)
+            curses.init_pair(8, bg, bg)
+            curses.init_pair(9, *self.config.score_highlight_color_256)
+        else:
+            bg = self.config.background_color
+            curses.init_pair(1, *self.config.incorrect_color)
+            curses.init_pair(2, *self.config.status_color)
+            curses.init_pair(3, *self.config.correct_color)
+            curses.init_pair(4, *self.config.quote_color)
+            curses.init_pair(5, curses.COLOR_WHITE, bg) # UNUSED
+            curses.init_pair(6, *self.config.author_color)
+            curses.init_pair(7, *self.config.prompt_color)
+            curses.init_pair(9, *self.config.score_highlight_color)
 
     def is_escape(self, key):
         if len(key) == 1:
