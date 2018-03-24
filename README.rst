@@ -14,8 +14,9 @@ Features
 - Extremely low typing latency!
 - Timer starts when you strike the first key
 - Completed text is *darkened*, helping you to focus ahead
-- Keeps separate stats for, e.g. type of keyboard, layout etc.
-- Saves race scores in a CSV file that is compatible with Excel and TypeRacer
+- Keep separate stats for, e.g. type of keyboard, layout etc.
+- Saves race scores in a CSV file that is a superset of TypeRacer's export
+  format. Loads fine in Excel as well.
 - Launches quickly in your terminal window for "in-between moments"
 
 Demo
@@ -45,6 +46,10 @@ Run outside of tmux, and use a really speedy terminal window. On my macOS
 system, I found the best latency using the built-in Terminal.app, which easily
 beats iTerm. I also found the Kitty terminal to provide very low latency.
 
+I also feel that running it under PyPy provides a little lower latency as well,
+but I haven't timed it. You can install it under PyPy with ``pypy -m pip
+install wpm``.
+
 How to install
 ==============
 
@@ -52,9 +57,10 @@ The recommended way is to install via PyPi
 
 .. code:: bash
 
-    $ pip install wpm
+    $ pip install wpm [--user]
 
-But you can also install from the source with
+Remember to check for upgrades with ``pip install --upgrade wpm``. You can also
+install it from the source repository with
 
 .. code:: bash
 
@@ -135,6 +141,8 @@ Copyright 2017, 2018 Christian Stigen Larsen
 
 Distributed under the GNU GPL v3 or later. See the file LICENSE.txt for the
 full license text. This software makes use of open source software.
+
+The quotes database is *not* covered by the GPL!
 
 .. |license| image:: https://img.shields.io/badge/license-GPL%20v3%2B-blue.svg
     :target: http://www.gnu.org/licenses/old-licenses/gpl-3.en.html
