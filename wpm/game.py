@@ -17,6 +17,7 @@ import locale
 import os
 import sys
 import time
+import wpm.config
 import wpm.error
 
 def word_wrap(s, w):
@@ -46,9 +47,15 @@ def screen_coords(lens, pos):
 
 class Screen(object):
     def __init__(self):
+        self.config = wpm.config.Config()
+
         # Make delay slower
-        os.environ.setdefault("ESCDELAY", "15")
+        os.environ.setdefault("ESCDELAY", self.config.escdelay)
+
+        # I can't remember why we set LC_ALL to an empty string. Figure it out,
+        # cause it doesn't look too smart.
         locale.setlocale(locale.LC_ALL, "")
+
         self.screen = curses.initscr()
         self.screen.nodelay(True)
 
@@ -68,69 +75,68 @@ class Screen(object):
         curses.start_color()
 
         if os.getenv("TERM").endswith("256color"):
-            bg = 233
+            bg = self.config.background_color_256
 
             # Incorrect
-            curses.init_pair(1, 197, 52)
+            curses.init_pair(1, *self.config.incorrect_color_256)
 
             # Status
-            curses.init_pair(2, 51, 24)
+            curses.init_pair(2, *self.config.status_color_256)
 
             # Done text
-            curses.init_pair(3, 240, bg)
+            curses.init_pair(3, *self.config.correct_color_256)
 
             # Normal text
-            curses.init_pair(4, 195, bg)
+            curses.init_pair(4, *self.config.quote_color_256)
 
             # UNUSED
             curses.init_pair(5, 244, bg)
 
             # Author
-            curses.init_pair(6, 240, bg)
+            curses.init_pair(6, *self.config.author_color_256)
 
             # Edit text and info
-            curses.init_pair(7, 244, 233)
+            curses.init_pair(7, *self.config.prompt_color_256)
 
             # Background color
             curses.init_pair(8, bg, bg)
 
             # Score highlight
-            curses.init_pair(9, 230, 197)
+            curses.init_pair(9, *self.config.score_highlight_color_256)
 
         else:
-            bg = curses.COLOR_BLACK
+            bg = self.config.background_color
 
             # Incorrect
-            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+            curses.init_pair(1, *self.config.incorrect_color)
 
             # Status
-            curses.init_pair(2, curses.COLOR_CYAN, bg)
+            curses.init_pair(2, *self.config.status_color)
 
             # Done text
-            curses.init_pair(3, curses.COLOR_WHITE, bg)
+            curses.init_pair(3, *self.config.correct_color)
 
             # Normal text
-            curses.init_pair(4, curses.COLOR_WHITE, bg)
+            curses.init_pair(4, *self.config.quote_color)
 
             # UNUSED
             curses.init_pair(5, curses.COLOR_WHITE, bg)
 
             # Author
-            curses.init_pair(6, curses.COLOR_WHITE, bg)
+            curses.init_pair(6, *self.config.author_color)
 
             # Edit text and info
-            curses.init_pair(7, curses.COLOR_WHITE, bg)
+            curses.init_pair(7, *self.config.prompt_color)
 
             # Background color
             curses.init_pair(8, bg, bg)
 
             # Score highlight
-            curses.init_pair(9, curses.COLOR_YELLOW, curses.COLOR_RED)
-
+            curses.init_pair(9, *self.config.score_highlight_color)
 
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
         self.window.keypad(True)
-        self.window.timeout(20)
+        self.window.timeout(self.config.window_timeout)
         self.window.bkgd(" ", curses.color_pair(8))
 
     def is_escape(self, key):
@@ -259,6 +265,7 @@ class Screen(object):
 
 class Game(object):
     def __init__(self, quotes, stats):
+        self.config = wpm.config.Config()
         self.stats = stats
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
         self.tab_spaces = None
