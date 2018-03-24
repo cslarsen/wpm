@@ -96,9 +96,13 @@ You can also bundle up several texts into a single JSON file, using ``wpm
         "author": "Author Name",
         "title": "Title of Work",
         "text": "The text to type here ..."
+        "text_id": 123,
       },
       ...
     ]
+
+The ``text_id`` is an optional integer. If you leave it out, an increasing,
+zero-based integer will be used.
 
 Format of race history
 ----------------------
