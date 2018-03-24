@@ -100,7 +100,7 @@ class Quotes(object):
             author = quote["author"]
             title = quote["title"]
             text = quote["text"]
-            text_id = int(quote.get("text_id", text_id))
+            text_id = int(quote.get("id", text_id))
             out.append((author, title, text, text_id))
 
         return Quotes(list(set(out)))

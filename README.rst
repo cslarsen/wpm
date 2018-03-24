@@ -57,7 +57,7 @@ The recommended way is to install via PyPi
 
 .. code:: bash
 
-    $ pip install wpm [--user]
+    $ pip install wpm
 
 Remember to check for upgrades with ``pip install --upgrade wpm``. You can also
 install it from the source repository with
