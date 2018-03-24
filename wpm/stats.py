@@ -82,9 +82,12 @@ class GameResults(object):
 
 class Stats(object):
     """Typing statistics"""
-    def __init__(self, current_keyboard=None):
+    def __init__(self, current_keyboard=None, games=None):
         self.keyboard = current_keyboard
-        self.games = collections.defaultdict(list)
+        if games is None:
+            self.games = collections.defaultdict(list)
+        else:
+            self.games = games
 
     def results(self, keyboard, last_n=0):
         return GameResults(keyboard, self.games[keyboard][-last_n:])
@@ -147,9 +150,7 @@ class Stats(object):
                     text_id, timestamp, database))
                 current_keyboard = keyboard
 
-        stats = Stats(current_keyboard)
-        stats.games = games
-        return stats
+        return Stats(current_keyboard, games)
 
     def save(self, filename):
         """Writes game results to a CSV file compatible with the one from
