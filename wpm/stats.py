@@ -53,6 +53,9 @@ class GameResults(object):
         return len(self.games)
 
     def averages(self):
+        if len(self) == 0:
+            return 0, 0
+
         wpms = 0
         accs = 0
 
