@@ -119,12 +119,12 @@ class Screen(object):
     def get_key(self):
         # Install a suitable get_key based on Python version
         if sys.version_info[0:2] >= (3, 3):
-            self.get_key = self.getkey_py33
+            self.get_key = self.get_key_py33
         else:
-            self.get_key = self.getkey_py27
+            self.get_key = self.get_key_py27
         return self.get_key()
 
-    def getkey_py33(self):
+    def get_key_py33(self):
         try:
             # Curses in Python 3.3 handles unicode via get_wch
             key = self.window.get_wch()
@@ -143,9 +143,29 @@ class Screen(object):
         except KeyboardInterrupt:
             raise
 
-    def getkey_py27(self):
+    def get_key_py27(self):
         try:
-            return self.window.getkey()
+            key = self.window.getkey()
+
+            # Start of UTF-8 multi-byte character?
+            if ord(key[0]) & 0x80:
+                s = key[0]
+                f = ord(key[0]) << 1
+                while f & 0x80:
+                    f <<= 1
+                    s += self.window.getkey()[0]
+                return s.decode("utf-8")
+
+            if type(key) == int:
+                if key == curses.KEY_LEFT:
+                    return "KEY_LEFT"
+                elif key == curses.KEY_RIGHT:
+                    return "KEY_RIGHT"
+                elif key == curses.KEY_RESIZE:
+                    return "KEY_RESIZE"
+                else:
+                    return None
+            return key.decode("ascii")
         except KeyboardInterrupt:
             raise
         except curses.error:
@@ -176,7 +196,7 @@ class Screen(object):
             # Display quote
             color = curses.color_pair(4 if browse == 1 else 3)
             for y, length in enumerate(lengths, 2):
-                self.window.addstr(y, 0, quote[:length], color)
+                self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
                 quote = quote[1+length:]
 
             # Show author
@@ -204,7 +224,8 @@ class Screen(object):
         if self.cheight < curses.LINES:
             self.window.move(self.cheight, 0)
             self.window.clrtoeol()
-            self.window.addstr(self.cheight, 0, typed, curses.color_pair(7))
+            self.window.addstr(self.cheight, 0, typed.encode("utf-8"),
+                    curses.color_pair(7))
         if browse > 1:
             # If done, highlight score
             self.window.chgat(self.cheight, 11,
