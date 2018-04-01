@@ -16,4 +16,4 @@ The quotes database is *not* covered by the GPL!
 __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright 2017, 2018 Christian Stigen Larsen"
 __license__ = "GNU GPL v3 or later"
-__version__ = "1.36"
+__version__ = "1.37"
