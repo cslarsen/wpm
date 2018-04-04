@@ -1,6 +1,6 @@
 PYTHON := python
 PYPY := pypy
-PYTHON3 := python3.6
+PYTHON3 := python3
 PYFLAKES := pyflakes
 
 default: test
