@@ -7,6 +7,7 @@ import json
 import os
 import pkg_resources
 import random
+import sys
 
 class Quote(object):
     def __init__(self, author, title, text, text_id):
@@ -113,7 +114,11 @@ class Quotes(object):
         else:
             database = os.path.splitext(os.path.basename(filename))[0]
 
-        with gzip.open(filename, mode="rt", encoding="utf-8") as f:
+        args = {"filename": filename, "mode": "rt"}
+        if sys.version_info.major == 3:
+            args["encoding"] = "utf-8"
+
+        with gzip.open(**args) as f:
             quotes = json.load(f)
             quotes = tuple(map(tuple, quotes))
             return Quotes(quotes, database)
@@ -122,5 +127,9 @@ class Quotes(object):
         if filename is None:
             filename = Quotes._database_filename()
 
-        with gzip.open(filename, mode="wt", encoding="utf-8") as f:
+        args = {"filename": filename, "mode": "wt"}
+        if sys.version_info.major == 3:
+            args["encoding"] = "utf-8"
+
+        with gzip.open(**args) as f:
             json.dump(self.quotes, f)
