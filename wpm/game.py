@@ -135,6 +135,8 @@ class Screen(object):
                     return "KEY_RIGHT"
                 elif key == curses.KEY_RESIZE:
                     return "KEY_RESIZE"
+                elif key == curses.KEY_BACKSPACE:
+                    return "KEY_BACKSPACE"
                 else:
                     return None
             return key
