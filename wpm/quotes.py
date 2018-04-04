@@ -113,7 +113,7 @@ class Quotes(object):
         else:
             database = os.path.splitext(os.path.basename(filename))[0]
 
-        with gzip.open(filename) as f:
+        with gzip.open(filename, mode="rt", encoding="utf-8") as f:
             quotes = json.load(f)
             quotes = tuple(map(tuple, quotes))
             return Quotes(quotes, database)
@@ -122,5 +122,5 @@ class Quotes(object):
         if filename is None:
             filename = Quotes._database_filename()
 
-        with gzip.open(filename, mode="wb") as f:
+        with gzip.open(filename, mode="wt", encoding="utf-8") as f:
             json.dump(self.quotes, f)
