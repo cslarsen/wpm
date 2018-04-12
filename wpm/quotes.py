@@ -16,6 +16,14 @@ class Quote(object):
         self.title = title
         self.text_id = text_id
 
+    @staticmethod
+    def from_tuple(t):
+        author = t[0]
+        text = t[1]
+        title = t[2]
+        text_id = t[3]
+        return Quote(author, text, title, text_id)
+
 
 class RandomIterator(object):
     """Random, bi-directional iterator."""

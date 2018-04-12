@@ -49,6 +49,9 @@ The format is
     p.add_argument("--id", "-i", default=None, type=int,
             help="If specified, jumps to given text ID on start.")
 
+    p.add_argument("--search", default=None, type=str,
+            help="Go to first quote that matches query")
+
     opts = p.parse_args()
 
     if opts.version:
@@ -120,6 +123,18 @@ def main():
     try:
         if len(quotes) == 0:
             quotes = wpm.quotes.Quotes.load()
+
+        if opts.search is not None:
+            found = None
+            for quote in iter(quotes):
+                quote = wpm.quotes.Quote.from_tuple(quote)
+                if opts.search in quote.text:
+                    found = quote.text_id
+                    break
+            if found is not None:
+                opts.id = found
+            else:
+                raise wpm.error.WpmError("No quotes matching %r" % opts.search)
 
         with wpm.game.Game(quotes, stats) as game:
             game.set_tab_spaces(opts.tabs)
