@@ -147,12 +147,13 @@ License
 
 Copyright 2017, 2018 Christian Stigen Larsen
 
-Distributed under the GNU GPL v3 or later. See the file LICENSE.txt for the
-full license text. This software makes use of open source software.
+Distributed under the GNU Affero General Public License (AGPL) v3 or later. See
+the file LICENSE.txt for the full license text. This software makes use of open
+source software.
 
-The quotes database is *not* covered by the GPL!
+The quotes database is *not* covered by the AGPL!
 
-.. |license| image:: https://img.shields.io/badge/license-GPL%20v3%2B-blue.svg
+.. |license| image:: https://img.shields.io/badge/license-AGPL%20v3%2B-blue.svg
     :target: http://www.gnu.org/licenses/old-licenses/gpl-3.en.html
     :alt: Project License
 
