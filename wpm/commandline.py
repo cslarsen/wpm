@@ -57,7 +57,7 @@ The format is
     if opts.version:
         print("WPM v%s" % wpm.__version__)
         print(wpm.__copyright__)
-        print("Distributed under the %s" % wpm.__license__)
+        print("Source code (sans quotes) distributed under the %s" % wpm.__license__)
         sys.exit(0)
 
     opts.stats_file = os.path.expanduser(opts.stats_file)
@@ -137,7 +137,6 @@ def main():
 
                 if (query in text) or (query in author) or (query in title):
                     ids.append(quote.text_id)
-                    print("%s\n" % quote)
             if not ids:
                 raise wpm.error.WpmError("No quotes matching %r" % opts.search)
 
