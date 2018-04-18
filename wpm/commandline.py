@@ -50,7 +50,7 @@ The format is
             help="If specified, jumps to given text ID on start.")
 
     p.add_argument("--search", default=None, type=str,
-            help="Go to first quote that matches query")
+            help="Put quotes/authors/titles matching case-insensitive text query first")
 
     opts = p.parse_args()
 
@@ -121,30 +121,29 @@ def main():
         return
 
     try:
+        ids = []
+
         if len(quotes) == 0:
             quotes = wpm.quotes.Quotes.load()
 
         if opts.search is not None:
-            found = None
+            query = opts.search.lower()
             for quote in iter(quotes):
                 quote = wpm.quotes.Quote.from_tuple(quote)
-                if opts.search in quote.text:
-                    found = quote.text_id
-                    break
-            if found is not None:
-                opts.id = found
-            else:
+
+                author = quote.author.lower()
+                title = quote.title.lower()
+                text = quote.text.lower()
+
+                if (query in text) or (query in author) or (query in title):
+                    ids.append(quote.text_id)
+                    print("%s\n" % quote)
+            if not ids:
                 raise wpm.error.WpmError("No quotes matching %r" % opts.search)
 
         with wpm.game.Game(quotes, stats) as game:
             game.set_tab_spaces(opts.tabs)
-            if opts.id is not None:
-                try:
-                    game.jump_to(opts.id)
-                except KeyError as e:
-                    raise wpm.error.WpmError("Text ID %d not found" % opts.id)
-                    sys.exit(1)
-            game.run()
+            game.run(to_front=ids)
     except KeyboardInterrupt:
         game.stats.save(opts.stats_file)
         sys.exit(0)

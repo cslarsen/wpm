@@ -24,6 +24,9 @@ class Quote(object):
         text_id = t[3]
         return Quote(author, text, title, text_id)
 
+    def __str__(self):
+        return "\"%s\"\n\t- %s: %s" % (self.text, self.author, self.title)
+
 
 class RandomIterator(object):
     """Random, bi-directional iterator."""
@@ -38,18 +41,37 @@ class RandomIterator(object):
 
     def _current(self):
         index = self.indices[self.index]
+        return self._get_quote(index)
 
+    def __getitem__(self, index):
+        return self._get_quote(index)
+
+    def _get_quote(self, index):
         quote = self.quotes[index]
         author = quote[0]
         title = quote[1]
         text = quote[2]
-
         if len(quote) > 3:
             text_id = quote[3]
         else:
             text_id = index
-
         return Quote(author, title, text, text_id)
+
+    def put_to_front(self, text_ids):
+        front = []
+        back = []
+
+        for index in range(len(self.quotes)):
+            quote = self[index]
+
+            if quote.text_id in text_ids:
+                front.append(index)
+            else:
+                back.append(index)
+
+        random.shuffle(back)
+        self.indices = front + back
+        self.index = 0
 
     @property
     def database(self):

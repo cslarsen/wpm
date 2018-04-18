@@ -284,15 +284,6 @@ class Game(object):
         else:
             return self
 
-    def jump_to(self, text_id):
-        """Skips until then given text id is found."""
-        pos = 0
-        while self.quote.text_id != text_id:
-            self.quote = self.quotes.next()
-            pos += 1
-            if pos > self.num_quotes:
-                raise KeyError("Text ID not found: %s" % text_id)
-
     def set_tab_spaces(self, spaces):
         self.tab_spaces = spaces
 
@@ -302,7 +293,11 @@ class Game(object):
                 self.quote.text_id, self.quotes.database)
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
-    def run(self):
+    def run(self, to_front=None):
+        if to_front is not None:
+            self.quotes.put_to_front(to_front)
+            self.quote = self.quotes._current()
+
         while True:
             is_typing = self.start is not None and self.stop is None
 
