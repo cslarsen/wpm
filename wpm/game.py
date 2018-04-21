@@ -209,13 +209,12 @@ class Screen(object):
 
     def update(self, browse, head, quote, position, incorrect, author, title,
             typed, wpm, average):
-        cols = curses.COLS
-        lengths = word_wrap(quote, cols - 1)
+        lengths = word_wrap(quote, curses.COLS - 1)
         sx, sy = screen_coords(lengths, position)
         h = len(lengths)
 
         # Show header
-        self.window.addstr(0, 0, head + " "*(cols - len(head)),
+        self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
                 curses.color_pair(Screen.COLOR_STATUS))
 
         if browse:
@@ -228,7 +227,8 @@ class Screen(object):
 
             # Show author
             credit = u"— %s, %s" % (author, title)
-            self.cheight = 4 + h + self.column(3+h, cols - 10, cols//2, credit,
+            self.cheight = 4 + h + self.column(3+h, curses.COLS - 10,
+                    curses.COLS//2, credit,
                     curses.color_pair(Screen.COLOR_AUTHOR), False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
@@ -263,7 +263,7 @@ class Screen(object):
         # Move cursor to current position in text before refreshing
         if browse < 1:
             sx, sy = screen_coords(lengths, position + incorrect)
-            self.window.move(2 + sy, min(sx, cols - 1))
+            self.window.move(2 + sy, min(sx, curses.COLS - 1))
         else:
             self.window.move(2, 0)
 
