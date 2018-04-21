@@ -60,6 +60,12 @@ def screen_coords(lengths, position):
 
     return position, y_position
 
+def pad_right(text, width):
+    """Pads string with spaces on the right."""
+    if len(text) < width:
+        return text + " "*(width - len(text))
+    return text
+
 
 class Screen(object):
     COLOR_AUTHOR = 1
@@ -214,7 +220,7 @@ class Screen(object):
         h = len(lengths)
 
         # Show header
-        self.window.addstr(0, 0, head + " "*(curses.COLS - len(head)),
+        self.window.addstr(0, 0, pad_right(head, curses.COLS),
                 curses.color_pair(Screen.COLOR_STATUS))
 
         if browse:
