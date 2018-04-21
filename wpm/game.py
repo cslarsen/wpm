@@ -68,6 +68,8 @@ def pad_right(text, width):
 
 
 class Screen(object):
+    """Renders the terminal screen."""
+
     COLOR_AUTHOR = 1
     COLOR_BACKGROUND = 2
     COLOR_CORRECT = 3
@@ -113,6 +115,8 @@ class Screen(object):
         self.window.bkgd(" ", curses.color_pair(Screen.COLOR_BACKGROUND))
 
     def set_colors(self):
+        """Sets up curses color pairs."""
+
         if os.getenv("TERM").endswith("256color"):
             bg = self.config.background_color_256
             curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color_256)
@@ -134,12 +138,14 @@ class Screen(object):
             curses.init_pair(Screen.COLOR_BACKGROUND, bg, bg)
             curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color)
 
-    def is_escape(self, key):
+    @staticmethod
+    def is_escape(key):
         if len(key) == 1:
             return ord(key) == curses.ascii.ESC
         return False
 
-    def is_backspace(self, key):
+    @staticmethod
+    def is_backspace(key):
         if len(key) > 1:
             return key == "KEY_BACKSPACE"
         elif ord(key) in (curses.ascii.BS, curses.ascii.DEL):
@@ -438,15 +444,15 @@ class Game(object):
             if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
                 self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
-            elif self.screen.is_escape(key):
+            elif Screen.is_escape(key):
                 # Exit program
                 raise KeyboardInterrupt()
 
-        if self.screen.is_escape(key):
+        if Screen.is_escape(key):
             self.reset()
             return
 
-        if self.screen.is_backspace(key):
+        if Screen.is_backspace(key):
             if self.incorrect > 0:
                 self.incorrect -= 1
                 self._edit = self._edit[:-1]
