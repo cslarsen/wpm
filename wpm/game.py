@@ -22,21 +22,21 @@ import time
 import wpm.config
 import wpm.error
 
-def word_wrap(s, w):
+def word_wrap(text, width):
     """Returns lengths of lines that can be printed without wrapping."""
     lengths = []
-    while len(s) > w:
-        end = s[:w+1].rindex(" ")
+    while len(text) > width:
+        end = text[:width + 1].rindex(" ")
 
         # We can't divide the input nicely, so just display it as-is
         if end == -1:
-            return [len(s)]
+            return [len(text)]
 
         lengths.append(end)
-        s = s[end+1:]
+        text = text[end + 1:]
 
-    if len(s) > 0:
-        lengths.append(len(s))
+    if len(text) > 0:
+        lengths.append(len(text))
 
     return lengths
 
