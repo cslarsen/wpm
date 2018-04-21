@@ -40,12 +40,26 @@ def word_wrap(text, width):
 
     return lengths
 
-def screen_coords(lens, pos):
-    for y, l in enumerate(lens):
-        if pos <= l:
+def screen_coords(lengths, position):
+    """Translates quote offset into screen coordinates.
+
+    Args:
+        lengths: List of line lengths for the word-wrapped quote.
+        position: Offset into the quote that we want to translate to screen
+                  coordinates.
+
+    Returns:
+        Tuple containing X and Y screen coordinates.
+    """
+    y_position = 0
+
+    for y_position, line_length in enumerate(lengths):
+        if position <= line_length:
             break
-        pos -= (l+1)
-    return pos, y
+        position -= line_length + 1
+
+    return position, y_position
+
 
 class Screen(object):
     COLOR_AUTHOR = 1
