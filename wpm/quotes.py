@@ -17,11 +17,15 @@ import codecs
 import gzip
 import json
 import os
-import pkg_resources
 import random
 import sys
 
+import pkg_resources
+
 class Quote(object):
+    """Holds a single quote."""
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, author, title, text, text_id):
         self.author = author
         self.text = text
@@ -29,11 +33,12 @@ class Quote(object):
         self.text_id = text_id
 
     @staticmethod
-    def from_tuple(t):
-        author = t[0]
-        text = t[1]
-        title = t[2]
-        text_id = t[3]
+    def from_tuple(data):
+        """Converts tuple of (author, text, title, text_id) to Quote object."""
+        author = data[0]
+        text = data[1]
+        title = data[2]
+        text_id = data[3]
         return Quote(author, text, title, text_id)
 
     def __str__(self):
@@ -70,6 +75,7 @@ class RandomIterator(object):
         return Quote(author, title, text, text_id)
 
     def put_to_front(self, text_ids):
+        """Puts given text IDs to the very front of the queue."""
         front = []
         back = []
 
@@ -87,24 +93,31 @@ class RandomIterator(object):
 
     @property
     def database(self):
+        """The quotes database."""
         return self.quotes.database
 
     @property
     def text_id(self):
+        """Returns text ID of current quote."""
         return self.indices[self.index]
 
     def next(self):
+        """Goes to next quote."""
         self.index = (self.index + 1) % len(self.quotes)
         if self.index == 0:
+            # TODO: Move this elsewhere. Cannot go back and forth if we keep
+            # randomizing here.
             random.shuffle(self.indices)
         return self._current()
 
     def previous(self):
+        """Goes back to previous quote."""
         self.index = (self.index - 1) % len(self.quotes)
         return self._current()
 
 
 class Quotes(object):
+    """Container for quotes."""
     def __init__(self, quotes=None, database=None):
         self.quotes = quotes
         self.database = database
@@ -123,19 +136,22 @@ class Quotes(object):
         self.quotes[index] = item
 
     def random_iterator(self):
+        """Returns a random iterator for all the quotes."""
         return RandomIterator(self)
 
     @staticmethod
     def _database_filename():
+        """Returns the filename of the packaged database."""
         return pkg_resources.resource_filename("wpm", "data/examples.json.gz")
 
     @staticmethod
     def load_json(filename=None):
+        """Loads quotes from a JSON file."""
         if filename is None:
             filename = Quotes._database_filename()
 
-        with codecs.open(filename, encoding="utf-8") as f:
-            quotes = json.load(f)
+        with codecs.open(filename, encoding="utf-8") as file_obj:
+            quotes = json.load(file_obj)
 
         # Flatten
         out = []
@@ -150,6 +166,7 @@ class Quotes(object):
 
     @staticmethod
     def load(filename=None):
+        """Loads quotes from gzipped JSON file."""
         if filename is None:
             filename = Quotes._database_filename()
             database = "default"
@@ -160,12 +177,13 @@ class Quotes(object):
         if sys.version_info.major == 3:
             args["encoding"] = "utf-8"
 
-        with gzip.open(**args) as f:
-            quotes = json.load(f)
+        with gzip.open(**args) as file_obj:
+            quotes = json.load(file_obj)
             quotes = tuple(map(tuple, quotes))
             return Quotes(quotes, database)
 
     def save(self, filename=None):
+        """Saves current quotes to gzipped JSON file."""
         if filename is None:
             filename = Quotes._database_filename()
 
@@ -173,5 +191,5 @@ class Quotes(object):
         if sys.version_info.major == 3:
             args["encoding"] = "utf-8"
 
-        with gzip.open(**args) as f:
-            json.dump(self.quotes, f)
+        with gzip.open(**args) as file_obj:
+            json.dump(self.quotes, file_obj)

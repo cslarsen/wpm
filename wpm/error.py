@@ -12,5 +12,6 @@ The quotes database is *not* covered by the AGPL!
 """
 
 class WpmError(RuntimeError):
+    """General WPM errors."""
     def __init__(self, *args, **kw):
         super(WpmError, self).__init__(*args, **kw)
