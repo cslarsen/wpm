@@ -225,17 +225,24 @@ class Screen(object):
 
         if browse:
             # Display quote
-            color = curses.color_pair(Screen.COLOR_QUOTE if browse == 1 else
-                    Screen.COLOR_CORRECT)
+            if browse != 1:
+                color = curses.color_pair(Screen.COLOR_CORRECT)
+            else:
+                color = curses.color_pair(Screen.COLOR_QUOTE)
+
             for y, length in enumerate(lengths, 2):
                 self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
                 quote = quote[1+length:]
 
             # Show author
             credit = u"— %s, %s" % (author, title)
-            self.cheight = 4 + h + self.column(3+h, curses.COLS - 10,
-                    curses.COLS//2, credit,
-                    curses.color_pair(Screen.COLOR_AUTHOR), False)
+            self.cheight = 4 + h
+            self.cheight += self.column(3 + h,
+                                        curses.COLS - 10,
+                                        curses.COLS // 2,
+                                        credit,
+                                        curses.color_pair(Screen.COLOR_AUTHOR),
+                                        False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
                         else ".")
