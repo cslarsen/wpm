@@ -41,6 +41,9 @@ class Config(object):
         Config.config.set("curses", "escdelay", "15")
         Config.config.set("curses", "window_timeout", "20")
 
+        Config.config.add_section("wpm")
+        Config.config.set("wpm", "max_quote_width", "-1")
+
         Config.config.add_section("xterm-256color")
         Config.config.set("xterm-256color", "author_bg", str(233))
         Config.config.set("xterm-256color", "author_fg", str(240))
@@ -86,6 +89,15 @@ class Config(object):
     @property
     def window_timeout(self):
         return int(Config.config.get("curses", "window_timeout"))
+
+    @property
+    def max_quote_width(self):
+        """Wrap quotes at this length. Inactive if set to zero or less."""
+        try:
+            return int(Config.config.get("wpm", "max_quote_width"))
+        except configparser.NoSectionError:
+            Config.config.add_section("wpm")
+            Config.config.set("wpm", "max_quote_width", 0)
 
     @property
     def background_color_256(self):

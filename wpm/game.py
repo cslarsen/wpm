@@ -215,7 +215,13 @@ class Screen(object):
 
     def update(self, browse, head, quote, position, incorrect, author, title,
             typed, wpm, average):
-        lengths = word_wrap(quote, curses.COLS - 1)
+
+        if self.config.max_quote_width > 0:
+            quote_columns = min(curses.COLS, self.config.max_quote_width)
+        else:
+            quote_columns = curses.COLS
+
+        lengths = word_wrap(quote, quote_columns - 1)
         sx, sy = screen_coords(lengths, position)
         h = len(lengths)
 
@@ -235,12 +241,11 @@ class Screen(object):
                 quote = quote[1+length:]
 
             # Show author
-            credit = u"— %s, %s" % (author, title)
             self.cheight = 4 + h
             self.cheight += self.column(3 + h,
-                                        curses.COLS - 10,
-                                        curses.COLS // 2,
-                                        credit,
+                                        quote_columns - 10,
+                                        quote_columns // 2,
+                                        u"— %s, %s" % (author, title),
                                         curses.color_pair(Screen.COLOR_AUTHOR),
                                         False)
             if browse >= 2:
@@ -276,7 +281,7 @@ class Screen(object):
         # Move cursor to current position in text before refreshing
         if browse < 1:
             sx, sy = screen_coords(lengths, position + incorrect)
-            self.window.move(2 + sy, min(sx, curses.COLS - 1))
+            self.window.move(2 + sy, min(sx, quote_columns - 1))
         else:
             self.window.move(2, 0)
 
