@@ -18,18 +18,24 @@ import math
 import os
 
 class Timestamp(object):
+    """Methods for dealing with timestamps."""
     DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
     @staticmethod
     def from_string(string):
+        """Parses timestamp from string in ``Timestamp.DATETIME_FORMAT``."""
         return datetime.datetime.strptime(string, Timestamp.DATETIME_FORMAT)
 
     @staticmethod
     def now():
+        """Returns current UTC time."""
         return datetime.datetime.utcnow()
 
 
 class GameResult(object):
+    """Contains the result of one game."""
+    # pylint: disable=too-many-instance-attributes, too-few-public-methods
+
     def __init__(self, game):
         race, wpm, accuracy, rank, racers, text_id, timestamp, database = game
         self.race = race
@@ -43,12 +49,14 @@ class GameResult(object):
 
 
 class GameResults(object):
+    """Container for several GameResult objects."""
     def __init__(self, keyboard, games):
         self.keyboard = keyboard
         self.games = games
 
     @property
     def results(self):
+        """Yields all the ``GameResult`` objects."""
         for game in self.games:
             yield GameResult(game)
 
@@ -56,7 +64,8 @@ class GameResults(object):
         return len(self.games)
 
     def averages(self):
-        if len(self) == 0:
+        """Returns a tuple of WPM and accuracy averages."""
+        if not self.games:
             return 0, 0
 
         wpms = 0
@@ -69,9 +78,10 @@ class GameResults(object):
         return wpms / len(self), accs / len(self)
 
     def stddevs(self):
-        n = len(self)
+        """Returns a tuple of WPM and accuracy standard deviations."""
+        count = len(self)
 
-        if n <= 1:
+        if count <= 1:
             return 0.0, 0.0
 
         wpm_sd = 0
@@ -83,7 +93,8 @@ class GameResults(object):
             wpm_sd += (result.wpm - wpm_avg)**2.0
             acc_sd += (result.accuracy - acc_avg)**2.0
 
-        return math.sqrt(wpm_sd/(n-1)), math.sqrt(acc_sd/(n-1))
+        return (math.sqrt(wpm_sd/(count - 1)),
+                math.sqrt(acc_sd/(count - 1)))
 
 
 class Stats(object):
@@ -96,9 +107,11 @@ class Stats(object):
             self.games = games
 
     def results(self, keyboard, last_n=0):
+        """Returns the ``GameResults``."""
         return GameResults(keyboard, self.games[keyboard][-last_n:])
 
     def add(self, wpm, accuracy, text_id, database):
+        """Adds a game result to the stats."""
         race = 0
         rank = 1
         racers = 1
@@ -114,8 +127,8 @@ class Stats(object):
             database))
 
     def average(self, keyboard=None, last_n=None):
-        wpm_avg, acc_avg = self.results(keyboard, last_n).averages()
-        return wpm_avg
+        """Returns the average WPM."""
+        return self.results(keyboard, last_n).averages()[0]
 
     def __len__(self):
         return len(self.games)
@@ -124,21 +137,26 @@ class Stats(object):
         return self.games[key]
 
     def keys(self):
+        """Returns keys for this dict-like object."""
         return self.games.keys()
 
     def values(self):
+        """Returns values for this dict-like object."""
         return self.games.values()
 
     def items(self):
+        """Returns tuple of keys and values for this dict-like object."""
         return self.games.items()
 
     @staticmethod
     def load(filename):
+        """Loads stats from a CSV file."""
         games = collections.defaultdict(list)
         current_keyboard = None
 
-        with open(filename, "rt") as f:
-            reader = csv.reader(f)
+        with open(filename, "rt") as file_obj:
+            reader = csv.reader(file_obj)
+
             for row in reader:
                 race = int(row[0])
                 wpm = float(row[1])
@@ -152,8 +170,16 @@ class Stats(object):
 
                 if keyboard not in games:
                     games[keyboard] = []
-                games[keyboard].append((race, wpm, accuracy, rank, racers,
-                    text_id, timestamp, database))
+
+                games[keyboard].append((race,
+                                        wpm,
+                                        accuracy,
+                                        rank,
+                                        racers,
+                                        text_id,
+                                        timestamp,
+                                        database))
+
                 current_keyboard = keyboard
 
         return Stats(current_keyboard, games)
@@ -173,8 +199,8 @@ class Stats(object):
         games = sorted(allgames, key=by_time)
 
         # Write to a temp file just in case we get an exception
-        with open(filename + ".tmp", "wt") as f:
-            writer = csv.writer(f)
+        with open(filename + ".tmp", "wt") as file_obj:
+            writer = csv.writer(file_obj)
 
             for race, game in enumerate(games):
                 # The timestamp is the race number, so use that instead.
