@@ -112,31 +112,41 @@ class Screen(object):
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
         self.window.keypad(True)
         self.window.timeout(self.config.window_timeout)
-        self.window.bkgd(" ", curses.color_pair(Screen.COLOR_BACKGROUND))
+        self.window.bkgd(" ", Screen.COLOR_BACKGROUND)
 
     def set_colors(self):
         """Sets up curses color pairs."""
 
         if os.getenv("TERM").endswith("256color"):
             bg = self.config.background_color_256
-            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color_256)
-            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color_256)
-            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color_256)
-            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color_256)
             curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color_256)
-            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color_256)
             curses.init_pair(Screen.COLOR_BACKGROUND, bg, bg)
+            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color_256)
             curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color_256)
+            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color_256)
+            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color_256)
+            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color_256)
+            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color_256)
         else:
             bg = self.config.background_color
-            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color)
-            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color)
-            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color)
-            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color)
             curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color)
-            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color)
             curses.init_pair(Screen.COLOR_BACKGROUND, bg, bg)
+            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color)
             curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color)
+            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color)
+            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color)
+            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color)
+            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color)
+
+        # Rebind class variables
+        Screen.COLOR_AUTHOR = curses.color_pair(Screen.COLOR_AUTHOR)
+        Screen.COLOR_BACKGROUND = curses.color_pair(Screen.COLOR_BACKGROUND)
+        Screen.COLOR_CORRECT = curses.color_pair(Screen.COLOR_CORRECT)
+        Screen.COLOR_HISCORE = curses.color_pair(Screen.COLOR_HISCORE)
+        Screen.COLOR_INCORRECT = curses.color_pair(Screen.COLOR_INCORRECT)
+        Screen.COLOR_PROMPT = curses.color_pair(Screen.COLOR_PROMPT)
+        Screen.COLOR_QUOTE = curses.color_pair(Screen.COLOR_QUOTE)
+        Screen.COLOR_STATUS = curses.color_pair(Screen.COLOR_STATUS)
 
     @staticmethod
     def is_escape(key):
@@ -233,14 +243,14 @@ class Screen(object):
 
         # Show header
         self.window.addstr(0, 0, pad_right(head, curses.COLS),
-                curses.color_pair(Screen.COLOR_STATUS))
+                Screen.COLOR_STATUS)
 
         if browse:
             # Display quote
             if browse != 1:
-                color = curses.color_pair(Screen.COLOR_CORRECT)
+                color = Screen.COLOR_CORRECT
             else:
-                color = curses.color_pair(Screen.COLOR_QUOTE)
+                color = Screen.COLOR_QUOTE
 
             for y, length in enumerate(lengths, 2):
                 self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
@@ -252,7 +262,7 @@ class Screen(object):
                                         quote_columns - 10,
                                         quote_columns // 2,
                                         u"— %s, %s" % (author, title),
-                                        curses.color_pair(Screen.COLOR_AUTHOR),
+                                        Screen.COLOR_AUTHOR,
                                         False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
@@ -261,8 +271,8 @@ class Screen(object):
                 typed = ""
             typed += "Use arrows/space to browse, esc to quit, or start typing."
         elif position < len(quote):
-            color = curses.color_pair(Screen.COLOR_CORRECT if incorrect == 0
-                    else Screen.COLOR_INCORRECT)
+            color = (Screen.COLOR_CORRECT if incorrect == 0 else
+                    Screen.COLOR_INCORRECT)
             typed = "> " + typed
 
             if position + incorrect < len(quote):
@@ -270,19 +280,18 @@ class Screen(object):
                 self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
                 sx, sy = screen_coords(lengths, position + incorrect)
-                self.window.chgat(2 + sy, sx,
-                        curses.color_pair(Screen.COLOR_QUOTE))
+                self.window.chgat(2 + sy, sx, 1, Screen.COLOR_QUOTE)
 
         # Show typed text
         if self.cheight < curses.LINES:
             self.window.move(self.cheight, 0)
             self.window.clrtoeol()
             self.window.addstr(self.cheight, 0, typed.encode("utf-8"),
-                    curses.color_pair(Screen.COLOR_PROMPT))
+                    Screen.COLOR_PROMPT)
         if browse > 1:
             # If done, highlight score
-            self.window.chgat(self.cheight, 11,
-                len(str("%.1f" % wpm)), curses.color_pair(Screen.COLOR_HISCORE))
+            self.window.chgat(self.cheight, 11, len(str("%.1f" % wpm)),
+                    Screen.COLOR_HISCORE)
 
         # Move cursor to current position in text before refreshing
         if browse < 1:
