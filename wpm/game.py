@@ -46,6 +46,15 @@ def screen_coords(lens, pos):
     return pos, y
 
 class Screen(object):
+    COLOR_AUTHOR = 1
+    COLOR_BACKGROUND = 2
+    COLOR_CORRECT = 3
+    COLOR_HISCORE = 4
+    COLOR_INCORRECT = 5
+    COLOR_PROMPT = 6
+    COLOR_QUOTE = 7
+    COLOR_STATUS = 8
+
     def __init__(self):
         self.config = wpm.config.Config()
 
@@ -79,30 +88,29 @@ class Screen(object):
         self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
         self.window.keypad(True)
         self.window.timeout(self.config.window_timeout)
-        self.window.bkgd(" ", curses.color_pair(8))
+        self.window.bkgd(" ", curses.color_pair(Screen.COLOR_BACKGROUND))
 
     def set_colors(self):
         if os.getenv("TERM").endswith("256color"):
             bg = self.config.background_color_256
-            curses.init_pair(1, *self.config.incorrect_color_256)
-            curses.init_pair(2, *self.config.status_color_256)
-            curses.init_pair(3, *self.config.correct_color_256)
-            curses.init_pair(4, *self.config.quote_color_256)
-            curses.init_pair(5, 244, bg) # UNUSED
-            curses.init_pair(6, *self.config.author_color_256)
-            curses.init_pair(7, *self.config.prompt_color_256)
-            curses.init_pair(8, bg, bg)
-            curses.init_pair(9, *self.config.score_highlight_color_256)
+            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color_256)
+            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color_256)
+            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color_256)
+            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color_256)
+            curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color_256)
+            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color_256)
+            curses.init_pair(Screen.COLOR_BACKGROUND, bg, bg)
+            curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color_256)
         else:
             bg = self.config.background_color
-            curses.init_pair(1, *self.config.incorrect_color)
-            curses.init_pair(2, *self.config.status_color)
-            curses.init_pair(3, *self.config.correct_color)
-            curses.init_pair(4, *self.config.quote_color)
-            curses.init_pair(5, curses.COLOR_WHITE, bg) # UNUSED
-            curses.init_pair(6, *self.config.author_color)
-            curses.init_pair(7, *self.config.prompt_color)
-            curses.init_pair(9, *self.config.score_highlight_color)
+            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color)
+            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color)
+            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color)
+            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color)
+            curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color)
+            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color)
+            curses.init_pair(Screen.COLOR_BACKGROUND, bg, bg)
+            curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color)
 
     def is_escape(self, key):
         if len(key) == 1:
@@ -192,11 +200,12 @@ class Screen(object):
 
         # Show header
         self.window.addstr(0, 0, head + " "*(cols - len(head)),
-                curses.color_pair(2))
+                curses.color_pair(Screen.COLOR_STATUS))
 
         if browse:
             # Display quote
-            color = curses.color_pair(4 if browse == 1 else 3)
+            color = curses.color_pair(Screen.COLOR_QUOTE if browse == 1 else
+                    Screen.COLOR_CORRECT)
             for y, length in enumerate(lengths, 2):
                 self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
                 quote = quote[1+length:]
@@ -204,7 +213,7 @@ class Screen(object):
             # Show author
             credit = u"— %s, %s" % (author, title)
             self.cheight = 4 + h + self.column(3+h, cols - 10, cols//2, credit,
-                    curses.color_pair(6), False)
+                    curses.color_pair(Screen.COLOR_AUTHOR), False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (wpm, "!" if wpm > average
                         else ".")
@@ -212,7 +221,8 @@ class Screen(object):
                 typed = ""
             typed += "Use arrows/space to browse, esc to quit, or start typing."
         elif position < len(quote):
-            color = curses.color_pair(3 if incorrect == 0 else 1)
+            color = curses.color_pair(Screen.COLOR_CORRECT if incorrect == 0
+                    else Screen.COLOR_INCORRECT)
             typed = "> " + typed
 
             if position + incorrect < len(quote):
@@ -220,18 +230,19 @@ class Screen(object):
                 self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
                 sx, sy = screen_coords(lengths, position + incorrect)
-                self.window.chgat(2 + sy, sx, curses.color_pair(4))
+                self.window.chgat(2 + sy, sx,
+                        curses.color_pair(Screen.COLOR_QUOTE))
 
         # Show typed text
         if self.cheight < curses.LINES:
             self.window.move(self.cheight, 0)
             self.window.clrtoeol()
             self.window.addstr(self.cheight, 0, typed.encode("utf-8"),
-                    curses.color_pair(7))
+                    curses.color_pair(Screen.COLOR_PROMPT))
         if browse > 1:
             # If done, highlight score
             self.window.chgat(self.cheight, 11,
-                len(str("%.1f" % wpm)), curses.color_pair(9))
+                len(str("%.1f" % wpm)), curses.color_pair(Screen.COLOR_HISCORE))
 
         # Move cursor to current position in text before refreshing
         if browse < 1:
