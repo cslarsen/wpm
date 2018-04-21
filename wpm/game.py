@@ -240,8 +240,6 @@ class Screen(object):
         else:
             self.window.move(2, 0)
 
-        self.window.refresh()
-
     def clear(self):
         self.window.clear()
 
