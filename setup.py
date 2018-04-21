@@ -23,11 +23,11 @@ setup(
     include_package_data=True,
     url="https://github.com/cslarsen/wpm",
     download_url="https://github.com/cslarsen/wpm/tarball/v%s" % _VERSION,
-    license="https://www.gnu.org/licenses/gpl-3.0.html",
+    license="https://www.gnu.org/licenses/agpl-3.0.html",
     long_description=open("README.rst").read(),
     zip_safe=True,
     keywords=["wpm", "typing", "typist"],
-    platforms=["unix", "linux", "osx", "cygwin", "win32"],
+    platforms=["unix", "linux", "osx", "cygwin"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
@@ -44,6 +44,9 @@ setup(
         "Programming Language :: Python :: 3.1",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
 )
