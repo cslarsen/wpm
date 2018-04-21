@@ -2,6 +2,7 @@ PYTHON := python
 PYPY := pypy
 PYTHON3 := python3
 PYFLAKES := pyflakes
+PYLINT := pylint
 
 default: test
 
@@ -47,6 +48,9 @@ setup-pypi-publish:
 
 lint:
 	@$(PYFLAKES) `find . -name '*.py' -print`
+
+pylint:
+	@$(PYLINT) wpm/*.py
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;
