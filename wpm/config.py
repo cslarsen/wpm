@@ -21,6 +21,9 @@ except ImportError:
     import ConfigParser as configparser
 
 class Config(object):
+    """Contains the user configuration, backed by the .wpmrc file."""
+    # pylint: disable=too-many-public-methods
+
     config = configparser.ConfigParser()
 
     def __init__(self):
@@ -29,14 +32,22 @@ class Config(object):
         if os.path.isfile(self.filename):
             self.load()
         else:
-            self.set_defaults()
+            Config.set_defaults()
             self.save()
 
     def load(self):
-        with open(self.filename, "rt") as f:
-            Config.config.readfp(f)
+        """Loads ~/.wpmrc config settings."""
+        with open(self.filename, "rt") as file_obj:
+            Config.config.readfp(file_obj)
 
-    def set_defaults(self):
+    def save(self):
+        """Saves settings to ~/.wpmrc"""
+        with open(self.filename, "wt") as file_obj:
+            Config.config.write(file_obj)
+
+    @staticmethod
+    def set_defaults():
+        """Sets up default settings."""
         Config.config.add_section("curses")
         Config.config.set("curses", "escdelay", "15")
         Config.config.set("curses", "window_timeout", "20")
@@ -78,21 +89,19 @@ class Config(object):
         Config.config.set("xterm-colors", "status_bg", str(curses.COLOR_BLUE))
         Config.config.set("xterm-colors", "status_fg", str(curses.COLOR_CYAN))
 
-    def save(self):
-        with open(self.filename, "wt") as f:
-            Config.config.write(f)
-
     @property
     def escdelay(self):
+        """Curses ESCDELAY."""
         return Config.config.get("curses", "escdelay")
 
     @property
     def window_timeout(self):
+        """Curses window timeout."""
         return int(Config.config.get("curses", "window_timeout"))
 
     @property
     def max_quote_width(self):
-        """Wrap quotes at this length. Inactive if set to zero or less."""
+        """Length to wrap quotes at. Inactive if zero or less."""
         try:
             return int(Config.config.get("wpm", "max_quote_width"))
         except configparser.NoSectionError:
@@ -101,92 +110,94 @@ class Config(object):
 
     @property
     def background_color_256(self):
+        """Background color for 256-color terminalss."""
         return int(Config.config.get("xterm-256color", "background"))
 
     @property
     def incorrect_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "incorrect_fg"))
-        bg = int(Config.config.get("xterm-256color", "incorrect_bg"))
-        return (fg, bg)
+        """Incorrectly type quote color for 256-color terminals."""
+        return (int(Config.config.get("xterm-256color", "incorrect_fg")),
+                int(Config.config.get("xterm-256color", "incorrect_bg")))
 
     @property
     def status_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "status_fg"))
-        bg = int(Config.config.get("xterm-256color", "status_bg"))
-        return (fg, bg)
+        """Top status bar color for 256-color terminals."""
+        return (int(Config.config.get("xterm-256color", "status_fg")),
+                int(Config.config.get("xterm-256color", "status_bg")))
 
     @property
     def correct_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "correct_fg"))
-        bg = int(Config.config.get("xterm-256color", "correct_bg"))
-        return (fg, bg)
+        """Color for correctly typed text for 256-color terminals."""
+        return (int(Config.config.get("xterm-256color", "correct_fg")),
+                int(Config.config.get("xterm-256color", "correct_bg")))
 
     @property
     def quote_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "quote_fg"))
-        bg = int(Config.config.get("xterm-256color", "quote_bg"))
-        return (fg, bg)
+        """Quote color for 256-color terminals."""
+        return (int(Config.config.get("xterm-256color", "quote_fg")),
+                int(Config.config.get("xterm-256color", "quote_bg")))
 
     @property
     def author_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "author_fg"))
-        bg = int(Config.config.get("xterm-256color", "author_bg"))
-        return (fg, bg)
+        """Author color for 256-color terminals."""
+        return (int(Config.config.get("xterm-256color", "author_fg")),
+                int(Config.config.get("xterm-256color", "author_bg")))
 
     @property
     def prompt_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "prompt_fg"))
-        bg = int(Config.config.get("xterm-256color", "prompt_bg"))
-        return (fg, bg)
+        """Prompt, or input, color for 256-color terminals."""
+        return (int(Config.config.get("xterm-256color", "prompt_fg")),
+                int(Config.config.get("xterm-256color", "prompt_bg")))
 
     @property
     def score_highlight_color_256(self):
-        fg = int(Config.config.get("xterm-256color", "score_highlight_fg"))
-        bg = int(Config.config.get("xterm-256color", "score_highlight_bg"))
-        return (fg, bg)
+        """Highlighted score color for 256-color displays."""
+        return (int(Config.config.get("xterm-256color", "score_highlight_fg")),
+                int(Config.config.get("xterm-256color", "score_highlight_bg")))
 
     @property
     def background_color(self):
+        """Background color."""
         return int(Config.config.get("xterm-colors", "background"))
 
     @property
     def incorrect_color(self):
-        fg = int(Config.config.get("xterm-colors", "incorrect_fg"))
-        bg = int(Config.config.get("xterm-colors", "incorrect_bg"))
-        return (fg, bg)
+        """Color of incorrectly typed text."""
+        return (int(Config.config.get("xterm-colors", "incorrect_fg")),
+                int(Config.config.get("xterm-colors", "incorrect_bg")))
 
     @property
     def status_color(self):
-        fg = int(Config.config.get("xterm-colors", "status_fg"))
-        bg = int(Config.config.get("xterm-colors", "status_bg"))
-        return (fg, bg)
+        """Top status bar color."""
+        return (int(Config.config.get("xterm-colors", "status_fg")),
+                int(Config.config.get("xterm-colors", "status_bg")))
 
     @property
     def correct_color(self):
-        fg = int(Config.config.get("xterm-colors", "correct_fg"))
-        bg = int(Config.config.get("xterm-colors", "correct_bg"))
-        return (fg, bg)
+        """Color for correctly typed text."""
+        return (int(Config.config.get("xterm-colors", "correct_fg")),
+                int(Config.config.get("xterm-colors", "correct_bg")))
 
     @property
     def quote_color(self):
-        fg = int(Config.config.get("xterm-colors", "quote_fg"))
-        bg = int(Config.config.get("xterm-colors", "quote_bg"))
-        return (fg, bg)
+        """Normal color for quote."""
+        return (int(Config.config.get("xterm-colors", "quote_fg")),
+                int(Config.config.get("xterm-colors", "quote_bg")))
 
     @property
     def author_color(self):
-        fg = int(Config.config.get("xterm-colors", "author_fg"))
-        bg = int(Config.config.get("xterm-colors", "author_bg"))
-        return (fg, bg)
+        """Color for author."""
+        return (int(Config.config.get("xterm-colors", "author_fg")),
+                int(Config.config.get("xterm-colors", "author_bg")))
 
     @property
     def prompt_color(self):
-        fg = int(Config.config.get("xterm-colors", "prompt_fg"))
-        bg = int(Config.config.get("xterm-colors", "prompt_bg"))
-        return (fg, bg)
+        """Color for the input field."""
+        return (int(Config.config.get("xterm-colors", "prompt_fg")),
+                int(Config.config.get("xterm-colors", "prompt_bg")))
 
     @property
     def score_highlight_color(self):
-        fg = int(Config.config.get("xterm-colors", "score_highlight_fg"))
-        bg = int(Config.config.get("xterm-colors", "score_highlight_bg"))
-        return (fg, bg)
+        """Highlighted score color."""
+        return (int(Config.config.get("xterm-colors", "score_highlight_fg")),
+                int(Config.config.get("xterm-colors", "score_highlight_bg")))
