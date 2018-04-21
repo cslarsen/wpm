@@ -17,4 +17,4 @@ The quotes database is *not* covered by the AGPL!
 __author__ = "Christian Stigen Larsen"
 __copyright__ = "Copyright 2017, 2018 Christian Stigen Larsen"
 __license__ = "GNU AGPL v3 or later"
-__version__ = "1.38"
+__version__ = "1.39"
