@@ -219,7 +219,7 @@ class Screen(object):
                 sx, sy = screen_coords(lengths, position + incorrect - 1)
                 self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
-                sx, sy = screen_coords(lengths, position + incorrect + 1)
+                sx, sy = screen_coords(lengths, position + incorrect)
                 self.window.chgat(2 + sy, sx, curses.color_pair(4))
 
         # Show typed text
