@@ -352,7 +352,7 @@ class Game(object):
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
     def run(self, to_front=None):
-        if to_front is not None:
+        if to_front:
             self.quotes.put_to_front(to_front)
             self.quote = self.quotes._current()
 
