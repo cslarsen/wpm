@@ -142,6 +142,13 @@ label you can use to tag races. For example, you could call the keyboard
 `realforce-colemak` or `cherry-red-qwerty` and use that as a basis to perform
 statistical analysis on your typing performance with various setups.
 
+The ~/.wpmrc file
+=================
+
+The first time you start wpm, it writes a `.wpmrc` file to your home directory.
+It allows you to change a few settings, including the colors. It should be
+mostly self-explanatory.
+
 License
 =======
 
@@ -154,7 +161,7 @@ source software.
 The quotes database is *not* covered by the AGPL!
 
 .. |license| image:: https://img.shields.io/badge/license-AGPL%20v3%2B-blue.svg
-    :target: http://www.gnu.org/licenses/old-licenses/gpl-3.en.html
+    :target: https://www.gnu.org/licenses/agpl-3.0.html
     :alt: Project License
 
 .. |versions| image:: https://img.shields.io/badge/python-2.7%2B%2C%203%2B%2C%20pypy-blue.svg
