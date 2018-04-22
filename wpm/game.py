@@ -107,29 +107,33 @@ class Screen(object):
             raise wpm.error.WpmError(
                 "wpm requires at least %d columns in your display" % min_cols)
 
-        self.screen.keypad(True)
-        curses.noecho()
-        curses.cbreak()
+        try:
+            self.screen.keypad(True)
+            curses.noecho()
+            curses.cbreak()
 
-        curses.start_color()
-        self.set_colors()
+            curses.start_color()
+            self.set_colors()
 
-        self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
-        self.window.keypad(True)
-        self.window.timeout(self.config.window_timeout)
-        self.window.bkgd(" ", Screen.COLOR_BACKGROUND)
+            self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
+            self.window.keypad(True)
+            self.window.timeout(self.config.window_timeout)
+            self.window.bkgd(" ", Screen.COLOR_BACKGROUND)
 
 
-        # Local variables related to quote. TODO: Move this mess to somewhere
-        # else.
-        self.cheight = 0
-        self.quote = ""
-        self.quote_author = ""
-        self.quote_columns = 0
-        self.quote_height = 0
-        self.quote_lengths = tuple()
-        self.quote_title = ""
-        self.quote_coords = tuple()
+            # Local variables related to quote. TODO: Move this mess to somewhere
+            # else.
+            self.cheight = 0
+            self.quote = ""
+            self.quote_author = ""
+            self.quote_columns = 0
+            self.quote_height = 0
+            self.quote_lengths = tuple()
+            self.quote_title = ""
+            self.quote_coords = tuple()
+        except:
+            curses.endwin()
+            raise
 
     def set_colors(self):
         """Sets up curses color pairs."""
