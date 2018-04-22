@@ -335,8 +335,8 @@ class Screen(object):
                               Screen.COLOR_HISCORE)
         elif browse < 1:
             # Move cursor to current position in text before refreshing
-            cursor_x, sy = screen_coords(self.quote_lengths, position + incorrect)
-            self.window.move(2 + sy, min(cursor_x, self.quote_columns - 1))
+            xpos, ypos = self.quote_coords[position + incorrect]
+            self.window.move(2 + ypos, min(xpos, self.quote_columns - 1))
         else:
             # Move cursor to start position
             self.window.move(2, 0)
