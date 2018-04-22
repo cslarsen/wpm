@@ -294,7 +294,7 @@ class Screen(object):
 
         self.update_header(head)
 
-        sx, sy = self.quote_coords[position]
+        cursor_x, cursor_y = self.quote_coords[position]
 
         if browse:
             self.update_quote(Screen.COLOR_CORRECT if browse != 1 else Screen.COLOR_QUOTE)
@@ -303,14 +303,16 @@ class Screen(object):
 
         elif position + incorrect <= len(self.quote):
             # Highlight correct / incorrect characters in quote
-            color = (Screen.COLOR_CORRECT if incorrect == 0 else
-                     Screen.COLOR_INCORRECT)
+            if incorrect:
+                color = Screen.COLOR_INCORRECT
+            else:
+                color = Screen.COLOR_CORRECT
 
-            sx, sy = screen_coords(self.quote_lengths, position + incorrect - 1)
-            self.window.chgat(2 + sy, max(sx, 0), 1, color)
+            xpos, ypos = self.quote_coords[position + incorrect - 1]
+            self.window.chgat(2 + ypos, max(xpos, 0), 1, color)
 
-            sx, sy = screen_coords(self.quote_lengths, position + incorrect)
-            self.window.chgat(2 + sy, sx, 1, Screen.COLOR_QUOTE)
+            xpos, ypos = self.quote_coords[position + incorrect]
+            self.window.chgat(2 + ypos, xpos, 1, Screen.COLOR_QUOTE)
 
         # Show typed text
         if self.cheight < curses.LINES:
@@ -333,8 +335,8 @@ class Screen(object):
                               Screen.COLOR_HISCORE)
         elif browse < 1:
             # Move cursor to current position in text before refreshing
-            sx, sy = screen_coords(self.quote_lengths, position + incorrect)
-            self.window.move(2 + sy, min(sx, self.quote_columns - 1))
+            cursor_x, sy = screen_coords(self.quote_lengths, position + incorrect)
+            self.window.move(2 + sy, min(cursor_x, self.quote_columns - 1))
         else:
             # Move cursor to start position
             self.window.move(2, 0)
