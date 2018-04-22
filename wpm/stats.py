@@ -154,32 +154,28 @@ class Stats(object):
         games = collections.defaultdict(list)
         current_keyboard = None
 
+        def parse(row):
+            """Converts CSV row to internal types."""
+            race = int(row[0])
+            wpm = float(row[1])
+            accuracy = float(row[2])
+            rank = int(row[3])
+            racers = int(row[4])
+            text_id = int(row[5])
+            timestamp = Timestamp.from_string(row[6])
+            database = row[7]
+            keyboard = row[8]
+
+            return (race, wpm, accuracy, rank, racers, text_id, timestamp,
+                    database, keyboard)
+
         with open(filename, "rt") as file_obj:
             reader = csv.reader(file_obj)
 
             for row in reader:
-                race = int(row[0])
-                wpm = float(row[1])
-                accuracy = float(row[2])
-                rank = int(row[3])
-                racers = int(row[4])
-                text_id = int(row[5])
-                timestamp = Timestamp.from_string(row[6])
-                database = row[7]
-                keyboard = row[8]
-
-                if keyboard not in games:
-                    games[keyboard] = []
-
-                games[keyboard].append((race,
-                                        wpm,
-                                        accuracy,
-                                        rank,
-                                        racers,
-                                        text_id,
-                                        timestamp,
-                                        database))
-
+                result = parse(row)
+                keyboard = result[-1]
+                games[keyboard].append(result[:-1])
                 current_keyboard = keyboard
 
         return Stats(current_keyboard, games)
