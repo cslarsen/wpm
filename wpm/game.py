@@ -281,6 +281,12 @@ class Screen(object):
             self.quote_coords.append((x_pos, y_pos))
         self.quote_coords = tuple(self.quote_coords)
 
+    def update_prompt(self, prompt):
+        self.window.move(self.cheight, 0)
+        self.window.clrtoeol()
+        self.window.addstr(self.cheight, 0, prompt.encode("utf-8"),
+                           Screen.COLOR_PROMPT)
+
     def update(self, browse, head, quote, position, incorrect, author, title,
                typed, cur_wpm, average):
         """Updates the screen."""
@@ -294,15 +300,8 @@ class Screen(object):
             self.show_author(4 + self.quote_height, self.quote_columns,
                              u"— %s, %s" % (author, title))
 
-            if browse >= 2:
-                typed = "You scored %.1f wpm%s " % (cur_wpm, "!" if
-                                                    cur_wpm > average else ".")
-            else:
-                typed = ""
-            typed += "Use arrows/space to browse, esc to quit, or start typing."
         elif position + incorrect <= len(quote):
             # Highlight correct / incorrect characters in quote
-            typed = "> " + typed
             color = (Screen.COLOR_CORRECT if incorrect == 0 else
                      Screen.COLOR_INCORRECT)
 
@@ -314,10 +313,19 @@ class Screen(object):
 
         # Show typed text
         if self.cheight < curses.LINES:
-            self.window.move(self.cheight, 0)
-            self.window.clrtoeol()
-            self.window.addstr(self.cheight, 0, typed.encode("utf-8"),
-                               Screen.COLOR_PROMPT)
+            if browse == 1:
+                prompt = "Use arrows/space to browse, esc to quit, or start typing."
+            elif browse >= 2:
+                prompt = "You scored %.1f wpm%s " % (cur_wpm, "!" if
+                                                    cur_wpm > average else ".")
+                prompt += " Use arrows/space to browse, esc to quit, or start typing."
+            elif position + incorrect <= len(quote):
+                prompt = "> " + typed
+            else:
+                prompt = ""
+
+            self.update_prompt(prompt)
+
         if browse > 1:
             # If done, highlight score
             self.window.chgat(self.cheight, 11, len(str("%.1f" % cur_wpm)),
@@ -491,6 +499,7 @@ class Game(object):
         y, x = self.screen.window.getmaxyx()
         self.screen.clear()
         curses.resizeterm(y, x)
+        self.screen.setup_quote(self.quote.text)
 
     def handle_key(self, key):
         """Dispatches actions based on key and current mode."""
