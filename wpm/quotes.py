@@ -57,6 +57,7 @@ class RandomIterator(object):
         return len(self.quotes)
 
     def current(self):
+        """Returns current quote."""
         index = self.indices[self.index]
         return self._get_quote(index)
 

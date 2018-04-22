@@ -13,7 +13,6 @@ The quotes database is *not* covered by the AGPL!
 
 import curses
 import os
-import sys
 
 try:
     import configparser
