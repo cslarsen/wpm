@@ -105,10 +105,6 @@ class RandomIterator(object):
     def next(self):
         """Goes to next quote."""
         self.index = (self.index + 1) % len(self.quotes)
-        if self.index == 0:
-            # TODO: Move this elsewhere. Cannot go back and forth if we keep
-            # randomizing here.
-            random.shuffle(self.indices)
         return self.current()
 
     def previous(self):
