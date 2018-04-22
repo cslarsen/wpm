@@ -56,7 +56,7 @@ class RandomIterator(object):
     def __len__(self):
         return len(self.quotes)
 
-    def _current(self):
+    def current(self):
         index = self.indices[self.index]
         return self._get_quote(index)
 
@@ -108,12 +108,12 @@ class RandomIterator(object):
             # TODO: Move this elsewhere. Cannot go back and forth if we keep
             # randomizing here.
             random.shuffle(self.indices)
-        return self._current()
+        return self.current()
 
     def previous(self):
         """Goes back to previous quote."""
         self.index = (self.index - 1) % len(self.quotes)
-        return self._current()
+        return self.current()
 
 
 class Quotes(object):

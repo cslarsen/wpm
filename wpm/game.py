@@ -114,8 +114,17 @@ class Screen(object):
         self.window.timeout(self.config.window_timeout)
         self.window.bkgd(" ", Screen.COLOR_BACKGROUND)
 
-        # TODO: Get rid of this
+
+        # Local variables related to quote. TODO: Move this mess to somewhere
+        # else.
         self.cheight = 0
+        self.quote = ""
+        self.quote_author = ""
+        self.quote_columns = 0
+        self.quote_height = 0
+        self.quote_lengths = tuple()
+        self.quote_title = ""
+        self.quote_coords = tuple()
 
     def set_colors(self):
         """Sets up curses color pairs."""
@@ -179,18 +188,19 @@ class Screen(object):
 
     def _get_key_py33(self):
         """Python 3.3+ implementation of get_key."""
+        # pylint: disable=too-many-return-statements
         try:
             # Curses in Python 3.3 handles unicode via get_wch
             key = self.window.get_wch()
             if isinstance(key, int):
-                if key == curses.KEY_LEFT:
+                if key == curses.KEY_BACKSPACE:
+                    return "KEY_BACKSPACE"
+                elif key == curses.KEY_LEFT:
                     return "KEY_LEFT"
                 elif key == curses.KEY_RIGHT:
                     return "KEY_RIGHT"
                 elif key == curses.KEY_RESIZE:
                     return "KEY_RESIZE"
-                elif key == curses.KEY_BACKSPACE:
-                    return "KEY_BACKSPACE"
                 return None
             return key
         except curses.error:
@@ -200,6 +210,7 @@ class Screen(object):
 
     def _get_key_py27(self):
         """Python 2.7 implementation of get_key."""
+        # pylint: disable=too-many-return-statements
         try:
             key = self.window.getkey()
 
@@ -213,7 +224,9 @@ class Screen(object):
                 return multibyte.decode("utf-8")
 
             if isinstance(key, int):
-                if key == curses.KEY_LEFT:
+                if key == curses.KEY_BACKSPACE:
+                    return "KEY_BACKSPACE"
+                elif key == curses.KEY_LEFT:
                     return "KEY_LEFT"
                 elif key == curses.KEY_RIGHT:
                     return "KEY_RIGHT"
@@ -226,36 +239,32 @@ class Screen(object):
         except curses.error:
             return None
 
-    def column(self, y, x, width, text, attr=None, left=True):
+    def right_column(self, y_pos, x_pos, width, text):
         """Writes text to screen in coumns."""
         lengths = word_wrap(text, width)
 
-        for y, length in enumerate(lengths, y):
-            if left:
-                self.window.addstr(y, x, text[:length].encode("utf-8"), attr)
-            else:
-                self.window.addstr(y, x - length, text[:length].encode("utf-8"), attr)
+        for cur_y, length in enumerate(lengths, y_pos):
+            self.window.addstr(cur_y, x_pos - length,
+                               text[:length].encode("utf-8"),
+                               Screen.COLOR_AUTHOR)
             text = text[1+length:]
 
         return len(lengths)
 
     def update_quote(self, color):
         """Renders complete quote on screen."""
-        start = 0
-        q = self.quote[:]
-        for y, length in enumerate(self.quote_lengths, 2):
-            self.window.addstr(y, 0, q[:length].encode("utf-8"), color)
-            q = q[1 + length:]
+        quote = self.quote[:]
+        for y_pos, length in enumerate(self.quote_lengths, 2):
+            self.window.addstr(y_pos, 0, quote[:length].encode("utf-8"), color)
+            quote = quote[1 + length:]
 
     def show_author(self, y_pos, right_position, author):
         """Renders author on screen."""
         self.cheight = y_pos
-        self.cheight += self.column(y_pos - 1,
-                                    right_position - 10,
-                                    right_position // 2,
-                                    author,
-                                    Screen.COLOR_AUTHOR,
-                                    left=False)
+        self.cheight += self.right_column(y_pos - 1,
+                                          right_position - 10,
+                                          right_position // 2,
+                                          author)
 
     def update_header(self, text):
         """Renders top-bar header."""
@@ -270,10 +279,11 @@ class Screen(object):
         else:
             self.quote_columns = curses.COLS
 
+        self.cheight = 0
         self.quote = quote.text
         self.quote_author = quote.author
         self.quote_title = quote.title
-        self.quote_lengths = word_wrap(self.quote, self.quote_columns - 1)
+        self.quote_lengths = tuple(word_wrap(self.quote, self.quote_columns - 1))
         self.quote_height = len(self.quote_lengths)
 
         # Remember (x, y) position for each quote offset.
@@ -284,6 +294,7 @@ class Screen(object):
         self.quote_coords = tuple(self.quote_coords)
 
     def update_prompt(self, prompt):
+        """Prints prompt on the display."""
         self.window.move(self.cheight, 0)
         self.window.clrtoeol()
         self.window.addstr(self.cheight, 0, prompt.encode("utf-8"),
@@ -293,8 +304,6 @@ class Screen(object):
         """Updates the screen."""
 
         self.update_header(head)
-
-        cursor_x, cursor_y = self.quote_coords[position]
 
         if browse:
             self.update_quote(Screen.COLOR_CORRECT if browse != 1 else Screen.COLOR_QUOTE)
@@ -320,7 +329,7 @@ class Screen(object):
                 prompt = "Use arrows/space to browse, esc to quit, or start typing."
             elif browse >= 2:
                 prompt = "You scored %.1f wpm%s " % (cur_wpm, "!" if
-                                                    cur_wpm > average else ".")
+                                                     cur_wpm > average else ".")
                 prompt += " Use arrows/space to browse, esc to quit, or start typing."
             elif position + incorrect <= len(self.quote):
                 prompt = "> " + typed
@@ -384,8 +393,7 @@ class Game(object):
         self.screen.deinit()
         if error_type is not None:
             return False
-        else:
-            return self
+        return self
 
     def set_tab_spaces(self, spaces):
         """Sets how many spaces a tab should expand to."""
@@ -405,7 +413,7 @@ class Game(object):
         """Starts the main game loop."""
         if to_front:
             self.quotes.put_to_front(to_front)
-            self.quote = self.quotes._current()
+            self.quote = self.quotes.current()
             self.screen.setup_quote(self.quote)
 
         while True:
@@ -496,9 +504,9 @@ class Game(object):
 
     def resize(self):
         """Handles a resized terminal."""
-        y, x = self.screen.window.getmaxyx()
+        max_y, max_x = self.screen.window.getmaxyx()
         self.screen.clear()
-        curses.resizeterm(y, x)
+        curses.resizeterm(max_y, max_x)
         self.screen.setup_quote(self.quote)
 
     def handle_key(self, key):
