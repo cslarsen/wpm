@@ -551,6 +551,7 @@ class Game(object):
 
     def handle_key(self, key):
         """Dispatches actions based on key and current mode."""
+        # TODO: Refactor this mess of a function
         if key == "KEY_RESIZE":
             self.resize()
             return
