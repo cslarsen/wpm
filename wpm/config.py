@@ -13,6 +13,7 @@ The quotes database is *not* covered by the AGPL!
 
 import curses
 import os
+import sys
 
 try:
     import configparser
@@ -24,9 +25,10 @@ class Config(object):
     """Contains the user configuration, backed by the .wpmrc file."""
     # pylint: disable=too-many-public-methods
 
-    config = configparser.ConfigParser()
+    config = None
 
     def __init__(self):
+        Config.config = configparser.ConfigParser()
         self.filename = os.path.expanduser("~/.wpmrc")
 
         if os.path.isfile(self.filename):
@@ -37,8 +39,7 @@ class Config(object):
 
     def load(self):
         """Loads ~/.wpmrc config settings."""
-        with open(self.filename, "rt") as file_obj:
-            Config.config.readfp(file_obj)
+        Config.config.read(self.filename)
 
     def save(self):
         """Saves settings to ~/.wpmrc"""
