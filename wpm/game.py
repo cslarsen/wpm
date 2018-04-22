@@ -229,13 +229,29 @@ class Screen(object):
     def column(self, y, x, width, text, attr=None, left=True):
         """Writes text to screen in coumns."""
         lengths = word_wrap(text, width)
+
         for y, length in enumerate(lengths, y):
             if left:
                 self.window.addstr(y, x, text[:length].encode("utf-8"), attr)
             else:
                 self.window.addstr(y, x - length, text[:length].encode("utf-8"), attr)
             text = text[1+length:]
+
         return len(lengths)
+
+    def show_quote(self, lengths, quote, color):
+        for y, length in enumerate(lengths, 2):
+            self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
+            quote = quote[1+length:]
+
+    def show_author(self, y_pos, right_position, author):
+            self.cheight = y_pos
+            self.cheight += self.column(y_pos - 1,
+                                        right_position - 10,
+                                        right_position // 2,
+                                        author,
+                                        Screen.COLOR_AUTHOR,
+                                        left=False)
 
     def update(self, browse, head, quote, position, incorrect, author, title,
                typed, cur_wpm, average):
@@ -255,24 +271,11 @@ class Screen(object):
                            Screen.COLOR_STATUS)
 
         if browse:
-            # Display quote
-            if browse != 1:
-                color = Screen.COLOR_CORRECT
-            else:
-                color = Screen.COLOR_QUOTE
+            self.show_quote(lengths, quote, Screen.COLOR_CORRECT if browse != 1
+                            else Screen.COLOR_QUOTE)
+            self.show_author(4 + h, quote_columns,
+                             u"— %s, %s" % (author, title))
 
-            for y, length in enumerate(lengths, 2):
-                self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
-                quote = quote[1+length:]
-
-            # Show author
-            self.cheight = 4 + h
-            self.cheight += self.column(3 + h,
-                                        quote_columns - 10,
-                                        quote_columns // 2,
-                                        u"— %s, %s" % (author, title),
-                                        Screen.COLOR_AUTHOR,
-                                        False)
             if browse >= 2:
                 typed = "You scored %.1f wpm%s " % (cur_wpm, "!" if
                                                     cur_wpm > average else ".")
