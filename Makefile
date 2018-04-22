@@ -18,6 +18,9 @@ profile:
 	PYTHONPATH=. $(PYTHON) -m cProfile -o stats wpm/__main__.py
 	python -c 'import pstats; p = pstats.Stats("stats"); p.sort_stats("cumulative").print_stats(10)'
 
+help:
+	PYTHONPATH=. $(PYTHON) wpm --help
+
 run3:
 	PYTHONPATH=. $(PYTHON3) wpm
 
