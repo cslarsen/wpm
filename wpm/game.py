@@ -240,18 +240,25 @@ class Screen(object):
         return len(lengths)
 
     def show_quote(self, lengths, quote, color):
+        """Renders complete quote on screen."""
         for y, length in enumerate(lengths, 2):
             self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
             quote = quote[1+length:]
 
     def show_author(self, y_pos, right_position, author):
-            self.cheight = y_pos
-            self.cheight += self.column(y_pos - 1,
-                                        right_position - 10,
-                                        right_position // 2,
-                                        author,
-                                        Screen.COLOR_AUTHOR,
-                                        left=False)
+        """Renders author on screen."""
+        self.cheight = y_pos
+        self.cheight += self.column(y_pos - 1,
+                                    right_position - 10,
+                                    right_position // 2,
+                                    author,
+                                    Screen.COLOR_AUTHOR,
+                                    left=False)
+
+    def show_header(self, text):
+        """Renders top-bar header."""
+        self.window.addstr(0, 0, pad_right(text, curses.COLS),
+                           Screen.COLOR_STATUS)
 
     def update(self, browse, head, quote, position, incorrect, author, title,
                typed, cur_wpm, average):
@@ -266,9 +273,7 @@ class Screen(object):
         sx, sy = screen_coords(lengths, position)
         h = len(lengths)
 
-        # Show header
-        self.window.addstr(0, 0, pad_right(head, curses.COLS),
-                           Screen.COLOR_STATUS)
+        self.show_header(head)
 
         if browse:
             self.show_quote(lengths, quote, Screen.COLOR_CORRECT if browse != 1
@@ -282,17 +287,17 @@ class Screen(object):
             else:
                 typed = ""
             typed += "Use arrows/space to browse, esc to quit, or start typing."
-        elif position < len(quote):
+        elif position + incorrect < len(quote):
+            # Highlight correct / incorrect characters in quote
+            typed = "> " + typed
             color = (Screen.COLOR_CORRECT if incorrect == 0 else
                      Screen.COLOR_INCORRECT)
-            typed = "> " + typed
 
-            if position + incorrect < len(quote):
-                sx, sy = screen_coords(lengths, position + incorrect - 1)
-                self.window.chgat(2 + sy, max(sx, 0), 1, color)
+            sx, sy = screen_coords(lengths, position + incorrect - 1)
+            self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
-                sx, sy = screen_coords(lengths, position + incorrect)
-                self.window.chgat(2 + sy, sx, 1, Screen.COLOR_QUOTE)
+            sx, sy = screen_coords(lengths, position + incorrect)
+            self.window.chgat(2 + sy, sx, 1, Screen.COLOR_QUOTE)
 
         # Show typed text
         if self.cheight < curses.LINES:
