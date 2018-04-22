@@ -270,8 +270,10 @@ class Screen(object):
         else:
             self.quote_columns = curses.COLS
 
-        self.quote = quote
-        self.quote_lengths = word_wrap(quote, self.quote_columns - 1)
+        self.quote = quote.text
+        self.quote_author = quote.author
+        self.quote_title = quote.title
+        self.quote_lengths = word_wrap(self.quote, self.quote_columns - 1)
         self.quote_height = len(self.quote_lengths)
 
         # Remember (x, y) position for each quote offset.
@@ -287,8 +289,7 @@ class Screen(object):
         self.window.addstr(self.cheight, 0, prompt.encode("utf-8"),
                            Screen.COLOR_PROMPT)
 
-    def update(self, browse, head, quote, position, incorrect, author, title,
-               typed, cur_wpm, average):
+    def update(self, browse, head, position, incorrect, typed, cur_wpm, average):
         """Updates the screen."""
 
         self.update_header(head)
@@ -298,9 +299,9 @@ class Screen(object):
         if browse:
             self.update_quote(Screen.COLOR_CORRECT if browse != 1 else Screen.COLOR_QUOTE)
             self.show_author(4 + self.quote_height, self.quote_columns,
-                             u"— %s, %s" % (author, title))
+                             u"— %s, %s" % (self.quote_author, self.quote_title))
 
-        elif position + incorrect <= len(quote):
+        elif position + incorrect <= len(self.quote):
             # Highlight correct / incorrect characters in quote
             color = (Screen.COLOR_CORRECT if incorrect == 0 else
                      Screen.COLOR_INCORRECT)
@@ -319,7 +320,7 @@ class Screen(object):
                 prompt = "You scored %.1f wpm%s " % (cur_wpm, "!" if
                                                     cur_wpm > average else ".")
                 prompt += " Use arrows/space to browse, esc to quit, or start typing."
-            elif position + incorrect <= len(quote):
+            elif position + incorrect <= len(self.quote):
                 prompt = "> " + typed
             else:
                 prompt = ""
@@ -372,7 +373,7 @@ class Game(object):
 
         self.screen = Screen()
         self.quote = self.quotes.next()
-        self.screen.setup_quote(self.quote.text)
+        self.screen.setup_quote(self.quote)
 
     def __enter__(self):
         return self
@@ -403,7 +404,7 @@ class Game(object):
         if to_front:
             self.quotes.put_to_front(to_front)
             self.quote = self.quotes._current()
-            self.screen.setup_quote(self.quote.text)
+            self.screen.setup_quote(self.quote)
 
         while True:
             is_typing = self.start is not None and self.stop is None
@@ -414,11 +415,8 @@ class Game(object):
 
             self.screen.update(browse,
                                self.get_stats(self.elapsed),
-                               self.quote.text,
                                self.position,
                                self.incorrect,
-                               self.quote.author,
-                               self.quote.title,
                                self._edit,
                                self.wpm(self.elapsed),
                                self.average)
@@ -491,7 +489,7 @@ class Game(object):
                 self.quote = self.quotes.next()
             else:
                 self.quote = self.quotes.previous()
-            self.screen.setup_quote(self.quote.text)
+            self.screen.setup_quote(self.quote)
             self.screen.clear()
 
     def resize(self):
@@ -499,7 +497,7 @@ class Game(object):
         y, x = self.screen.window.getmaxyx()
         self.screen.clear()
         curses.resizeterm(y, x)
-        self.screen.setup_quote(self.quote.text)
+        self.screen.setup_quote(self.quote)
 
     def handle_key(self, key):
         """Dispatches actions based on key and current mode."""
@@ -536,11 +534,8 @@ class Game(object):
             self.screen.clear()
             self.screen.update(1,
                                self.get_stats(self.elapsed),
-                               self.quote.text,
                                self.position,
                                self.incorrect,
-                               self.quote.author,
-                               self.quote.title,
                                self._edit,
                                self.wpm(self.elapsed),
                                self.average)
