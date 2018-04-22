@@ -96,13 +96,13 @@ class Screen(object):
         self.screen.nodelay(True)
 
         min_lines = 12
-        if curses.LINES < min_lines:
+        if self.lines < min_lines:
             curses.endwin()
             raise wpm.error.WpmError(
                 "wpm requires at least %d lines in your display" % min_lines)
 
         min_cols = 20
-        if curses.COLS < min_cols:
+        if self.columns < min_cols:
             curses.endwin()
             raise wpm.error.WpmError(
                 "wpm requires at least %d columns in your display" % min_cols)
@@ -115,7 +115,7 @@ class Screen(object):
             curses.start_color()
             self.set_colors()
 
-            self.window = curses.newwin(curses.LINES, curses.COLS, 0, 0)
+            self.window = curses.newwin(self.lines, self.columns, 0, 0)
             self.window.keypad(True)
             self.window.timeout(self.config.window_timeout)
             self.window.bkgd(" ", Screen.COLOR_BACKGROUND)
@@ -134,6 +134,18 @@ class Screen(object):
         except:
             curses.endwin()
             raise
+
+    @property
+    def columns(self):
+        """Returns number of terminal columns."""
+        # pylint: disable=no-member
+        return curses.COLS
+
+    @property
+    def lines(self):
+        """Returns number of terminal lines."""
+        # pylint: disable=no-member
+        return curses.LINES
 
     def set_colors(self):
         """Sets up curses color pairs."""
@@ -277,16 +289,16 @@ class Screen(object):
 
     def update_header(self, text):
         """Renders top-bar header."""
-        self.window.addstr(0, 0, pad_right(text, curses.COLS),
+        self.window.addstr(0, 0, pad_right(text, self.columns),
                            Screen.COLOR_STATUS)
 
     def setup_quote(self, quote):
         """Sets up variables used for a new quote."""
         # TODO: Refactor all of this stuff in time.
         if self.config.max_quote_width > 0:
-            self.quote_columns = min(curses.COLS, self.config.max_quote_width)
+            self.quote_columns = min(self.columns, self.config.max_quote_width)
         else:
-            self.quote_columns = curses.COLS
+            self.quote_columns = self.columns
 
         self.cheight = 0
         self.quote = quote.text
@@ -333,7 +345,7 @@ class Screen(object):
             self.window.chgat(2 + ypos, xpos, 1, Screen.COLOR_QUOTE)
 
         # Show typed text
-        if self.cheight < curses.LINES:
+        if self.cheight < self.lines:
             if browse == 1:
                 prompt = "Use arrows/space to browse, esc to quit, or start typing."
             elif browse >= 2:
@@ -494,7 +506,7 @@ class Game(object):
         stat = ""
 
         for part in parts:
-            if (len(stat) + len(part)) <= curses.COLS:
+            if (len(stat) + len(part)) <= self.screen.columns:
                 stat += part
 
         return stat
