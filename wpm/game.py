@@ -279,12 +279,13 @@ class Screen(object):
             self.window.addstr(y_pos, 0, quote[:length].encode("utf-8"), color)
             quote = quote[1 + length:]
 
-    def show_author(self, y_pos, right_position, author):
+    def update_author(self):
         """Renders author on screen."""
-        self.cheight = y_pos
-        self.cheight += self.right_column(y_pos - 1,
-                                          right_position - 10,
-                                          right_position // 2,
+        author = u"— %s, %s" % (self.quote_author, self.quote_title)
+        self.cheight = 4 + self.quote_height
+        self.cheight += self.right_column(self.cheight - 1,
+                                          self.quote_columns - 10,
+                                          self.quote_columns // 2,
                                           author)
 
     def update_header(self, text):
@@ -318,58 +319,66 @@ class Screen(object):
         """Prints prompt on the display."""
         self.window.move(self.cheight, 0)
         self.window.clrtoeol()
-        self.window.addstr(self.cheight, 0, prompt.encode("utf-8"),
+        self.window.addstr(self.cheight,
+                           0,
+                           prompt.encode("utf-8"),
                            Screen.COLOR_PROMPT)
 
-    def update(self, browse, head, position, incorrect, typed, cur_wpm, average):
-        """Updates the screen."""
+    def cursor_to_start(self):
+        """Moves cursor to beginning of quote."""
+        self.window.move(2, 0)
 
+    def show_browser(self, head):
+        """Show quote browsing screen."""
+        self.update_header(head)
+        self.update_quote(Screen.COLOR_QUOTE)
+        self.update_author()
+        self.update_prompt("Use arrows/space to browse, esc to quit, or start typing.")
+        self.cursor_to_start()
+
+    def show_score(self, head, wpm_score):
+        """Show score screen after typing has finished."""
+        self.update_header(head)
+        self.update_quote(Screen.COLOR_CORRECT)
+        self.update_author()
+
+        self.update_prompt("You scored %.1f wpm. "
+                           "Use arrows/space to browse, "
+                           "esc to quit, or start typing." % wpm_score)
+
+        # Highlight score
+        self.window.chgat(self.cheight, 11, len(str("%.1f" % wpm_score)),
+                          Screen.COLOR_HISCORE)
+
+        self.cursor_to_start()
+
+    def show_keystroke(self, head, position, incorrect, typed):
+        """Updates the screen while typing."""
         self.update_header(head)
 
-        if browse:
-            self.update_quote(Screen.COLOR_CORRECT if browse != 1 else Screen.COLOR_QUOTE)
-            self.show_author(4 + self.quote_height, self.quote_columns,
-                             u"— %s, %s" % (self.quote_author, self.quote_title))
+        if incorrect:
+            color = Screen.COLOR_INCORRECT
+        else:
+            color = Screen.COLOR_CORRECT
 
-        elif position + incorrect <= len(self.quote):
-            # Highlight correct / incorrect characters in quote
-            if incorrect:
-                color = Screen.COLOR_INCORRECT
-            else:
-                color = Screen.COLOR_CORRECT
+        prompt = ""
+        xpos, ypos = self.quote_coords[position + incorrect]
 
-            xpos, ypos = self.quote_coords[position + incorrect - 1]
-            self.window.chgat(2 + ypos, max(xpos, 0), 1, color)
+        if position + incorrect <= len(self.quote):
+            # Highlight correct / incorrect character in quote
+            ixpos, iypos = self.quote_coords[position + incorrect - 1]
+            self.window.chgat(2 + iypos, max(ixpos, 0), 1, color)
 
-            xpos, ypos = self.quote_coords[position + incorrect]
+            # Highlight next as correct, in case of backspace
             self.window.chgat(2 + ypos, xpos, 1, Screen.COLOR_QUOTE)
+            prompt = "> " + typed
 
         # Show typed text
         if self.cheight < self.lines:
-            if browse == 1:
-                prompt = "Use arrows/space to browse, esc to quit, or start typing."
-            elif browse >= 2:
-                prompt = "You scored %.1f wpm%s " % (cur_wpm, "!" if
-                                                     cur_wpm > average else ".")
-                prompt += " Use arrows/space to browse, esc to quit, or start typing."
-            elif position + incorrect <= len(self.quote):
-                prompt = "> " + typed
-            else:
-                prompt = ""
-
             self.update_prompt(prompt)
 
-        if browse > 1:
-            # If done, highlight score
-            self.window.chgat(self.cheight, 11, len(str("%.1f" % cur_wpm)),
-                              Screen.COLOR_HISCORE)
-        elif browse < 1:
-            # Move cursor to current position in text before refreshing
-            xpos, ypos = self.quote_coords[position + incorrect]
-            self.window.move(2 + ypos, min(xpos, self.quote_columns - 1))
-        else:
-            # Move cursor to start position
-            self.window.move(2, 0)
+        # Move cursor to current position in text before refreshing
+        self.window.move(2 + ypos, min(xpos, self.quote_columns - 1))
 
     def clear(self):
         """Clears the screen."""
@@ -440,17 +449,16 @@ class Game(object):
         while True:
             is_typing = self.start is not None and self.stop is None
 
-            browse = int(not is_typing)
-            if self.stop is not None:
-                browse = 2
-
-            self.screen.update(browse,
-                               self.get_stats(self.elapsed),
-                               self.position,
-                               self.incorrect,
-                               self._edit,
-                               self.wpm(self.elapsed),
-                               self.average)
+            if is_typing:
+                self.screen.show_keystroke(self.get_stats(self.elapsed),
+                                           self.position,
+                                           self.incorrect,
+                                           self._edit)
+            elif self.stop is not None:
+                self.screen.show_score(self.get_stats(self.elapsed),
+                                       self.wpm(self.elapsed))
+            else:
+                self.screen.show_browser(self.get_stats(self.elapsed))
 
             key = self.screen.get_key()
             if key is not None:
@@ -570,17 +578,19 @@ class Game(object):
                 self._edit = self._edit[:-1]
             return
 
-        # Try again?
         if self.stop is not None:
+            # Use wants to try again immediately after score
             self.reset()
             self.screen.clear()
-            self.screen.update(1,
-                               self.get_stats(self.elapsed),
-                               self.position,
-                               self.incorrect,
-                               self._edit,
-                               self.wpm(self.elapsed),
-                               self.average)
+
+            # Render quote anew
+            self.screen.show_browser(self.get_stats(self.elapsed))
+
+            # Update first keypress
+            self.screen.show_keystroke(self.get_stats(self.elapsed),
+                                       self.position,
+                                       self.incorrect,
+                                       self._edit)
 
         # Start recording upon first ordinary key press
         if self.start is None:
