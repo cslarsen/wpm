@@ -172,12 +172,12 @@ class Screen(object):
         # pylint: disable=method-hidden
         # Install a suitable get_key based on Python version
         if sys.version_info[0:2] >= (3, 3):
-            self.get_key = self.get_key_py33
+            self.get_key = self._get_key_py33
         else:
-            self.get_key = self.get_key_py27
+            self.get_key = self._get_key_py27
         return self.get_key()
 
-    def get_key_py33(self):
+    def _get_key_py33(self):
         """Python 3.3+ implementation of get_key."""
         try:
             # Curses in Python 3.3 handles unicode via get_wch
@@ -198,7 +198,7 @@ class Screen(object):
         except KeyboardInterrupt:
             raise
 
-    def get_key_py27(self):
+    def _get_key_py27(self):
         """Python 2.7 implementation of get_key."""
         try:
             key = self.window.getkey()
