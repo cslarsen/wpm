@@ -295,7 +295,7 @@ class Screen(object):
 
     def setup_quote(self, quote):
         """Sets up variables used for a new quote."""
-        # TODO: Refactor all of this stuff in time.
+        # TODO: Move this stuff elsewhere
         if self.config.max_quote_width > 0:
             self.quote_columns = min(self.columns, self.config.max_quote_width)
         else:
