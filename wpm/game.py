@@ -471,17 +471,24 @@ class Game(object):
 
     def get_stats(self, elapsed):
         """Returns the top-bar stats line."""
-        keyboard = self.stats.keyboard
-        if keyboard is None:
-            keyboard = "Unspecified"
+        kbd = self.stats.keyboard
 
-        return "%5.1f wpm %4.1f cps %5.2fs %5.1f%% acc %5.1f avg wpm - %s" % (
-            self.wpm(elapsed),
-            self.cps(elapsed),
-            elapsed,
-            100.0*self.accuracy,
-            self.average,
-            keyboard)
+        parts = (
+            "%5.1f wpm" % self.wpm(elapsed),
+            " %4.1f cps" % self.cps(elapsed),
+            " %5.2fs" % elapsed,
+            " %5.1f%% acc" % (100.0*self.accuracy),
+            " %5.1f avg wpm" % self.average,
+            " - " + (kbd if kbd is not None else "Unspecified"),
+        )
+
+        stat = ""
+
+        for part in parts:
+            if (len(stat) + len(part)) <= curses.COLS:
+                stat += part
+
+        return stat
 
     def reset(self, direction=0):
         """Cancels current game."""
