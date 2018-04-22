@@ -26,7 +26,10 @@ def word_wrap(text, width):
     """Returns lengths of lines that can be printed without wrapping."""
     lengths = []
     while len(text) > width:
-        end = text[:width + 1].rindex(" ")
+        try:
+            end = text[:width + 1].rindex(" ")
+        except ValueError:
+            break
 
         # We can't divide the input nicely, so just display it as-is
         if end == -1:
