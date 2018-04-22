@@ -239,11 +239,13 @@ class Screen(object):
 
         return len(lengths)
 
-    def show_quote(self, lengths, quote, color):
+    def update_quote(self, color):
         """Renders complete quote on screen."""
-        for y, length in enumerate(lengths, 2):
-            self.window.addstr(y, 0, quote[:length].encode("utf-8"), color)
-            quote = quote[1+length:]
+        start = 0
+        q = self.quote[:]
+        for y, length in enumerate(self.quote_lengths, 2):
+            self.window.addstr(y, 0, q[:length].encode("utf-8"), color)
+            q = q[1 + length:]
 
     def show_author(self, y_pos, right_position, author):
         """Renders author on screen."""
@@ -255,30 +257,41 @@ class Screen(object):
                                     Screen.COLOR_AUTHOR,
                                     left=False)
 
-    def show_header(self, text):
+    def update_header(self, text):
         """Renders top-bar header."""
         self.window.addstr(0, 0, pad_right(text, curses.COLS),
                            Screen.COLOR_STATUS)
+
+    def setup_quote(self, quote):
+        """Sets up variables used for a new quote."""
+        # TODO: Refactor all of this stuff in time.
+        if self.config.max_quote_width > 0:
+            self.quote_columns = min(curses.COLS, self.config.max_quote_width)
+        else:
+            self.quote_columns = curses.COLS
+
+        self.quote = quote
+        self.quote_lengths = word_wrap(quote, self.quote_columns - 1)
+        self.quote_height = len(self.quote_lengths)
+
+        # Remember (x, y) position for each quote offset.
+        self.quote_coords = []
+        for offset in range(len(self.quote)+1):
+            x_pos, y_pos = screen_coords(self.quote_lengths, offset)
+            self.quote_coords.append((x_pos, y_pos))
+        self.quote_coords = tuple(self.quote_coords)
 
     def update(self, browse, head, quote, position, incorrect, author, title,
                typed, cur_wpm, average):
         """Updates the screen."""
 
-        if self.config.max_quote_width > 0:
-            quote_columns = min(curses.COLS, self.config.max_quote_width)
-        else:
-            quote_columns = curses.COLS
+        self.update_header(head)
 
-        lengths = word_wrap(quote, quote_columns - 1)
-        sx, sy = screen_coords(lengths, position)
-        h = len(lengths)
-
-        self.show_header(head)
+        sx, sy = self.quote_coords[position]
 
         if browse:
-            self.show_quote(lengths, quote, Screen.COLOR_CORRECT if browse != 1
-                            else Screen.COLOR_QUOTE)
-            self.show_author(4 + h, quote_columns,
+            self.update_quote(Screen.COLOR_CORRECT if browse != 1 else Screen.COLOR_QUOTE)
+            self.show_author(4 + self.quote_height, self.quote_columns,
                              u"— %s, %s" % (author, title))
 
             if browse >= 2:
@@ -287,16 +300,16 @@ class Screen(object):
             else:
                 typed = ""
             typed += "Use arrows/space to browse, esc to quit, or start typing."
-        elif position + incorrect < len(quote):
+        elif position + incorrect <= len(quote):
             # Highlight correct / incorrect characters in quote
             typed = "> " + typed
             color = (Screen.COLOR_CORRECT if incorrect == 0 else
                      Screen.COLOR_INCORRECT)
 
-            sx, sy = screen_coords(lengths, position + incorrect - 1)
+            sx, sy = screen_coords(self.quote_lengths, position + incorrect - 1)
             self.window.chgat(2 + sy, max(sx, 0), 1, color)
 
-            sx, sy = screen_coords(lengths, position + incorrect)
+            sx, sy = screen_coords(self.quote_lengths, position + incorrect)
             self.window.chgat(2 + sy, sx, 1, Screen.COLOR_QUOTE)
 
         # Show typed text
@@ -309,12 +322,12 @@ class Screen(object):
             # If done, highlight score
             self.window.chgat(self.cheight, 11, len(str("%.1f" % cur_wpm)),
                               Screen.COLOR_HISCORE)
-
-        # Move cursor to current position in text before refreshing
-        if browse < 1:
-            sx, sy = screen_coords(lengths, position + incorrect)
-            self.window.move(2 + sy, min(sx, quote_columns - 1))
+        elif browse < 1:
+            # Move cursor to current position in text before refreshing
+            sx, sy = screen_coords(self.quote_lengths, position + incorrect)
+            self.window.move(2 + sy, min(sx, self.quote_columns - 1))
         else:
+            # Move cursor to start position
             self.window.move(2, 0)
 
     def clear(self):
@@ -348,9 +361,10 @@ class Game(object):
         self._edit = ""
         self.num_quotes = len(quotes)
         self.quotes = quotes.random_iterator()
-        self.quote = self.quotes.next()
 
         self.screen = Screen()
+        self.quote = self.quotes.next()
+        self.screen.setup_quote(self.quote.text)
 
     def __enter__(self):
         return self
@@ -381,6 +395,7 @@ class Game(object):
         if to_front:
             self.quotes.put_to_front(to_front)
             self.quote = self.quotes._current()
+            self.screen.setup_quote(self.quote.text)
 
         while True:
             is_typing = self.start is not None and self.stop is None
@@ -468,6 +483,7 @@ class Game(object):
                 self.quote = self.quotes.next()
             else:
                 self.quote = self.quotes.previous()
+            self.screen.setup_quote(self.quote.text)
             self.screen.clear()
 
     def resize(self):
