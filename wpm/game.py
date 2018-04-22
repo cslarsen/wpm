@@ -95,15 +95,17 @@ class Screen(object):
         self.screen = curses.initscr()
         self.screen.nodelay(True)
 
-        if curses.LINES < 12:
+        min_lines = 12
+        if curses.LINES < min_lines:
             curses.endwin()
             raise wpm.error.WpmError(
-                "wpm requires at least 12 lines in your display")
+                "wpm requires at least %d lines in your display" % min_lines)
 
-        if curses.COLS < 51:
+        min_cols = 20
+        if curses.COLS < min_cols:
             curses.endwin()
             raise wpm.error.WpmError(
-                "wpm requires at least 51 columns in your display")
+                "wpm requires at least %d columns in your display" % min_cols)
 
         self.screen.keypad(True)
         curses.noecho()
@@ -516,7 +518,11 @@ class Game(object):
         """Handles a resized terminal."""
         max_y, max_x = self.screen.window.getmaxyx()
         self.screen.clear()
-        curses.resizeterm(max_y, max_x)
+
+        if hasattr(curses, "resizeterm"):
+            # My PyPy version does not have resizeterm, for example.
+            curses.resizeterm(max_y, max_x)
+
         self.screen.setup_quote(self.quote)
 
     def handle_key(self, key):
