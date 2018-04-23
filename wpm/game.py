@@ -260,14 +260,25 @@ class Screen(object):
         except curses.error:
             return None
 
+    def addstr(self, x_pos, y_pos, text, color=None):
+        """Wraps call around curses.window.addsr."""
+        if self.lines > y_pos >= 0:
+            if x_pos >= 0 and (x_pos + len(text)) < self.columns:
+                self.window.addstr(y_pos, x_pos, text, color)
+
+    def set_cursor(self, x_pos, y_pos):
+        """Sets cursor position."""
+        if (y_pos < self.lines) and (x_pos < self.columns):
+            self.window.move(y_pos, x_pos)
+
     def right_column(self, y_pos, x_pos, width, text):
         """Writes text to screen in coumns."""
         lengths = word_wrap(text, width)
 
         for cur_y, length in enumerate(lengths, y_pos):
-            self.window.addstr(cur_y, x_pos - length,
-                               text[:length].encode(self.encoding),
-                               Screen.COLOR_AUTHOR)
+            self.addstr(x_pos - length, cur_y,
+                        text[:length].encode(self.encoding),
+                        Screen.COLOR_AUTHOR)
             text = text[1+length:]
 
         return len(lengths)
@@ -276,7 +287,7 @@ class Screen(object):
         """Renders complete quote on screen."""
         quote = self.quote[:]
         for y_pos, length in enumerate(self.quote_lengths, 2):
-            self.window.addstr(y_pos, 0, quote[:length].encode(self.encoding), color)
+            self.addstr(0, y_pos, quote[:length].encode(self.encoding), color)
             quote = quote[1 + length:]
 
     def update_author(self):
@@ -290,8 +301,10 @@ class Screen(object):
 
     def update_header(self, text):
         """Renders top-bar header."""
-        self.window.addstr(0, 0, pad_right(text, self.columns),
-                           Screen.COLOR_STATUS)
+        # NOTE: If this doesn't show the full bar in the background color,
+        # revert back to pad_right usage.
+        self.addstr(0, 0, text, Screen.COLOR_STATUS)
+        self.window.chgat(0, 0, self.columns, Screen.COLOR_STATUS)
 
     def setup_quote(self, quote):
         """Sets up variables used for a new quote."""
@@ -317,16 +330,14 @@ class Screen(object):
 
     def update_prompt(self, prompt):
         """Prints prompt on the display."""
-        self.window.move(self.cheight, 0)
+        self.set_cursor(0, self.cheight)
         self.window.clrtoeol()
-        self.window.addstr(self.cheight,
-                           0,
-                           prompt.encode(self.encoding),
-                           Screen.COLOR_PROMPT)
+        self.addstr(0, self.cheight, prompt.encode(self.encoding),
+                    Screen.COLOR_PROMPT)
 
     def cursor_to_start(self):
         """Moves cursor to beginning of quote."""
-        self.window.move(2, 0)
+        self.set_cursor(0, 2)
 
     def show_browser(self, head):
         """Show quote browsing screen."""
@@ -378,7 +389,7 @@ class Screen(object):
             self.update_prompt(prompt)
 
         # Move cursor to current position in text before refreshing
-        self.window.move(2 + ypos, min(xpos, self.quote_columns - 1))
+        self.set_cursor(min(xpos, self.quote_columns - 1), 2 + ypos)
 
     def clear(self):
         """Clears the screen."""
