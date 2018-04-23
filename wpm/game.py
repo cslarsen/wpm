@@ -335,17 +335,21 @@ class Screen(object):
         self.addstr(0, self.cheight, prompt.encode(self.encoding),
                     Screen.COLOR_PROMPT)
 
-    def cursor_to_start(self):
-        """Moves cursor to beginning of quote."""
-        self.set_cursor(0, 2)
-
     def show_browser(self, head):
         """Show quote browsing screen."""
         self.update_header(head)
         self.update_quote(Screen.COLOR_QUOTE)
         self.update_author()
-        self.update_prompt("Use arrows/space to browse, esc to quit, or start typing.")
-        self.cursor_to_start()
+        self.show_help()
+        self.set_cursor(0, 2)
+
+    def show_help(self):
+        """Shows help instructions on screen."""
+        self.cheight += 1
+        self.set_cursor(0, self.cheight)
+        self.addstr(0, self.cheight,
+            "Start typing, hit SPACE/ARROWS to browse or ESC to quit.",
+            Screen.COLOR_PROMPT)
 
     def show_score(self, head, wpm_score):
         """Show score screen after typing has finished."""
@@ -353,15 +357,15 @@ class Screen(object):
         self.update_quote(Screen.COLOR_CORRECT)
         self.update_author()
 
-        self.update_prompt("You scored %.1f wpm. "
-                           "Use arrows/space to browse, "
-                           "esc to quit, or start typing." % wpm_score)
-
         # Highlight score
-        self.window.chgat(self.cheight, 11, len(str("%.1f" % wpm_score)),
-                          Screen.COLOR_HISCORE)
+        score = "You scored %.1f wpm!" % wpm_score
+        self.update_prompt(score)
+        if len(score) < self.columns:
+            self.window.chgat(self.cheight, 11, len(str("%.1f" % wpm_score)),
+                              Screen.COLOR_HISCORE)
+        self.show_help()
 
-        self.cursor_to_start()
+        self.set_cursor(0, 2)
 
     def highlight_progress(self, position, incorrect):
         if incorrect:
@@ -384,9 +388,7 @@ class Screen(object):
 
         if position + incorrect <= len(self.quote):
             self.highlight_progress(position, incorrect)
-
-            if self.cheight < self.lines:
-                self.update_prompt(">" + typed)
+            self.update_prompt("> " + typed)
 
         # Move cursor to current position in text before refreshing
         xpos, ypos = self.quote_coords[position + incorrect]
