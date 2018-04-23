@@ -106,7 +106,11 @@ class Config(object):
             return int(Config.config.get("wpm", "max_quote_width"))
         except configparser.NoSectionError:
             Config.config.add_section("wpm")
-            Config.config.set("wpm", "max_quote_width", 0)
+            Config.config.set("wpm", "max_quote_width", "-1")
+            return -1
+        except configparser.NoOptionError:
+            Config.config.set("wpm", "max_quote_width", "-1")
+            return -1
 
     @property
     def background_color_256(self):
