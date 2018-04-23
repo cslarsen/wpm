@@ -347,8 +347,8 @@ class Screen(object):
         self.cheight += 1
         self.set_cursor(0, self.cheight)
         self.addstr(0, self.cheight,
-            "Start typing, hit SPACE/ARROWS to browse or ESC to quit.",
-            Screen.COLOR_PROMPT)
+                    "Start typing, hit SPACE/ARROWS to browse or ESC to quit.",
+                    Screen.COLOR_PROMPT)
 
     def show_score(self, head, wpm_score):
         """Show score screen after typing has finished."""
@@ -565,16 +565,14 @@ class Game(object):
 
         if self.start is not None and self.stop is None:
             # Resize during typing requires redrawing quote.
-            # TODO: This doesn't fix the background colors for done and
-            # incorrect text.
             self.screen.update_quote(Screen.COLOR_QUOTE)
             self.screen.update_author()
 
             if self.position + self.incorrect <= len(self.quote.text):
-                for n in range(self.position + 1):
-                    self.screen.highlight_progress(n, 0)
-                for n in range(self.incorrect + 1):
-                    self.screen.highlight_progress(self.position, n)
+                for pos in range(self.position + 1):
+                    self.screen.highlight_progress(pos, 0)
+                for inc in range(self.incorrect + 1):
+                    self.screen.highlight_progress(self.position, inc)
 
     def handle_key(self, key):
         """Dispatches actions based on key and current mode."""
