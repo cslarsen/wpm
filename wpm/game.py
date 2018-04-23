@@ -367,6 +367,7 @@ class Screen(object):
         self.set_cursor(0, 2)
 
     def highlight_progress(self, position, incorrect):
+        """Colors finished and incorrectly typed parts of the quote."""
         if incorrect:
             color = Screen.COLOR_INCORRECT
         else:
