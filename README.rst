@@ -28,6 +28,39 @@ Demo
   :alt: Screen recording of WPM in action
   :target: https://asciinema.org/a/JHgfVrf1jIxxl099hdnRcG4Lf?size=medium&autoplay=1
 
+How to install
+--------------
+
+The recommended way is to install via PyPi
+
+.. code:: bash
+
+    $ pip install wpm
+
+The above usually requires ``sudo``. If you don't want to install it
+system-wide, you can use ``pip install wpm --user``.
+
+Remember to check for upgrades with ``pip install --upgrade wpm``. You can also
+install it from the source repository with
+
+.. code:: bash
+
+    $ python setup.py install [--user]
+
+To just test the app without installing, type ``make run``.
+
+How to run
+----------
+
+Just type ``wpm`` to start the program. The timer will start when you press the
+first key. At any time, you can hit ESCAPE to quit.
+
+You can backspace for the current word you're editing, if you make a mistake.
+Mistakes will lower the accuracy score.
+
+If you have problems finding the ``wpm`` file, you can also start it by typing
+``python -m wpm``. You can also see options with ``python -m wpm --help``.
+
 Calculating WPM
 ---------------
 
@@ -51,38 +84,8 @@ I also feel that running it under PyPy provides a little lower latency as well,
 but I haven't timed it. You can install it under PyPy with ``pypy -m pip
 install wpm``.
 
-How to install
-==============
-
-The recommended way is to install via PyPi
-
-.. code:: bash
-
-    $ pip install wpm
-
-The above usually requires ``sudo``. If you don't want to install it
-system-wide, you can use ``pip install wpm --user``.
-
-Remember to check for upgrades with ``pip install --upgrade wpm``. You can also
-install it from the source repository with
-
-.. code:: bash
-
-    $ python setup.py install [--user]
-
-To just test the app without installing, type ``make run``.
-
-How to run
-==========
-
-Just type ``wpm`` to start the program. The timer will start when you press the
-first key. At any time, you can hit ESCAPE to quit.
-
-You can backspace for the current word you're editing, if you make a mistake.
-Mistakes will lower the accuracy score.
-
-If you have problems finding the ``wpm`` file, you can also start it by typing
-``python -m wpm``. You can also see options with ``python -m wpm --help``.
+Loading custom texts
+--------------------
 
 If you want to type a custom text, run
 
@@ -143,14 +146,14 @@ label you can use to tag races. For example, you could call the keyboard
 statistical analysis on your typing performance with various setups.
 
 The ~/.wpmrc file
-=================
+-----------------
 
 The first time you start wpm, it writes a `.wpmrc` file to your home directory.
 It allows you to change a few settings, including the colors. It should be
 mostly self-explanatory.
 
 License
-=======
+-------
 
 Copyright 2017, 2018 Christian Stigen Larsen
 
