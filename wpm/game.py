@@ -88,9 +88,9 @@ class Screen(object):
         # Make delay slower
         os.environ.setdefault("ESCDELAY", self.config.escdelay)
 
-        # I can't remember why we set LC_ALL to an empty string. Figure it out,
-        # cause it doesn't look too smart.
+        # Use the preferred system encoding
         locale.setlocale(locale.LC_ALL, "")
+        self.encoding = locale.getpreferredencoding().lower()
 
         self.screen = curses.initscr()
         self.screen.nodelay(True)
@@ -236,13 +236,13 @@ class Screen(object):
             key = self.window.getkey()
 
             # Start of UTF-8 multi-byte character?
-            if ord(key[0]) & 0x80:
+            if self.encoding == "utf-8" and ord(key[0]) & 0x80:
                 multibyte = key[0]
                 cont_bytes = ord(key[0]) << 1
                 while cont_bytes & 0x80:
                     cont_bytes <<= 1
                     multibyte += self.window.getkey()[0]
-                return multibyte.decode("utf-8")
+                return multibyte.decode(self.encoding)
 
             if isinstance(key, int):
                 if key == curses.KEY_BACKSPACE:
@@ -266,7 +266,7 @@ class Screen(object):
 
         for cur_y, length in enumerate(lengths, y_pos):
             self.window.addstr(cur_y, x_pos - length,
-                               text[:length].encode("utf-8"),
+                               text[:length].encode(self.encoding),
                                Screen.COLOR_AUTHOR)
             text = text[1+length:]
 
@@ -276,7 +276,7 @@ class Screen(object):
         """Renders complete quote on screen."""
         quote = self.quote[:]
         for y_pos, length in enumerate(self.quote_lengths, 2):
-            self.window.addstr(y_pos, 0, quote[:length].encode("utf-8"), color)
+            self.window.addstr(y_pos, 0, quote[:length].encode(self.encoding), color)
             quote = quote[1 + length:]
 
     def update_author(self):
@@ -321,7 +321,7 @@ class Screen(object):
         self.window.clrtoeol()
         self.window.addstr(self.cheight,
                            0,
-                           prompt.encode("utf-8"),
+                           prompt.encode(self.encoding),
                            Screen.COLOR_PROMPT)
 
     def cursor_to_start(self):
@@ -448,13 +448,14 @@ class Game(object):
 
         while True:
             is_typing = self.start is not None and self.stop is None
+            game_done = (not is_typing) and (self.stop is not None)
 
             if is_typing:
                 self.screen.show_keystroke(self.get_stats(self.elapsed),
                                            self.position,
                                            self.incorrect,
                                            self._edit)
-            elif self.stop is not None:
+            elif game_done:
                 self.screen.show_score(self.get_stats(self.elapsed),
                                        self.wpm(self.elapsed))
             else:
