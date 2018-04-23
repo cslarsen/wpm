@@ -63,12 +63,6 @@ def screen_coords(lengths, position):
 
     return position, y_position
 
-def pad_right(text, width):
-    """Pads string with spaces on the right."""
-    if len(text) < width:
-        return text + " "*(width - len(text))
-    return text
-
 
 class Screen(object):
     """Renders the terminal screen."""
@@ -266,6 +260,12 @@ class Screen(object):
             if x_pos >= 0 and (x_pos + len(text)) < self.columns:
                 self.window.addstr(y_pos, x_pos, text, color)
 
+    def chgat(self, x_pos, y_pos, length, color):
+        """Wraps call around curses.window.chgat."""
+        if self.lines > y_pos >= 0:
+            if x_pos >= 0 and (x_pos + length) <= self.columns:
+                self.window.chgat(y_pos, x_pos, length, color)
+
     def set_cursor(self, x_pos, y_pos):
         """Sets cursor position."""
         if (y_pos < self.lines) and (x_pos < self.columns):
@@ -301,10 +301,9 @@ class Screen(object):
 
     def update_header(self, text):
         """Renders top-bar header."""
-        # NOTE: If this doesn't show the full bar in the background color,
-        # revert back to pad_right usage.
         self.addstr(0, 0, text, Screen.COLOR_STATUS)
-        self.window.chgat(0, 0, self.columns, Screen.COLOR_STATUS)
+        self.chgat(0, 0, self.columns, Screen.COLOR_STATUS)
+        #self.window.chgat(0, 0, self.columns, Screen.COLOR_STATUS)
 
     def setup_quote(self, quote):
         """Sets up variables used for a new quote."""
@@ -361,8 +360,8 @@ class Screen(object):
         score = "You scored %.1f wpm!" % wpm_score
         self.update_prompt(score)
         if len(score) < self.columns:
-            self.window.chgat(self.cheight, 11, len(str("%.1f" % wpm_score)),
-                              Screen.COLOR_HISCORE)
+            self.chgat(11, self.cheight, len(str("%.1f" % wpm_score)),
+                       Screen.COLOR_HISCORE)
         self.show_help()
 
         self.set_cursor(0, 2)
@@ -376,11 +375,11 @@ class Screen(object):
         # Highlight correct / incorrect character in quote
         ixpos, iypos = self.quote_coords[position + incorrect - 1]
         color = Screen.COLOR_INCORRECT if incorrect else Screen.COLOR_CORRECT
-        self.window.chgat(2 + iypos, max(ixpos, 0), 1, color)
+        self.chgat(max(ixpos, 0), 2 + iypos, 1, color)
 
         # Highlight next as correct, in case of backspace
         xpos, ypos = self.quote_coords[position + incorrect]
-        self.window.chgat(2 + ypos, xpos, 1, Screen.COLOR_QUOTE)
+        self.chgat(xpos, 2 + ypos, 1, Screen.COLOR_QUOTE)
 
     def show_keystroke(self, head, position, incorrect, typed):
         """Updates the screen while typing."""
