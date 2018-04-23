@@ -363,32 +363,33 @@ class Screen(object):
 
         self.cursor_to_start()
 
-    def show_keystroke(self, head, position, incorrect, typed):
-        """Updates the screen while typing."""
-        self.update_header(head)
-
+    def highlight_progress(self, position, incorrect):
         if incorrect:
             color = Screen.COLOR_INCORRECT
         else:
             color = Screen.COLOR_CORRECT
 
-        prompt = ""
+        # Highlight correct / incorrect character in quote
+        ixpos, iypos = self.quote_coords[position + incorrect - 1]
+        color = Screen.COLOR_INCORRECT if incorrect else Screen.COLOR_CORRECT
+        self.window.chgat(2 + iypos, max(ixpos, 0), 1, color)
+
+        # Highlight next as correct, in case of backspace
         xpos, ypos = self.quote_coords[position + incorrect]
+        self.window.chgat(2 + ypos, xpos, 1, Screen.COLOR_QUOTE)
+
+    def show_keystroke(self, head, position, incorrect, typed):
+        """Updates the screen while typing."""
+        self.update_header(head)
 
         if position + incorrect <= len(self.quote):
-            # Highlight correct / incorrect character in quote
-            ixpos, iypos = self.quote_coords[position + incorrect - 1]
-            self.window.chgat(2 + iypos, max(ixpos, 0), 1, color)
+            self.highlight_progress(position, incorrect)
 
-            # Highlight next as correct, in case of backspace
-            self.window.chgat(2 + ypos, xpos, 1, Screen.COLOR_QUOTE)
-            prompt = "> " + typed
-
-        # Show typed text
-        if self.cheight < self.lines:
-            self.update_prompt(prompt)
+            if self.cheight < self.lines:
+                self.update_prompt(">" + typed)
 
         # Move cursor to current position in text before refreshing
+        xpos, ypos = self.quote_coords[position + incorrect]
         self.set_cursor(min(xpos, self.quote_columns - 1), 2 + ypos)
 
     def clear(self):
@@ -560,6 +561,19 @@ class Game(object):
             curses.resizeterm(max_y, max_x)
 
         self.screen.setup_quote(self.quote)
+
+        if self.start is not None and self.stop is None:
+            # Resize during typing requires redrawing quote.
+            # TODO: This doesn't fix the background colors for done and
+            # incorrect text.
+            self.screen.update_quote(Screen.COLOR_QUOTE)
+            self.screen.update_author()
+
+            if self.position + self.incorrect <= len(self.quote.text):
+                for n in range(self.position + 1):
+                    self.screen.highlight_progress(n, 0)
+                for n in range(self.incorrect + 1):
+                    self.screen.highlight_progress(self.position, n)
 
     def handle_key(self, key):
         """Dispatches actions based on key and current mode."""
