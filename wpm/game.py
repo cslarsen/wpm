@@ -120,14 +120,15 @@ class Screen(object):
             # Local variables related to quote. TODO: Move this mess to somewhere
             # else.
             self.cheight = 0
+            self.first_key = True
             self.quote = ""
             self.quote_author = ""
-            self.quote_id = 0
             self.quote_columns = 0
+            self.quote_coords = tuple()
             self.quote_height = 0
+            self.quote_id = 0
             self.quote_lengths = tuple()
             self.quote_title = ""
-            self.quote_coords = tuple()
         except:
             curses.endwin()
             raise
@@ -430,6 +431,14 @@ class Screen(object):
         xpos, ypos = self.quote_coords[position + incorrect]
         self.set_cursor(min(xpos, self.quote_columns - 1), 2 + ypos)
 
+    def rerender_race(self, head):
+        """Re-renders currently running game."""
+        self.clear()
+        self.update_header(head)
+        self.update_quote(Screen.COLOR_QUOTE)
+        self.update_author()
+        self.set_cursor(0, 2)
+
     def clear(self):
         """Clears the screen."""
         self.window.clear()
@@ -497,21 +506,26 @@ class Game(object):
             self.screen.setup_quote(self.quote)
 
         while True:
+            # TODO: Simplify boolean expressions with implicit tests
             is_typing = self.start is not None and self.stop is None
             game_done = (not is_typing) and (self.stop is not None)
+            head = self.get_stats(self.elapsed)
 
             if is_typing:
-                self.screen.show_keystroke(self.get_stats(self.elapsed),
+                if self.screen.first_key:
+                    self.screen.first_key = False
+                    self.screen.rerender_race(head)
+
+                self.screen.show_keystroke(head,
                                            self.position,
                                            self.incorrect,
                                            self._edit)
             elif game_done:
-                self.screen.show_score(self.get_stats(self.elapsed),
+                self.screen.show_score(head,
                                        self.wpm(self.elapsed),
                                        self.stats)
             else:
-                self.screen.show_browser(self.get_stats(self.elapsed),
-                                         self.stats)
+                self.screen.show_browser(head, self.stats)
 
             key = self.screen.get_key()
             if key is not None:
@@ -580,8 +594,11 @@ class Game(object):
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
+        self.cheight = 0
 
         self._edit = ""
+        self.screen.first_key = True
+        self.screen.update_prompt("")
 
         if direction:
             if direction > 0:
@@ -649,13 +666,9 @@ class Game(object):
         if self.stop is not None:
             # Use wants to try again immediately after score
             self.reset()
-            self.screen.clear()
-
-            # Render quote anew
-            self.screen.show_browser(self.get_stats(self.elapsed), self.stats)
-
-            # Update first keypress
-            self.screen.show_keystroke(self.get_stats(self.elapsed),
+            head = self.get_stats(self.elapsed)
+            self.screen.rerender_race(head)
+            self.screen.show_keystroke(head,
                                        self.position,
                                        self.incorrect,
                                        self._edit)
