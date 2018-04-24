@@ -67,9 +67,10 @@ class GameResults(object):
         return len(self.games)
 
     def extremals(self):
-        min_wpm = 99999
+        init = 999999
+        min_wpm = init
         max_wpm = 0
-        min_acc = 99999
+        min_acc = init
         max_acc = 0
 
         for result in self.results:
@@ -77,6 +78,11 @@ class GameResults(object):
             max_wpm = max(max_wpm, result.wpm)
             min_acc = min(min_acc, result.accuracy)
             max_acc = max(max_acc, result.accuracy)
+
+        if min_wpm == init:
+            min_wpm = 0
+        if min_acc == init:
+            min_acc = 0
 
         return min_wpm, max_wpm, min_acc, max_acc
 

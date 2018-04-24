@@ -338,12 +338,13 @@ class Screen(object):
         self.addstr(0, self.cheight, prompt.encode(self.encoding),
                     Screen.COLOR_PROMPT)
 
-    def show_browser(self, head):
+    def show_browser(self, head, stats):
         """Show quote browsing screen."""
         self.update_header(head)
         self.update_quote(Screen.COLOR_QUOTE)
         self.update_author()
         self.show_help()
+        self.show_stats(stats)
         self.set_cursor(0, 2)
 
     def show_help(self):
@@ -354,22 +355,13 @@ class Screen(object):
                     "Start typing, hit SPACE/ARROWS to browse or ESC to quit.",
                     Screen.COLOR_PROMPT)
 
-    def show_score(self, head, wpm_score, stats):
-        """Show score screen after typing has finished."""
-        self.update_header(head)
-        self.update_quote(Screen.COLOR_CORRECT)
-        self.update_author()
-
-        # Highlight score
-        score = "You scored %.1f wpm!" % wpm_score
-        self.update_prompt(score)
-        if len(score) < self.columns:
-            self.chgat(11, self.cheight, len(str("%.1f" % wpm_score)),
-                       Screen.COLOR_HISCORE)
-        self.show_help()
-
-        # Show some recent scores
+    def show_stats(self, stats):
+        """Shows statistics for the current quote."""
         results = stats.text_id_results(stats.keyboard, self.quote_id)
+
+        if len(results) < 2:
+            return
+
         wpm_avg, acc_avg = results.averages()
         wpm_sd, acc_sd = results.stddevs()
         wpm_min, wpm_max, acc_min, acc_max = results.extremals()
@@ -390,6 +382,21 @@ class Screen(object):
         self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
+    def show_score(self, head, wpm_score, stats):
+        """Show score screen after typing has finished."""
+        self.update_header(head)
+        self.update_quote(Screen.COLOR_CORRECT)
+        self.update_author()
+
+        # Highlight score
+        score = "You scored %.1f wpm!" % wpm_score
+        self.update_prompt(score)
+        if len(score) < self.columns:
+            self.chgat(11, self.cheight, len(str("%.1f" % wpm_score)),
+                       Screen.COLOR_HISCORE)
+
+        self.show_help()
+        self.show_stats(stats)
         self.set_cursor(0, 2)
 
     def highlight_progress(self, position, incorrect):
@@ -500,7 +507,8 @@ class Game(object):
                                        self.wpm(self.elapsed),
                                        self.stats)
             else:
-                self.screen.show_browser(self.get_stats(self.elapsed))
+                self.screen.show_browser(self.get_stats(self.elapsed),
+                                         self.stats)
 
             key = self.screen.get_key()
             if key is not None:
@@ -641,7 +649,7 @@ class Game(object):
             self.screen.clear()
 
             # Render quote anew
-            self.screen.show_browser(self.get_stats(self.elapsed))
+            self.screen.show_browser(self.get_stats(self.elapsed), self.stats)
 
             # Update first keypress
             self.screen.show_keystroke(self.get_stats(self.elapsed),

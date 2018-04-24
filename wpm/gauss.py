@@ -35,5 +35,7 @@ def phi_inv(p):
 
 def confidence_interval(mu, sd, n, alpha):
     """Calculates the confidence interval given the normal distribution."""
+    if n == 0:
+        return 0, 0
     z = phi_inv(1.0 - alpha/2.0)
     return mu - z*sd/math.sqrt(n), mu + z*sd/math.sqrt(n)
