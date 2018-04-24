@@ -113,7 +113,7 @@ def print_stats(stats):
     for keyboard in sorted(stats.games.keys()):
         name = keyboard if keyboard is not None else "n/a"
 
-        for last_n in [0, 10, 100, 1000]:
+        for last_n in [0, 10, 50, 100, 500, 1000]:
             results = stats.results(keyboard, last_n=last_n)
 
             if len(results) >= last_n:
