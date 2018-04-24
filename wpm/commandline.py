@@ -15,7 +15,10 @@ import argparse
 import codecs
 import os
 import sys
+
+from wpm.gauss import confidence_interval
 import wpm
+import wpm.config
 import wpm.error
 import wpm.game
 import wpm.quotes
@@ -104,8 +107,11 @@ def print_stats(stats):
     """Prints table of game results."""
     table = []
 
+    config = wpm.config.Config()
+    percent = config.wpm_confidence_interval_percent
+
     for keyboard in sorted(stats.games.keys()):
-        name = keyboard if keyboard is not None else "Unspecified"
+        name = keyboard if keyboard is not None else "n/a"
 
         for last_n in [0, 10, 100, 1000]:
             results = stats.results(keyboard, last_n=last_n)
@@ -119,25 +125,30 @@ def print_stats(stats):
                 wpm_avg, acc_avg = results.averages()
                 wpm_sd, acc_sd = results.stddevs()
 
+                alpha = 1 - (percent/100.0)
+                wpm_ci = confidence_interval(wpm_avg, wpm_sd, len(results), alpha)
+
                 table.append([name,
                               label,
                               wpm_avg,
                               wpm_sd,
                               100.0*acc_avg,
-                              100.0*acc_sd])
+                              100.0*acc_sd,
+                              wpm_ci[0],
+                              wpm_ci[1]])
 
     if table:
         width = max(max(len(e[0]) for e in table), 11)
     else:
         width = 0
 
-    print("Keyboard      Games    WPM avg stddev      Accuracy avg stddev")
-    print("--------------------------------------------------------------")
+    print("Keyboard     Games   WPM                        Accuracy")
+    print("                     average stddev %d%% ci      average stddev" % percent)
 
     for entry in table:
-        label, count, wpm_avg, wpm_sd, acc_avg, acc_sd = entry
-        print("%-*s   %5s      %5.1f  %5.1f            %5.1f%% %5.1f%%" %
-              (width, label, count, wpm_avg, wpm_sd, acc_avg, acc_sd))
+        label, count, wpm_avg, wpm_sd, acc_avg, acc_sd, ci0, ci1 = entry
+        print("%-*s   %5s  %5.1f  %5.1f   %5.1f-%5.1f %5.1f%%  %5.1f%%" %
+              (width, label, count, wpm_avg, wpm_sd, ci0, ci1, acc_avg, acc_sd))
 
 def search(quotes, query):
     """Returns text IDs for quotes matching query."""
