@@ -19,6 +19,8 @@ import locale
 import os
 import sys
 import time
+
+from wpm.gauss import confidence_interval
 import wpm.config
 import wpm.error
 
@@ -376,9 +378,16 @@ class Screen(object):
         self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
+        percent = self.config.wpm_confidence_interval_percent
+        alpha = 1 - (percent/100.0)
+        start, stop = confidence_interval(wpm_avg, wpm_sd, len(results), alpha)
+        msg = "%d%% confidence interval: %.1f to %.1f wpm" % (percent, start, stop)
+        self.cheight += 1
+        self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
+
         msg = "acc %.1f min, %.1f avg, %.1f max, %.1f sd" % (
                 acc_min, acc_avg, acc_max, acc_sd)
-        self.cheight += 1
+        self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
         self.set_cursor(0, 2)

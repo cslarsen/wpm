@@ -54,6 +54,7 @@ class Config(object):
 
         Config.config.add_section("wpm")
         Config.config.set("wpm", "max_quote_width", "-1")
+        Config.config.set("wpm", "wpm_confidence_interval_percent", "90")
 
         Config.config.add_section("xterm-256color")
         Config.config.set("xterm-256color", "author_bg", str(233))
@@ -111,6 +112,20 @@ class Config(object):
         except configparser.NoOptionError:
             Config.config.set("wpm", "max_quote_width", "-1")
             return -1
+
+    @property
+    def wpm_confidence_interval_percent(self):
+        """Used to construct an x% confidence interval for WPM."""
+        try:
+            return int(Config.config.get("wpm",
+                "wpm_confidence_interval_percent"))
+        except configparser.NoSectionError:
+            Config.config.add_section("wpm")
+            Config.config.set("wpm", "wpm_confidence_interval_percent", "90")
+            return 90
+        except configparser.NoOptionError:
+            Config.config.set("wpm", "wpm_confidence_interval_percent", "90")
+            return 90
 
     @property
     def background_color_256(self):
