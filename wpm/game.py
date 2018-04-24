@@ -362,25 +362,28 @@ class Screen(object):
         if len(results) < 2:
             return
 
+        percent = self.config.wpm_confidence_interval_percent
+        alpha = 1 - (percent/100.0)
+        samples = len(results)
+
         wpm_avg, acc_avg = results.averages()
         wpm_sd, acc_sd = results.stddevs()
         wpm_min, wpm_max, acc_min, acc_max = results.extremals()
-        msg = "wpm %.1f min, %.1f avg, %.1f max, %.1f sd (n=%d)" % (
-                wpm_min, wpm_avg, wpm_max, wpm_sd, len(results))
+        wpm_ci0, wpm_ci1 = confidence_interval(wpm_avg, wpm_sd, samples, alpha)
+        acc_ci0, acc_ci1 = confidence_interval(acc_avg, acc_sd, samples, alpha)
+
+        msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd [%5.1f-%5.1f] %d%% ci (n=%d)" % (
+                wpm_min, wpm_avg, wpm_max, wpm_sd, wpm_ci0, wpm_ci1, percent,
+                samples)
         self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
-        percent = self.config.wpm_confidence_interval_percent
-        alpha = 1 - (percent/100.0)
-        start, stop = confidence_interval(wpm_avg, wpm_sd, len(results), alpha)
-        msg = "%d%% confidence interval: %.1f to %.1f wpm" % (percent, start, stop)
+        msg = "acc %5.1f min %5.1f avg %5.1f max %5.1f sd [%5.1f %5.1f] %d%% ci (n=%d)" % (
+                100*acc_min, 100*acc_avg, 100*acc_max, 100*acc_sd, 100*acc_ci0,
+                100*acc_ci1, percent, samples)
         self.cheight += 1
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
-
-        msg = "acc %.1f min, %.1f avg, %.1f max, %.1f sd" % (
-                acc_min, acc_avg, acc_max, acc_sd)
-        self.cheight += 2
-        self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
+        self.cheight += 1
 
     def show_score(self, head, wpm_score, stats):
         """Show score screen after typing has finished."""
