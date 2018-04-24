@@ -101,10 +101,13 @@ class GameResults(object):
         return wpms / len(self), accs / len(self)
 
     def stddevs(self):
-        """Returns a tuple of WPM and accuracy standard deviations."""
-        count = len(self)
+        """Returns a tuple of WPM and accuracy standard deviations.
 
-        if count <= 1:
+        Calculated from the root of the sample variance.
+        """
+        samples = len(self)
+
+        if samples <= 1:
             return 0.0, 0.0
 
         wpm_sd = 0
@@ -116,8 +119,8 @@ class GameResults(object):
             wpm_sd += (result.wpm - wpm_avg)**2.0
             acc_sd += (result.accuracy - acc_avg)**2.0
 
-        return (math.sqrt(wpm_sd/(count - 1)),
-                math.sqrt(acc_sd/(count - 1)))
+        return (math.sqrt(wpm_sd/(samples - 1)),
+                math.sqrt(acc_sd/(samples - 1)))
 
 
 class Stats(object):
