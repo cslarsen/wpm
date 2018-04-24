@@ -131,12 +131,12 @@ def print_stats(stats):
     else:
         width = 0
 
-    print("Keyboard      Games    WPM avg stddev     Accuracy avg stddev")
-    print("-------------------------------------------------------------")
+    print("Keyboard      Games    WPM avg stddev      Accuracy avg stddev")
+    print("--------------------------------------------------------------")
 
     for entry in table:
         label, count, wpm_avg, wpm_sd, acc_avg, acc_sd = entry
-        print("%-*s   %5s      %5.1f  %5.1f            %4.1f%% %5.1f%%" %
+        print("%-*s   %5s      %5.1f  %5.1f            %5.1f%% %5.1f%%" %
               (width, label, count, wpm_avg, wpm_sd, acc_avg, acc_sd))
 
 def search(quotes, query):
