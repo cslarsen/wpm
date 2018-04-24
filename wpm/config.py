@@ -121,10 +121,10 @@ class Config(object):
         except configparser.NoSectionError:
             Config.config.add_section("wpm")
             Config.config.set("wpm", "confidence_interval_percent", "95")
-            return 90
+            return 95
         except configparser.NoOptionError:
             Config.config.set("wpm", "confidence_interval_percent", "95")
-            return 90
+            return 95
 
     @property
     def background_color_256(self):
