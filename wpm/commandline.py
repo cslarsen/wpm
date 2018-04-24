@@ -108,7 +108,7 @@ def print_stats(stats):
     table = []
 
     config = wpm.config.Config()
-    percent = config.wpm_confidence_interval_percent
+    percent = config.confidence_interval_percent
 
     for keyboard in sorted(stats.games.keys()):
         name = keyboard if keyboard is not None else "n/a"

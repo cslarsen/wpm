@@ -362,7 +362,7 @@ class Screen(object):
         if len(results) < 2:
             return
 
-        percent = self.config.wpm_confidence_interval_percent
+        percent = self.config.confidence_interval_percent
         alpha = 1 - (percent/100.0)
         samples = len(results)
 
