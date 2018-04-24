@@ -97,6 +97,9 @@ def load_json_quotes(filename):
 
 def load_plain_text_quote(quotes, filename):
     """Loads quotes from plain text file."""
+    if not os.path.isfile(filename):
+        raise wpm.error.WpmError("No such file: %s" % filename)
+
     with codecs.open(filename, encoding="utf-8") as file_obj:
         text = file_obj.read()
         text = text.replace("\r", "").rstrip()
@@ -164,30 +167,33 @@ def search(quotes, query):
 
 def main():
     """Main entry point for command line invocation."""
-    opts = parse_args()
+    try:
+        opts = parse_args()
+        stats = load_stats(opts.stats_file, opts.keyboard)
 
-    stats = load_stats(opts.stats_file, opts.keyboard)
+        if opts.load_json is not None:
+            quotes = load_json_quotes(opts.load_json)
+        elif opts.load is not None:
+            quotes = load_plain_text_quote([], opts.load)
+        else:
+            # Load default database
+            quotes = wpm.quotes.Quotes.load()
 
-    if opts.load_json is not None:
-        quotes = load_json_quotes(opts.load_json)
-    elif opts.load is not None:
-        quotes = load_plain_text_quote([], opts.load)
-    else:
-        # Load default database
-        quotes = wpm.quotes.Quotes.load()
+        if opts.stats:
+            print_stats(stats)
+            return
 
-    if opts.stats:
-        print_stats(stats)
-        return
+        if opts.search:
+            text_ids = list(search(quotes, opts.search.lower()))
 
-    if opts.search:
-        text_ids = list(search(quotes, opts.search.lower()))
-
-        if not text_ids:
-            print("No quotes matching %r" % opts.search)
-            sys.exit(1)
-    else:
-        text_ids = []
+            if not text_ids:
+                print("No quotes matching %r" % opts.search)
+                sys.exit(1)
+        else:
+            text_ids = []
+    except wpm.error.WpmError as error:
+        print(error)
+        sys.exit(1)
 
     try:
         with wpm.game.Game(quotes, stats) as game:
