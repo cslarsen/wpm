@@ -120,6 +120,7 @@ class Screen(object):
             self.cheight = 0
             self.quote = ""
             self.quote_author = ""
+            self.quote_id = 0
             self.quote_columns = 0
             self.quote_height = 0
             self.quote_lengths = tuple()
@@ -316,6 +317,7 @@ class Screen(object):
         self.cheight = 0
         self.quote = quote.text
         self.quote_author = quote.author
+        self.quote_id = quote.text_id
         self.quote_title = quote.title
         self.quote_lengths = tuple(word_wrap(self.quote, self.quote_columns - 1))
         self.quote_height = len(self.quote_lengths)
@@ -350,7 +352,7 @@ class Screen(object):
                     "Start typing, hit SPACE/ARROWS to browse or ESC to quit.",
                     Screen.COLOR_PROMPT)
 
-    def show_score(self, head, wpm_score):
+    def show_score(self, head, wpm_score, stats):
         """Show score screen after typing has finished."""
         self.update_header(head)
         self.update_quote(Screen.COLOR_CORRECT)
@@ -363,6 +365,21 @@ class Screen(object):
             self.chgat(11, self.cheight, len(str("%.1f" % wpm_score)),
                        Screen.COLOR_HISCORE)
         self.show_help()
+
+        # Show some recent scores
+        results = stats.text_id_results(stats.keyboard, self.quote_id)
+        wpm_avg, acc_avg = results.averages()
+        wpm_sd, acc_sd = results.stddevs()
+        wpm_min, wpm_max, acc_min, acc_max = results.extremals()
+        msg = "wpm %.1f min, %.1f avg, %.1f max, %.1f sd (n=%d)" % (
+                wpm_min, wpm_avg, wpm_max, wpm_sd, len(results))
+        self.cheight += 2
+        self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
+
+        msg = "acc %.1f min, %.1f avg, %.1f max, %.1f sd" % (
+                acc_min, acc_avg, acc_max, acc_sd)
+        self.cheight += 1
+        self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
         self.set_cursor(0, 2)
 
@@ -471,7 +488,8 @@ class Game(object):
                                            self._edit)
             elif game_done:
                 self.screen.show_score(self.get_stats(self.elapsed),
-                                       self.wpm(self.elapsed))
+                                       self.wpm(self.elapsed),
+                                       self.stats)
             else:
                 self.screen.show_browser(self.get_stats(self.elapsed))
 

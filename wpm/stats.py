@@ -60,8 +60,25 @@ class GameResults(object):
         for game in self.games:
             yield GameResult(game)
 
+    def append(self, game):
+        self.games.append(game)
+
     def __len__(self):
         return len(self.games)
+
+    def extremals(self):
+        min_wpm = 99999
+        max_wpm = 0
+        min_acc = 99999
+        max_acc = 0
+
+        for result in self.results:
+            min_wpm = min(min_wpm, result.wpm)
+            max_wpm = max(max_wpm, result.wpm)
+            min_acc = min(min_acc, result.accuracy)
+            max_acc = max(max_acc, result.accuracy)
+
+        return min_wpm, max_wpm, min_acc, max_acc
 
     def averages(self):
         """Returns a tuple of WPM and accuracy averages."""
@@ -109,6 +126,15 @@ class Stats(object):
     def results(self, keyboard, last_n=0):
         """Returns the ``GameResults``."""
         return GameResults(keyboard, self.games[keyboard][-last_n:])
+
+    def text_id_results(self, keyboard, text_id):
+        results = GameResults(self.keyboard, [])
+
+        for game in self.games[keyboard]:
+            if game[5] == text_id:
+                results.append(game)
+
+        return results
 
     def add(self, wpm, accuracy, text_id, database):
         """Adds a game result to the stats."""
