@@ -558,9 +558,12 @@ class Game(object):
         max_y, max_x = self.screen.window.getmaxyx()
         self.screen.clear()
 
+        # Check if we have the resizeterm ncurses extension
         if hasattr(curses, "resizeterm"):
-            # My PyPy version does not have resizeterm, for example.
             curses.resizeterm(max_y, max_x)
+            # An ungetch for KEY_RESIZE will be sent to let others handle it.
+            # We'll just pop it off again to prevent endless loops.
+            self.screen.get_key()
 
         self.screen.setup_quote(self.quote)
 
