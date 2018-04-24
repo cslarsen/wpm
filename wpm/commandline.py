@@ -171,7 +171,7 @@ def main():
     if opts.load_json is not None:
         quotes = load_json_quotes(opts.load_json)
     elif opts.load is not None:
-        quotes = load_plain_text_quote(opts.load, quotes)
+        quotes = load_plain_text_quote([], opts.load)
     else:
         # Load default database
         quotes = wpm.quotes.Quotes.load()
