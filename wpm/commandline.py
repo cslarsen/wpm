@@ -103,8 +103,16 @@ def load_plain_text_quote(quotes, filename):
     with codecs.open(filename, encoding="utf-8") as file_obj:
         text = file_obj.read()
         text = text.replace("\r", "").rstrip()
-        quotes.append(["", "", text])
-        return wpm.quotes.Quotes(quotes, database=os.path.basename(filename))
+
+        author = ""
+        title = os.path.basename(filename)
+        database = "plaintext"
+
+        # For now, just use inode for the text ID
+        text_id = os.stat(filename).st_ino
+
+        quotes.append([author, title, text, text_id])
+        return wpm.quotes.Quotes(quotes, database=database)
 
 def print_stats(stats):
     """Prints table of game results."""

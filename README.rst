@@ -93,6 +93,10 @@ If you want to type a custom text, run
 
     $ wpm --load yourfile.txt
 
+If you use ``--load``, the author will currently be empty, the title will be
+the basename of the file. The text ID will be its inode, just to make them
+somewhat unique, so your stats will work.
+
 You can also bundle up several texts into a single JSON file, using ``wpm
 --load-json yourfile.json``. It must have the following format:
 
