@@ -39,7 +39,7 @@ class Quote(object):
         text = data[1]
         title = data[2]
         text_id = data[3]
-        return Quote(author, text, title, text_id)
+        return Quote(author, title, text, text_id)
 
     def __str__(self):
         return "\"%s\"\n\t- %s: %s" % (self.text, self.author, self.title)
