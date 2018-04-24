@@ -101,7 +101,7 @@ def load_plain_text_quote(quotes, filename):
         text = file_obj.read()
         text = text.replace("\r", "").rstrip()
         quotes.append(["", "", text])
-        return wpm.quotes.Quotes(quotes)
+        return wpm.quotes.Quotes(quotes, database=os.path.basename(filename))
 
 def print_stats(stats):
     """Prints table of game results."""
