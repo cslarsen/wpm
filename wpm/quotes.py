@@ -36,8 +36,8 @@ class Quote(object):
     def from_tuple(data):
         """Converts tuple of (author, text, title, text_id) to Quote object."""
         author = data[0]
-        text = data[1]
-        title = data[2]
+        title = data[1]
+        text = data[2]
         text_id = data[3]
         return Quote(author, title, text, text_id)
 
@@ -124,6 +124,9 @@ class Quotes(object):
 
     def __getitem__(self, index):
         return self.quotes[index]
+
+    def at(self, index):
+        return Quote.from_tuple(self[index])
 
     def __setitem__(self, index, item):
         if not isinstance(item, list):
