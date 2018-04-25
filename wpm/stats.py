@@ -132,8 +132,10 @@ class Stats(object):
         else:
             self.games = games
 
-    def results(self, keyboard, last_n=0):
+    def results(self, keyboard=None, last_n=0):
         """Returns the ``GameResults``."""
+        if keyboard is None:
+            keyboard = self.keyboard
         return GameResults(keyboard, self.games[keyboard][-last_n:])
 
     def text_id_results(self, keyboard, text_id):
