@@ -47,6 +47,10 @@ class GameResult(object):
         self.timestamp = timestamp
         self.database = database
 
+    def __repr__(self):
+        return "<GameResult: @%s wpm=%.1f acc=%.1f id=%d>" % (
+                self.timestamp, self.wpm, self.accuracy, self.text_id)
+
 
 class GameResults(object):
     """Container for several GameResult objects."""
@@ -59,6 +63,10 @@ class GameResults(object):
         """Yields all the ``GameResult`` objects."""
         for game in self.games:
             yield GameResult(game)
+
+    def __repr__(self):
+        return "<GameResults: len=%d keyboard=%r>" % (len(self.games),
+                                                      self.keyboard)
 
     def append(self, game):
         self.games.append(game)
@@ -131,6 +139,9 @@ class Stats(object):
             self.games = collections.defaultdict(list)
         else:
             self.games = games
+
+    def __repr__(self):
+        return "<Stats: keyboards=%d current=%r>" % (len(self), self.keyboard)
 
     def results(self, keyboard=None, last_n=0):
         """Returns the ``GameResults``."""
