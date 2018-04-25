@@ -118,6 +118,21 @@ class Quotes(object):
     def __init__(self, quotes=None, database=None):
         self.quotes = quotes
         self.database = database
+        self._index = None
+
+    def _build_index(self):
+        """Builds an index of text_ids."""
+        if self._index is None:
+            self._index = {}
+            for index, quote in enumerate(self.quotes):
+                quote = Quote.from_tuple(quote)
+                self._index[quote.text_id] = index
+
+    def from_id(self, text_id):
+        """Looks up quote from text_id."""
+        self._build_index()
+        index = self._index[text_id]
+        return Quote.from_tuple(self.quotes[index])
 
     def __len__(self):
         return len(self.quotes)
