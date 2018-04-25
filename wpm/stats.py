@@ -184,8 +184,12 @@ class Stats(object):
         return self.games.items()
 
     @staticmethod
-    def load(filename):
+    def load(filename=None):
         """Loads stats from a CSV file."""
+
+        if filename is None:
+            filename = os.path.expanduser("~/.wpm.csv")
+
         games = collections.defaultdict(list)
         current_keyboard = None
 
