@@ -16,7 +16,7 @@ run:
 
 repl:
 	PYTHONPATH=. $(PYTHON) -i -c \
-		'from wpm.stats import*; from wpm.quotes import *; quotes = Quotes.load(); stats = Stats.load()'
+		'from wpm.stats import*; from wpm.quotes import *; from wpm.difficulty import *; quotes = Quotes.load(); stats = Stats.load(); diffs = Difficulty.load()'
 
 profile:
 	PYTHONPATH=. $(PYTHON) -m cProfile -o stats wpm/__main__.py
