@@ -25,6 +25,9 @@ profile:
 help:
 	PYTHONPATH=. $(PYTHON) wpm --help
 
+dump:
+	PYTHONPATH=. $(PYTHON) tools/dumpdiffs.py
+
 run3:
 	PYTHONPATH=. $(PYTHON3) wpm
 
