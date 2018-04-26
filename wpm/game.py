@@ -665,6 +665,8 @@ class Game(object):
             self.reset()
             return
 
+        self.time_recorder.add(self.elapsed, key)
+
         if Screen.is_backspace(key):
             if self.incorrect:
                 self.incorrect -= 1
@@ -682,13 +684,12 @@ class Game(object):
             self.screen.show_keystroke(head,
                                        self.position,
                                        self.incorrect,
-                                       self._edit)
+                                       self._edit,
+                                       key)
 
         # Start recording upon first ordinary key press
         if self.start is None:
             self.start = time.time()
-
-        self.time_recorder.add(self.elapsed, key)
 
         if key == curses.KEY_ENTER:
             key = "\n"
