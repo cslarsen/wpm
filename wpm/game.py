@@ -310,7 +310,7 @@ class Screen(object):
         self.chgat(0, 0, self.columns, Screen.COLOR_STATUS)
         #self.window.chgat(0, 0, self.columns, Screen.COLOR_STATUS)
 
-    def setup_quote(self, quote):
+    def set_quote(self, quote):
         """Sets up variables used for a new quote."""
         # TODO: Move this stuff elsewhere
         if self.config.max_quote_width > 0:
@@ -501,8 +501,8 @@ class Game(object):
     def set_quote(self, quote):
         """Sets current quote."""
         self.quote = quote
-        self.time_recorder = wpm.record.TimeRecorder(len(self.quote.text))
-        self.screen.setup_quote(self.quote)
+        self.time_recorder = wpm.record.TimeRecorder()
+        self.screen.set_quote(self.quote)
 
     def run(self, to_front=None):
         """Starts the main game loop."""
@@ -522,7 +522,7 @@ class Game(object):
             if is_typing:
                 if self.screen.first_key:
                     self.screen.first_key = False
-                    self.time_recorder.reset(len(self.quote.text))
+                    self.time_recorder.reset()
                     self.screen.rerender_race(head)
 
                 self.screen.show_keystroke(head,
@@ -628,7 +628,7 @@ class Game(object):
             # We'll just pop it off again to prevent endless loops.
             self.screen.get_key()
 
-        self.screen.setup_quote(self.quote)
+        self.screen.set_quote(self.quote)
 
         if self.start is not None and self.stop is None:
             # Resize during typing requires redrawing quote.

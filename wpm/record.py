@@ -15,15 +15,15 @@ import collections
 
 class TimeRecorder(object):
     """Class for recording keystrokes."""
-    def __init__(self, size):
-        self.reset(size)
+    def __init__(self):
+        self.reset()
 
     def add(self, elapsed, key):
         """Adds a time stamp."""
         self.values.append(elapsed)
         self.keys.append(key)
 
-    def reset(self, size):
+    def reset(self):
         """Destroys all time stamps."""
         self.values = collections.deque()
         self.keys = collections.deque()
