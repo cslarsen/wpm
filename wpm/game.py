@@ -506,6 +506,8 @@ class Game(object):
             self.screen.setup_quote(self.quote)
 
         while True:
+            self.now = time.time()
+
             # TODO: Simplify boolean expressions with implicit tests
             is_typing = self.start is not None and self.stop is None
             game_done = (not is_typing) and (self.stop is not None)
@@ -549,10 +551,9 @@ class Game(object):
         if self.start is None:
             # Typing has not started
             return 0
-        elif self.stop is None:
+        if self.stop is None:
             # Currently typing
-            return time.time() - self.start
-
+            return self.now - self.start
         # Done typing
         return self.stop - self.start
 
