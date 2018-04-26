@@ -48,7 +48,7 @@ class GameResult(object):
         self.database = database
 
     def __repr__(self):
-        return "<GameResult: @%s wpm=%.1f acc=%.1f id=%d>" % (
+        return "<GameResult: %s wpm=%.1f acc=%.1f id=%d>" % (
                 self.timestamp, self.wpm, self.accuracy, self.text_id)
 
 
