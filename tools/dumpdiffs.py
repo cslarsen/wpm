@@ -13,10 +13,13 @@ if __name__ == "__main__":
 
     print("Dumping CSV file with (wpm, accuracy, difficulty, length)")
 
-    rows = [(r.wpm, r.accuracy,
-             diffs[r.text_id],
-             len(quotes.from_id(r.text_id).text),
-            ) for r in results]
+    rows = []
+    for r in results:
+        if r.text_id not in diffs:
+            continue
+        diff = diffs[r.text_id]
+        quote = quotes.from_id(r.text_id).text
+        rows.append((r.wpm, r.accuracy, diff, len(quote)))
 
     with open("diffs.csv", "wb") as csvfile:
         csvw = csv.writer(csvfile)
