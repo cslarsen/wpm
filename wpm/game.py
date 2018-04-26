@@ -538,8 +538,7 @@ class Game(object):
                 self.screen.show_browser(head, self.stats)
 
             key = self.screen.get_key()
-            if key is not None:
-                self.handle_key(key)
+            self.handle_key(key)
 
     def wpm(self, elapsed):
         """Words per minute."""
