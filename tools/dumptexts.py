@@ -8,10 +8,12 @@ Dumps texts from typeracerdata.com.
 from HTMLParser import HTMLParser
 from multiprocessing import Pool as ThreadPool
 import argparse
+import codecs
 import gzip
 import hashlib
 import json
 import os
+import pickle
 import urllib2
 
 def normalize(s):
@@ -127,7 +129,45 @@ def read_ids(url="http://www.typeracerdata.com/texts"):
 def make_tuple(quotes):
     return tuple(set(map(tuple, quotes)))
 
-def main(verbose=False, threads=1):
+def get_difficulty(verbose=False):
+    print("Reading list of quote scores")
+
+    html = loadurl("http://www.typeracerdata.com/texts?sort=relative_average")
+
+    scores = {}
+    text_id = None
+    score = None
+
+    for line in html.split("\n"):
+        if text_id is None:
+            find = "/text?id="
+            if find in line:
+                start = line.index(find)
+                stop = line.index('"', start + len(find))
+                text_id = int(line[start + len(find):stop])
+            continue
+        elif score is None:
+            # Find difficulty rating
+            find = "<td class=\"sort\">"
+            if find in line:
+                start = line.index(find) + len(find)
+                stop = line.index("</td>", start)
+                score = float(line[start:stop])
+        else:
+            if score > 0:
+                scores[text_id] = score
+            text_id = None
+            score = None
+
+    filename = "scores.pickle"
+    print("Pickling %d scores to %s" % (len(scores), filename))
+
+    with open(filename, "wb") as file_obj:
+        pickle.dump(scores, file_obj)
+
+    return scores
+
+def get_texts(verbose=False, threads=1):
     print("Reading list of quotes")
     ids = read_ids()
 
@@ -176,6 +216,12 @@ if __name__ == "__main__":
             help="Number of concurrent downloads")
     p.add_argument("-v", "--verbose", default=False,
             action="store_true")
+    p.add_argument("--difficulty", default=False, action="store_true",
+            help="Only retrieve text_id and difficulty rating")
 
     opts = p.parse_args()
-    main(opts.verbose, opts.jobs)
+
+    if opts.difficulty:
+        get_difficulty(opts.verbose)
+    else:
+        get_texts(opts.verbose, opts.jobs)
