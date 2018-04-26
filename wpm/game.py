@@ -420,11 +420,11 @@ class Screen(object):
         xpos, ypos = self.quote_coords[position + incorrect]
         self.chgat(xpos, 2 + ypos, 1, Screen.COLOR_QUOTE)
 
-    def show_keystroke(self, head, position, incorrect, typed):
+    def show_keystroke(self, head, position, incorrect, typed, key):
         """Updates the screen while typing."""
         self.update_header(head)
 
-        if position + incorrect <= len(self.quote):
+        if key and (position + incorrect) <= len(self.quote):
             self.highlight_progress(position, incorrect)
             self.update_prompt("> " + typed)
 
@@ -510,6 +510,7 @@ class Game(object):
             self.quotes.put_to_front(to_front)
             self.set_quote(self.quotes.current())
 
+        key = None
         while True:
             self.now = time.time()
 
@@ -527,7 +528,8 @@ class Game(object):
                 self.screen.show_keystroke(head,
                                            self.position,
                                            self.incorrect,
-                                           self._edit)
+                                           self._edit,
+                                           key)
             elif game_done:
                 self.screen.show_score(head,
                                        self.wpm(self.elapsed),
