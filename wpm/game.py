@@ -23,6 +23,7 @@ import time
 from wpm.gauss import confidence_interval
 import wpm.config
 import wpm.error
+import wpm.record
 
 def word_wrap(text, width):
     """Returns lengths of lines that can be printed without wrapping."""
@@ -472,8 +473,7 @@ class Game(object):
         self.quotes = quotes.random_iterator()
 
         self.screen = Screen()
-        self.quote = self.quotes.next()
-        self.screen.setup_quote(self.quote)
+        self.set_quote(self.quotes.next())
 
     def __enter__(self):
         return self
@@ -498,12 +498,17 @@ class Game(object):
 
         self.average = self.stats.average(self.stats.keyboard, last_n=10)
 
+    def set_quote(self, quote):
+        """Sets current quote."""
+        self.quote = quote
+        self.time_recorder = wpm.record.TimeRecorder(len(self.quote.text))
+        self.screen.setup_quote(self.quote)
+
     def run(self, to_front=None):
         """Starts the main game loop."""
         if to_front:
             self.quotes.put_to_front(to_front)
-            self.quote = self.quotes.current()
-            self.screen.setup_quote(self.quote)
+            self.set_quote(self.quotes.current())
 
         while True:
             self.now = time.time()
@@ -516,6 +521,7 @@ class Game(object):
             if is_typing:
                 if self.screen.first_key:
                     self.screen.first_key = False
+                    self.time_recorder.reset(len(self.quote.text))
                     self.screen.rerender_race(head)
 
                 self.screen.show_keystroke(head,
@@ -603,10 +609,9 @@ class Game(object):
 
         if direction:
             if direction > 0:
-                self.quote = self.quotes.next()
+                self.set_quote(self.quotes.next())
             else:
-                self.quote = self.quotes.previous()
-            self.screen.setup_quote(self.quote)
+                self.set_quote(self.quotes.previous())
             self.screen.clear()
 
     def resize(self):
@@ -680,6 +685,8 @@ class Game(object):
         # Start recording upon first ordinary key press
         if self.start is None:
             self.start = time.time()
+
+        self.time_recorder.add(self.elapsed, key)
 
         if key == curses.KEY_ENTER:
             key = "\n"
