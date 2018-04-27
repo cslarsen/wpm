@@ -333,11 +333,13 @@ class Screen(object):
             self.quote_coords.append((x_pos, y_pos))
         self.quote_coords = tuple(self.quote_coords)
 
-    def update_prompt(self, prompt):
-        """Prints prompt on the display."""
+    def clear_prompt(self):
         self.set_cursor(0, self.cheight)
         self.window.clrtoeol()
-        self.addstr(0, self.cheight, prompt.encode(self.encoding),
+
+    def update_prompt(self, prompt):
+        """Prints prompt on the display."""
+        self.addstr(0, self.cheight, (prompt + " ").encode(self.encoding),
                     Screen.COLOR_PROMPT)
 
     def show_browser(self, head, stats):
@@ -606,7 +608,7 @@ class Game(object):
 
         self._edit = ""
         self.screen.first_key = True
-        self.screen.update_prompt("")
+        self.screen.clear_prompt()
 
         if direction:
             if direction > 0:
@@ -701,6 +703,7 @@ class Game(object):
 
             # Reset edit buffer on a correctly finished word
             if key == " " or key == "\n":
+                self.screen.clear_prompt()
                 self._edit = ""
             else:
                 self._edit += key
