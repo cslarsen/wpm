@@ -25,11 +25,12 @@ class Difficulty(object):
     @staticmethod
     def _normalize(diffs):
         """Normalizes difficulty scores to 0.0-1.0 where 1.0 is hardest."""
-        delta = max(diffs.values()) - min(diffs.values())
+        low = min(diffs.values())
+        delta = max(diffs.values()) - low
         out = {}
 
         for text_id, score in diffs.items():
-            out[text_id] = 1.0 - (float(score - delta) / delta)
+            out[text_id] = 1.0 - (float(score - low) / delta)
 
         return out
 
