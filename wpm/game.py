@@ -539,6 +539,7 @@ class Game(object):
             else:
                 self.screen.show_browser(head, self.stats)
 
+            self.screen.window.refresh()
             key = self.screen.get_key()
             self.handle_key(key)
 
