@@ -503,7 +503,7 @@ class Game(object):
     def set_quote(self, quote):
         """Sets current quote."""
         self.quote = quote
-        self.time_recorder = wpm.record.TimeRecorder()
+        self.recorder = wpm.record.Recorder()
         self.screen.set_quote(self.quote)
 
     def run(self, to_front=None):
@@ -524,7 +524,7 @@ class Game(object):
             if is_typing:
                 if self.screen.first_key:
                     self.screen.first_key = False
-                    self.time_recorder.reset()
+                    self.recorder.reset()
                     self.screen.rerender_race(head)
 
                 self.screen.show_keystroke(head,
@@ -667,7 +667,7 @@ class Game(object):
             self.reset()
             return
 
-        self.time_recorder.add(self.elapsed, key)
+        self.recorder.add(self.elapsed, key, self.position, self.incorrect)
 
         if Screen.is_backspace(key):
             if self.incorrect:
