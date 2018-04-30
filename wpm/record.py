@@ -45,6 +45,6 @@ class Playback(object):
         self.index = 0
 
     def next(self):
-        values = self.recorder[self.inde]
+        values = self.recorder[self.index]
         self.index = (self.index + 1) % len(self.recorder)
         return values
