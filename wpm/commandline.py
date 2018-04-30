@@ -197,6 +197,8 @@ def main():
             if not text_ids:
                 print("No quotes matching %r" % opts.search)
                 sys.exit(1)
+        elif opts.id is not None:
+            text_ids = [opts.id]
         else:
             text_ids = []
     except wpm.error.WpmError as error:
