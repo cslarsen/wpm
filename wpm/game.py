@@ -20,7 +20,7 @@ from wpm.config import Config
 from wpm.record import Recorder
 from wpm.screen import Screen
 
-class Game(object):
+class GameManager(object):
     """The main game runner."""
     def __init__(self, quotes, stats):
         self.config = Config()

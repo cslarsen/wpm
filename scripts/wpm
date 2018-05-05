@@ -5,7 +5,12 @@
 Measures your typing speed in words per minute (WPM).
 """
 
-import wpm.commandline
+from wpm.commandline import main
+from wpm.error import WpmError
 
 if __name__ == "__main__":
-    wpm.commandline.main()
+    try:
+        main()
+    except WpmError as error:
+        print(error)
+        sys.exit(1)
