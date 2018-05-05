@@ -8,7 +8,6 @@ Dumps texts from typeracerdata.com.
 from HTMLParser import HTMLParser
 from multiprocessing import Pool as ThreadPool
 import argparse
-import codecs
 import gzip
 import hashlib
 import json

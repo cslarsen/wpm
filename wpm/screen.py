@@ -17,9 +17,9 @@ import locale
 import os
 import sys
 
+from wpm.config import Config
+from wpm.error import WpmError
 from wpm.gauss import confidence_interval
-import wpm.config
-import wpm.error
 
 class Screen(object):
     """Renders the terminal screen."""
@@ -34,7 +34,7 @@ class Screen(object):
     COLOR_STATUS = 8
 
     def __init__(self):
-        self.config = wpm.config.Config()
+        self.config = Config()
 
         # Make delay slower
         os.environ.setdefault("ESCDELAY", self.config.escdelay)
@@ -49,13 +49,13 @@ class Screen(object):
         min_lines = 12
         if self.lines < min_lines:
             curses.endwin()
-            raise wpm.error.WpmError(
+            raise WpmError(
                 "wpm requires at least %d lines in your display" % min_lines)
 
         min_cols = 20
         if self.columns < min_cols:
             curses.endwin()
-            raise wpm.error.WpmError(
+            raise WpmError(
                 "wpm requires at least %d columns in your display" % min_cols)
 
         try:

@@ -14,11 +14,9 @@ The quotes database is *not* covered by the AGPL!
 """
 
 import curses
-import locale
 import time
 
 from wpm.config import Config
-from wpm.gauss import confidence_interval
 from wpm.record import Recorder
 from wpm.screen import Screen
 
