@@ -74,6 +74,16 @@ class Game(object):
         self.recorder = Recorder()
         self.screen.set_quote(self.quote)
 
+    @property
+    def is_typing(self):
+        """Is user currently typing a quote?"""
+        return self.start and not self.stop
+
+    @property
+    def game_done(self):
+        """Has user finished a quote?"""
+        return self.start and self.stop
+
     def run(self, to_front=None):
         """Starts the main game loop."""
         if to_front:
@@ -84,12 +94,9 @@ class Game(object):
         while True:
             self.now = time.time()
 
-            # TODO: Simplify boolean expressions with implicit tests
-            is_typing = self.start is not None and self.stop is None
-            game_done = (not is_typing) and (self.stop is not None)
             head = self.get_stats(self.elapsed)
 
-            if is_typing:
+            if self.is_typing:
                 if self.screen.first_key:
                     self.screen.first_key = False
                     self.recorder.reset()
@@ -100,7 +107,7 @@ class Game(object):
                                            self.incorrect,
                                            self._edit,
                                            key)
-            elif game_done:
+            elif self.game_done:
                 self.screen.show_score(head,
                                        self.wpm(self.elapsed),
                                        self.stats)
