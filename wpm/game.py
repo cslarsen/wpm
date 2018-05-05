@@ -77,12 +77,12 @@ class Game(object):
     @property
     def is_typing(self):
         """Is user currently typing a quote?"""
-        return self.start and not self.stop
+        return (self.start is not None) and (self.stop is None)
 
     @property
     def game_done(self):
         """Has user finished a quote?"""
-        return self.start and self.stop
+        return (self.start is not None) and (self.stop is None)
 
     def run(self, to_front=None):
         """Starts the main game loop."""
