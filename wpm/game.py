@@ -80,7 +80,7 @@ class GameManager(object):
     @property
     def game_done(self):
         """Has user finished a quote?"""
-        return (self.start is not None) and (self.stop is None)
+        return (self.start is not None) and (self.stop is not None)
 
     def run(self, to_front=None):
         """Starts the main game loop."""
