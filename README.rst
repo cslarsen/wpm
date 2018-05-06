@@ -167,8 +167,9 @@ Section        Name                        Default Description
 -------------- --------------------------- ------- -----------------------------------------------------------------------------
 curses         escdelay                         15 Time in ms to wait for follow-up key after ESC
 curses         window_timeout                   20 Time in ms until giving up waiting for a keypress. If negative, wait forever.
-wpm            max_quote_width                  -1 If positive, wrap text at this width
 wpm            confidence_interval_percent      95 The confidence interval percentage to use for WPM and accuracy reports
+wpm            max_quote_width                  -1 If positive, wrap text at this width
+wpm            spaces_to_expand_tabs_to          1 Number of spaces to expand tabs to
 xterm-256color                                     Color codes for 256-color terminals
 xterm-color                                        Color codes for ordinary terminals
 ============== =========================== ======= =============================================================================

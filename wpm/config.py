@@ -53,8 +53,9 @@ class Config(object):
         Config.config.set("curses", "window_timeout", "20")
 
         Config.config.add_section("wpm")
-        Config.config.set("wpm", "max_quote_width", "-1")
         Config.config.set("wpm", "confidence_interval_percent", "95")
+        Config.config.set("wpm", "max_quote_width", "-1")
+        Config.config.set("wpm", "spaces_to_expand_tabs_to", "1")
 
         Config.config.add_section("xterm-256color")
         Config.config.set("xterm-256color", "author_bg", str(233))
@@ -125,6 +126,19 @@ class Config(object):
         except configparser.NoOptionError:
             Config.config.set("wpm", "confidence_interval_percent", "95")
             return 95
+
+    @property
+    def tab_spaces(self):
+        """Used to construct an x% confidence interval."""
+        try:
+            return int(Config.config.get("wpm", "spaces_to_expand_tabs_to"))
+        except configparser.NoSectionError:
+            Config.config.add_section("wpm")
+            Config.config.set("wpm", "spaces_to_expand_tabs_to", "1")
+            return 1
+        except configparser.NoOptionError:
+            Config.config.set("wpm", "spaces_to_expand_tabs_to", "1")
+            return 1
 
     @property
     def background_color_256(self):

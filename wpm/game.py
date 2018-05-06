@@ -17,6 +17,7 @@ import curses
 import time
 
 from wpm.config import Config
+from wpm.error import WpmError
 from wpm.record import Recorder
 from wpm.screen import Screen
 
@@ -84,6 +85,8 @@ class GameManager(object):
 
     def run(self, to_front=None):
         """Starts the main game loop."""
+        self.set_tab_spaces(self.config.tab_spaces)
+
         if to_front:
             self.quotes.put_to_front(to_front)
             self.set_quote(self.quotes.current())

@@ -41,9 +41,6 @@ The format is
     argp.add_argument("-V", "--version", default=False, action="store_true",
                       help="Show program version")
 
-    argp.add_argument("--tabs", default=None, type=int,
-                      help="If set, expand tabs to this number of spaces")
-
     argp.add_argument("--keyboard", default=None, type=str,
                       help="Records WPM statistics under the given keyboard name")
 
@@ -203,7 +200,6 @@ def main():
 
     with wpm.game.GameManager(quotes, stats) as gm:
         try:
-            gm.set_tab_spaces(opts.tabs)
             gm.run(to_front=text_ids)
             gm.stats.save(opts.stats_file)
         except KeyboardInterrupt:
