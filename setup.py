@@ -40,6 +40,7 @@ setup(
     license="https://www.gnu.org/licenses/agpl-3.0.html",
     long_description=open("README.rst").read(),
     zip_safe=True,
+    test_suite="tests",
     keywords=["wpm", "typing", "typist"],
     platforms=["unix", "linux", "osx", "cygwin"],
     classifiers=[

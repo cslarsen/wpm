@@ -1,3 +1,4 @@
 include README.rst
 include LICENSE.txt
 include wpm/data/examples.json.gz
+graft tests
