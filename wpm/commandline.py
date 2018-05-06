@@ -172,31 +172,35 @@ def search(quotes, query):
 
 def main():
     """Main entry point for command line invocation."""
-    opts = parse_args()
-    stats = load_stats(opts.stats_file, opts.keyboard)
+    try:
+        opts = parse_args()
+        stats = load_stats(opts.stats_file, opts.keyboard)
 
-    if opts.load_json is not None:
-        quotes = load_json_quotes(opts.load_json)
-    elif opts.load is not None:
-        quotes = load_plain_text_quote([], opts.load)
-    else:
-        # Load default database
-        quotes = wpm.quotes.Quotes.load()
+        if opts.load_json is not None:
+            quotes = load_json_quotes(opts.load_json)
+        elif opts.load is not None:
+            quotes = load_plain_text_quote([], opts.load)
+        else:
+            # Load default database
+            quotes = wpm.quotes.Quotes.load()
 
-    if opts.stats:
-        print_stats(stats)
-        return
+        if opts.stats:
+            print_stats(stats)
+            return
 
-    if opts.search:
-        text_ids = list(search(quotes, opts.search.lower()))
+        if opts.search:
+            text_ids = list(search(quotes, opts.search.lower()))
 
-        if not text_ids:
-            print("No quotes matching %r" % opts.search)
-            sys.exit(1)
-    elif opts.id is not None:
-        text_ids = [opts.id]
-    else:
-        text_ids = []
+            if not text_ids:
+                print("No quotes matching %r" % opts.search)
+                sys.exit(1)
+        elif opts.id is not None:
+            text_ids = [opts.id]
+        else:
+            text_ids = []
+    except wpm.error.WpmError as error:
+        print(error)
+        sys.exit(1)
 
     with wpm.game.GameManager(quotes, stats) as gm:
         try:

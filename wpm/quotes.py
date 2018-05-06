@@ -22,6 +22,8 @@ import sys
 
 import pkg_resources
 
+from wpm.error import WpmError
+
 class Quote(object):
     """Holds a single quote."""
     # pylint: disable=too-few-public-methods
@@ -165,8 +167,11 @@ class Quotes(object):
         if filename is None:
             filename = Quotes._database_filename()
 
-        with codecs.open(filename, encoding="utf-8") as file_obj:
-            quotes = json.load(file_obj)
+        try:
+            with codecs.open(filename, encoding="utf-8") as file_obj:
+                quotes = json.load(file_obj)
+        except Exception as error:
+            raise WpmError("Could not read JSON file: %s" % error)
 
         # Flatten
         out = []
