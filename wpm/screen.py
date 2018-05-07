@@ -147,8 +147,9 @@ class Screen(object):
 
     def set_colors(self):
         """Sets up curses color pairs."""
+        hicolor = os.getenv("TERM").endswith("256color")
 
-        if os.getenv("TERM").endswith("256color"):
+        if hicolor:
             bg_col = self.config.background_color_256
             curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color_256)
             curses.init_pair(Screen.COLOR_BACKGROUND, bg_col, bg_col)
@@ -178,6 +179,13 @@ class Screen(object):
         Screen.COLOR_PROMPT = curses.color_pair(Screen.COLOR_PROMPT)
         Screen.COLOR_QUOTE = curses.color_pair(Screen.COLOR_QUOTE)
         Screen.COLOR_STATUS = curses.color_pair(Screen.COLOR_STATUS)
+
+        if not hicolor:
+            # Make certain colors more visible
+            Screen.COLOR_CORRECT |= curses.A_DIM
+            Screen.COLOR_INCORRECT |= curses.A_UNDERLINE | curses.A_BOLD
+            Screen.COLOR_QUOTE |= curses.A_BOLD
+            Screen.COLOR_STATUS |= curses.A_BOLD
 
     @staticmethod
     def is_escape(key):
