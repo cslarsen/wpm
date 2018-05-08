@@ -369,7 +369,7 @@ class Screen(object):
 
     def show_stats(self, stats):
         """Shows statistics for the current quote."""
-        results = stats.text_id_results(stats.keyboard, self.quote_id)
+        results = stats.text_id_results(stats.tag, self.quote_id)
 
         if len(results) < 2:
             return

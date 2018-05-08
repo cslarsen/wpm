@@ -14,7 +14,7 @@ Features
 - Extremely low typing latency!
 - Timer starts when you strike the first key
 - Completed text is *darkened*, helping you to focus ahead
-- Keep separate stats for, e.g. type of keyboard, layout etc.
+- Keep separate scores for, e.g. type of keyboard, layout etc.
 - Saves race scores in a CSV file that is a superset of TypeRacer's export
   format. Loads fine in Excel as well.
 - Launches quickly in your terminal window for "in-between moments"
@@ -142,18 +142,30 @@ racers     int      Always 1
 text_id    int      Item number of text in given database
 timestamp  str      UTC timestamp in strptime format `%Y-%m-%d %H:%M:%S.%f`
 database   str      Either "default" or the basename of the file used
-keyboard   str      A user supplied tag for that score
+tag        str      A user supplied tag for that score (e.g., keyboard)
 ========== ======== =======================================================
 
 Should there be any problem saving or loading the score history, it will copy
 the existing file into `~/.wpm.csv.backup` and create a new one.
 
-If you use `--keyboard=...` to specify a keyboard, the next time wpm is
-launched, it will assume that this is the keyboard you are still using. Just
-specify `--keyboard=...` again. The keyboard setting is really just a string
-label you can use to tag races. For example, you could call the keyboard
-`realforce-colemak` or `cherry-red-qwerty` and use that as a basis to perform
-statistical analysis on your typing performance with various setups.
+Tagging races
+-------------
+
+If you use `--tag=...` to tag your scores, this will be used until you change
+it. It is just a free text field that is saved along with each race result. It
+is useful to compare how well you are typing in various situations.
+
+For example, perhaps you want to check if you are typing faster (but perhaps
+less accurate?) on different keyboards, or you are learning a new keyboard
+layout like Dvorak or Colemak and then use the tags `--tag=qwerty` and
+`--tag=dvorak`.  If you are learning to touch type, or type with more fingers,
+you often start out slower than your normal speed. Tagging is a great way to
+keep track of your progress.
+
+By running `wpm --stats` (or just `-s`), you will see a table of statistics,
+grouped by each tag. It shows things like the average over time, along with
+confidence and prediction intervals. An item like `n-10` means "the last 10
+games".
 
 The ~/.wpmrc file
 -----------------

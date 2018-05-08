@@ -41,11 +41,11 @@ The format is
     argp.add_argument("-V", "--version", default=False, action="store_true",
                       help="Show program version")
 
-    argp.add_argument("--keyboard", default=None, type=str,
-                      help="Records WPM statistics under the given keyboard name")
+    argp.add_argument("--tag", default=None, type=str,
+                      help="Tag your race scores with this free text field.")
 
     argp.add_argument("-s", "--stats", default=False, action="store_true",
-                      help="Shows keyboard statistics")
+                      help="Shows score statistics grouped by tags")
 
     argp.add_argument("--stats-file", default="~/.wpm.csv", type=str,
                       help="File to record score history to (CSV format)")
@@ -67,10 +67,10 @@ The format is
     opts.stats_file = os.path.expanduser(opts.stats_file)
     return opts
 
-def load_stats(filename, keyboard):
+def load_stats(filename, tag):
     """Loads CSV stats from file."""
     if not os.path.isfile(filename):
-        return wpm.stats.Stats(keyboard)
+        return wpm.stats.Stats(tag)
 
     try:
         stats = wpm.stats.Stats.load(filename)
@@ -81,8 +81,8 @@ def load_stats(filename, keyboard):
         os.rename(filename, new_name)
         stats = wpm.stats.Stats()
 
-    if keyboard is not None:
-        stats.keyboard = keyboard
+    if tag is not None:
+        stats.tag = tag
 
     return stats
 
@@ -118,11 +118,11 @@ def print_stats(stats):
     config = wpm.config.Config()
     percent = config.confidence_interval_percent
 
-    for keyboard in sorted(stats.games.keys()):
-        name = keyboard if keyboard is not None else "n/a"
+    for tag in sorted(stats.games.keys()):
+        name = tag if tag is not None else "n/a"
 
         for last_n in [0, 10, 50, 100, 500, 1000]:
-            results = stats.results(keyboard, last_n=last_n)
+            results = stats.results(tag, last_n=last_n)
 
             if len(results) >= last_n:
                 if last_n == 0:
@@ -184,7 +184,7 @@ def main():
     """Main entry point for command line invocation."""
     try:
         opts = parse_args()
-        stats = load_stats(opts.stats_file, opts.keyboard)
+        stats = load_stats(opts.stats_file, opts.tag)
 
         if opts.load_json is not None:
             quotes = load_json_quotes(opts.load_json)

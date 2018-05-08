@@ -26,7 +26,7 @@ class GameManager(object):
     def __init__(self, quotes, stats):
         self.config = Config()
         self.stats = stats
-        self.average = self.stats.average(self.stats.keyboard, last_n=10)
+        self.average = self.stats.average(self.stats.tag, last_n=10)
         self.tab_spaces = None
 
         # Stats
@@ -65,7 +65,7 @@ class GameManager(object):
                        self.quote.text_id,
                        self.quotes.database)
 
-        self.average = self.stats.average(self.stats.keyboard, last_n=10)
+        self.average = self.stats.average(self.stats.tag, last_n=10)
 
     def set_quote(self, quote):
         """Sets current quote."""
@@ -154,7 +154,7 @@ class GameManager(object):
 
     def get_stats(self, elapsed):
         """Returns the top-bar stats line."""
-        kbd = self.stats.keyboard
+        kbd = self.stats.tag
 
         parts = (
             "%5.1f wpm" % self.wpm(elapsed),

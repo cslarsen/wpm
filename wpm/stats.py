@@ -54,8 +54,8 @@ class GameResult(object):
 
 class GameResults(object):
     """Container for several GameResult objects."""
-    def __init__(self, keyboard, games):
-        self.keyboard = keyboard
+    def __init__(self, tag, games):
+        self.tag = tag
         self.games = games
 
     @property
@@ -65,8 +65,7 @@ class GameResults(object):
             yield GameResult(game)
 
     def __repr__(self):
-        return "<GameResults: len=%d keyboard=%r>" % (len(self.games),
-                                                      self.keyboard)
+        return "<GameResults: len=%d tag=%r>" % (len(self.games), self.tag)
 
     def append(self, game):
         self.games.append(game)
@@ -133,26 +132,26 @@ class GameResults(object):
 
 class Stats(object):
     """Typing statistics"""
-    def __init__(self, current_keyboard=None, games=None):
-        self.keyboard = current_keyboard
+    def __init__(self, current_tag=None, games=None):
+        self.tag = current_tag
         if games is None:
             self.games = collections.defaultdict(list)
         else:
             self.games = games
 
     def __repr__(self):
-        return "<Stats: keyboards=%d current=%r>" % (len(self), self.keyboard)
+        return "<Stats: tag=%d current=%r>" % (len(self), self.tag)
 
-    def results(self, keyboard=None, last_n=0):
+    def results(self, tag=None, last_n=0):
         """Returns the ``GameResults``."""
-        if keyboard is None:
-            keyboard = self.keyboard
-        return GameResults(keyboard, self.games[keyboard][-last_n:])
+        if tag is None:
+            tag = self.tag
+        return GameResults(tag, self.games[tag][-last_n:])
 
-    def text_id_results(self, keyboard, text_id):
-        results = GameResults(self.keyboard, [])
+    def text_id_results(self, tag, text_id):
+        results = GameResults(self.tag, [])
 
-        for game in self.games[keyboard]:
+        for game in self.games[tag]:
             if game[5] == text_id:
                 results.append(game)
 
@@ -164,7 +163,7 @@ class Stats(object):
         rank = 1
         racers = 1
 
-        self.games[self.keyboard].append((
+        self.games[self.tag].append((
             race,
             wpm,
             accuracy,
@@ -174,9 +173,9 @@ class Stats(object):
             Timestamp.now(),
             database))
 
-    def average(self, keyboard=None, last_n=None):
+    def average(self, tag=None, last_n=None):
         """Returns the average WPM."""
-        return self.results(keyboard, last_n).averages()[0]
+        return self.results(tag, last_n).averages()[0]
 
     def __len__(self):
         return len(self.games)
@@ -204,7 +203,7 @@ class Stats(object):
             filename = os.path.expanduser("~/.wpm.csv")
 
         games = collections.defaultdict(list)
-        current_keyboard = None
+        current_tag = None
 
         def parse(row):
             """Converts CSV row to internal types."""
@@ -216,32 +215,32 @@ class Stats(object):
             text_id = int(row[5])
             timestamp = Timestamp.from_string(row[6])
             database = row[7]
-            keyboard = row[8]
+            tag = row[8]
 
             return (race, wpm, accuracy, rank, racers, text_id, timestamp,
-                    database, keyboard)
+                    database, tag)
 
         with open(filename, "rt") as file_obj:
             reader = csv.reader(file_obj)
 
             for row in reader:
                 result = parse(row)
-                keyboard = result[-1]
-                games[keyboard].append(result[:-1])
-                current_keyboard = keyboard
+                tag = result[-1]
+                games[tag].append(result[:-1])
+                current_tag = tag
 
-        return Stats(current_keyboard, games)
+        return Stats(current_tag, games)
 
     def save(self, filename):
         """Writes game results to a CSV file compatible with the one from
         TypeRacer."""
         allgames = []
-        for keyboard, games in self.items():
-            if keyboard is None:
-                keyboard = "Unspecified"
+        for tag, games in self.items():
+            if tag is None:
+                tag = "Unspecified"
 
             for game in games:
-                allgames.append(list(game) + [keyboard])
+                allgames.append(list(game) + [tag])
 
         by_time = lambda row: row[6]
         games = sorted(allgames, key=by_time)
