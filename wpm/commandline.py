@@ -16,7 +16,7 @@ import codecs
 import os
 import sys
 
-from wpm.gauss import confidence_interval
+from wpm.gauss import (prediction_interval, confidence_interval, phi_inv)
 import wpm
 import wpm.config
 import wpm.error
@@ -135,6 +135,7 @@ def print_stats(stats):
 
                 alpha = 1 - (percent/100.0)
                 wpm_ci = confidence_interval(wpm_avg, wpm_sd, len(results), alpha)
+                wpm_pi = prediction_interval(wpm_avg, wpm_sd, alpha)
 
                 table.append([name,
                               label,
@@ -143,20 +144,29 @@ def print_stats(stats):
                               100.0*acc_avg,
                               100.0*acc_sd,
                               wpm_ci[0],
-                              wpm_ci[1]])
+                              wpm_ci[1],
+                              wpm_pi[0],
+                              wpm_pi[1]])
 
     if table:
         width = max(max(len(e[0]) for e in table), 11)
     else:
         width = 0
 
-    print("Keyboard     Games   WPM                        Accuracy")
-    print("                     average stddev %d%% ci      average stddev" % percent)
+    head0 = "Keyboard     Games    WPM                                     Accuracy"
+    head1 = "                      avg     sd     %d%% ci      %d%% pi       avg     sd   " % (percent, percent)
+
+    print("="*len(head1))
+    print(head0)
+    print(head1)
+    print("-"*len(head1))
 
     for entry in table:
-        label, count, wpm_avg, wpm_sd, acc_avg, acc_sd, ci0, ci1 = entry
-        print("%-*s   %5s  %5.1f  %5.1f   %5.1f-%5.1f %5.1f%%  %5.1f%%" %
-              (width, label, count, wpm_avg, wpm_sd, ci0, ci1, acc_avg, acc_sd))
+        label, count, wpm_avg, wpm_sd, acc_avg, acc_sd, ci0, ci1, pi0, pi1 = entry
+        print("%-*s   %6s  %5.1f  %5.1f   %5.1f-%5.1f %5.1f-%5.1f %5.1f%%  %5.1f%%" %
+              (width, label, count, wpm_avg, wpm_sd, ci0, ci1, pi0, pi1, acc_avg, acc_sd))
+
+    print("="*len(head1))
 
 def search(quotes, query):
     """Returns text IDs for quotes matching query."""

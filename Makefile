@@ -35,7 +35,7 @@ runpypy:
 	PYTHONPATH=. $(PYPY) wpm
 
 stats:
-	PYTHONPATH=. $(PYTHON) wpm --stats
+	@PYTHONPATH=. $(PYTHON) wpm --stats
 
 remove-prefixes:
 	PYTHONPATH=. $(PYTHON) tools/remove-prefixes.py
