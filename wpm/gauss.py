@@ -27,7 +27,7 @@ def c(k):
 
     return res
 
-def erf_inv(z, steps=10):
+def erf_inv(z, steps=300):
     """THe inverse error function approximated through its MacLaurin series
     expansion.
 
@@ -52,3 +52,8 @@ def confidence_interval(mu, sd, n, alpha):
         return 0, 0
     z = phi_inv(1.0 - alpha/2.0)
     return mu - z*sd/math.sqrt(n), mu + z*sd/math.sqrt(n)
+
+def prediction_interval(mu, sd, alpha):
+    """Calculates the prediction interval given the normal distribution."""
+    z = phi_inv(1.0 - alpha/2.0)
+    return mu - z*sd, mu + z*sd
