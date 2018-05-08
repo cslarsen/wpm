@@ -153,7 +153,7 @@ def print_stats(stats):
     else:
         width = 0
 
-    head0 = "Keyboard     Games    WPM                                     Accuracy"
+    head0 = "Tag          Games    WPM                                     Accuracy"
     head1 = "                      avg     sd     %d%% ci      %d%% pi       avg     sd   " % (percent, percent)
 
     print("="*len(head1))
