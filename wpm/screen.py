@@ -19,7 +19,7 @@ import sys
 
 from wpm.config import Config
 from wpm.error import WpmError
-from wpm.gauss import confidence_interval
+from wpm.gauss import confidence_interval, prediction_interval
 
 class Screen(object):
     """Renders the terminal screen."""
@@ -381,18 +381,22 @@ class Screen(object):
         wpm_avg, acc_avg = results.averages()
         wpm_sd, acc_sd = results.stddevs()
         wpm_min, wpm_max, acc_min, acc_max = results.extremals()
-        wpm_ci0, wpm_ci1 = confidence_interval(wpm_avg, wpm_sd, samples, alpha)
-        acc_ci0, acc_ci1 = confidence_interval(acc_avg, acc_sd, samples, alpha)
 
-        msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd [%5.1f-%5.1f] %d%% ci (n=%d)" % (
-                wpm_min, wpm_avg, wpm_max, wpm_sd, wpm_ci0, wpm_ci1, percent,
-                samples)
+        wpm_ci0, wpm_ci1 = confidence_interval(wpm_avg, wpm_sd, samples, alpha)
+        wpm_pi0, wpm_pi1 = prediction_interval(wpm_avg, wpm_sd, alpha)
+
+        acc_ci0, acc_ci1 = confidence_interval(acc_avg, acc_sd, samples, alpha)
+        acc_pi0, acc_pi1 = prediction_interval(acc_avg, acc_sd, alpha)
+
+        msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd %d%% ci [%5.1f-%5.1f] [%5.1f-%5.1f] pi (n=%d)" % (
+                wpm_min, wpm_avg, wpm_max, wpm_sd, percent, wpm_ci0, wpm_ci1,
+                wpm_pi0, wpm_pi1, samples)
         self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
-        msg = "acc %5.1f min %5.1f avg %5.1f max %5.1f sd [%5.1f %5.1f] %d%% ci (n=%d)" % (
-                100*acc_min, 100*acc_avg, 100*acc_max, 100*acc_sd, 100*acc_ci0,
-                100*acc_ci1, percent, samples)
+        msg = "acc %5.1f min %5.1f avg %5.1f max %5.1f sd %d%% ci [%5.1f %5.1f] [%5.1f %5.1f] pi (n=%d)" % (
+                100*acc_min, 100*acc_avg, 100*acc_max, 100*acc_sd, percent,
+                100*acc_ci0, 100*acc_ci1, 100*acc_pi0, 100*acc_pi1, samples)
         self.cheight += 1
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
         self.cheight += 1
