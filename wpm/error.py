@@ -14,3 +14,7 @@ The quotes database is *not* covered by the AGPL!
 class WpmError(RuntimeError):
     """General WPM errors."""
     pass
+
+class ConfigError(WpmError):
+    """Incorrect .wpmrc option."""
+    pass

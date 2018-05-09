@@ -20,6 +20,75 @@ except ImportError:
     # Python 2.7
     import ConfigParser as configparser
 
+from wpm.error import ConfigError
+
+def int_tuple(s):
+    """Parses a string containing a tuple of two ints."""
+    if (s[0] != "(") or (s[-1] != ")"):
+        raise ConfigError("Required format is (integer, integer): %s" % s)
+
+    values = s[1:-1].split(",")
+    if len(values) != 2:
+        raise ConfigError("Required format is (integer, integer): %s" % s)
+
+    try:
+        return map(int, values)
+    except ValueError:
+        raise ConfigError("Required format is (integer, integer): %s" % s)
+
+DEFAULTS = {
+    "curses": {
+        "escdelay": (str, 15, "Curses ESCDELAY"),
+        "window_timeout": (int, 20, "Curses window timeout"),
+    },
+
+    "wpm": {
+        "confidence_level": (float, 0.95, "Confidence level for statistics from 0.0 to 1.0"),
+        "wrap_width": (int, -1, "Wrap text to this width"),
+        "tab_spaces": (int, 1, "Expand tabs to N spaces"),
+    },
+
+    "xterm256colors": {
+        "author": (int_tuple, (240, 233), ""),
+        "background": (int, 233, ""),
+        "correct": (int_tuple, (240, 233), ""),
+        "incorrect": (int_tuple, (197, 52), ""),
+        "prompt": (int_tuple, (244, 233), ""),
+        "quote": (int_tuple, (195, 233), ""),
+        "score": (int_tuple, (230, 197), ""),
+        "top_bar": (int_tuple, (51, 24), ""),
+    },
+
+    "xtermcolors": {
+        "author": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "background": (int, curses.COLOR_BLACK, ""),
+        "correct": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "incorrect": (int_tuple, (curses.COLOR_RED, curses.COLOR_BLACK), ""),
+        "prompt": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "quote": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "score": (int_tuple, (curses.COLOR_YELLOW, curses.COLOR_RED), ""),
+        "top_bar": (int_tuple, (curses.COLOR_CYAN, curses.COLOR_BLUE), ""),
+    },
+}
+
+class SectionValues(object):
+    """Option values for a given section."""
+    def __init__(self, section):
+        if section not in DEFAULTS.keys():
+            raise KeyError(section)
+        self.section = section
+
+    def __getattr__(self, name):
+        options = DEFAULTS[self.section]
+        convert, default, doc = options[name]
+        value = Config.config.get(self.section, name)
+        try:
+            return convert(value)
+        except ConfigError as e:
+            raise ConfigError("Error in .wpmrc section %r option %r: %s" %
+                    (self.section, name, e))
+
+
 class Config(object):
     """Contains the user configuration, backed by the .wpmrc file."""
     # pylint: disable=too-many-public-methods
@@ -32,8 +101,9 @@ class Config(object):
 
         if os.path.isfile(self.filename):
             self.load()
+            self.add_defaults()
         else:
-            Config.set_defaults()
+            self.add_defaults()
             self.save()
 
     def load(self):
@@ -45,191 +115,16 @@ class Config(object):
         with open(self.filename, "wt") as file_obj:
             Config.config.write(file_obj)
 
-    @staticmethod
-    def set_defaults():
-        """Sets up default settings."""
-        Config.config.add_section("curses")
-        Config.config.set("curses", "escdelay", "15")
-        Config.config.set("curses", "window_timeout", "20")
+    def add_defaults(self):
+        """Adds missing sections and options to your ~/.wpmrc file."""
+        for section, values in sorted(DEFAULTS.items()):
+            if not Config.config.has_section(section):
+                Config.config.add_section(section)
 
-        Config.config.add_section("wpm")
-        Config.config.set("wpm", "confidence_interval_percent", "95")
-        Config.config.set("wpm", "max_quote_width", "-1")
-        Config.config.set("wpm", "spaces_to_expand_tabs_to", "1")
+            for name, (type, default, doc) in sorted(values.items()):
+                if not Config.config.has_option(section, name):
+                    Config.config.set(section, name, str(default))
 
-        Config.config.add_section("xterm-256color")
-        Config.config.set("xterm-256color", "author_bg", str(233))
-        Config.config.set("xterm-256color", "author_fg", str(240))
-        Config.config.set("xterm-256color", "background", str(233))
-        Config.config.set("xterm-256color", "correct_bg", str(233))
-        Config.config.set("xterm-256color", "correct_fg", str(240))
-        Config.config.set("xterm-256color", "incorrect_bg", str(52))
-        Config.config.set("xterm-256color", "incorrect_fg", str(197))
-        Config.config.set("xterm-256color", "prompt_bg", str(233))
-        Config.config.set("xterm-256color", "prompt_fg", str(244))
-        Config.config.set("xterm-256color", "quote_bg", str(233))
-        Config.config.set("xterm-256color", "quote_fg", str(195))
-        Config.config.set("xterm-256color", "score_highlight_bg", str(197))
-        Config.config.set("xterm-256color", "score_highlight_fg", str(230))
-        Config.config.set("xterm-256color", "status_bg", str(24))
-        Config.config.set("xterm-256color", "status_fg", str(51))
-
-        Config.config.add_section("xterm-colors")
-        Config.config.set("xterm-colors", "author_bg", str(curses.COLOR_BLACK))
-        Config.config.set("xterm-colors", "author_fg", str(curses.COLOR_WHITE))
-        Config.config.set("xterm-colors", "background", str(curses.COLOR_BLACK))
-        Config.config.set("xterm-colors", "correct_bg", str(curses.COLOR_BLACK))
-        Config.config.set("xterm-colors", "correct_fg", str(curses.COLOR_WHITE))
-        Config.config.set("xterm-colors", "incorrect_bg", str(curses.COLOR_BLACK))
-        Config.config.set("xterm-colors", "incorrect_fg", str(curses.COLOR_RED))
-        Config.config.set("xterm-colors", "prompt_bg", str(curses.COLOR_BLACK))
-        Config.config.set("xterm-colors", "prompt_fg", str(curses.COLOR_WHITE))
-        Config.config.set("xterm-colors", "quote_bg", str(curses.COLOR_BLACK))
-        Config.config.set("xterm-colors", "quote_fg", str(curses.COLOR_WHITE))
-        Config.config.set("xterm-colors", "score_highlight_bg", str(curses.COLOR_RED))
-        Config.config.set("xterm-colors", "score_highlight_fg", str(curses.COLOR_YELLOW))
-        Config.config.set("xterm-colors", "status_bg", str(curses.COLOR_BLUE))
-        Config.config.set("xterm-colors", "status_fg", str(curses.COLOR_CYAN))
-
-    @property
-    def escdelay(self):
-        """Curses ESCDELAY."""
-        return Config.config.get("curses", "escdelay")
-
-    @property
-    def window_timeout(self):
-        """Curses window timeout."""
-        return int(Config.config.get("curses", "window_timeout"))
-
-    @property
-    def max_quote_width(self):
-        """Length to wrap quotes at. Inactive if zero or less."""
-        try:
-            return int(Config.config.get("wpm", "max_quote_width"))
-        except configparser.NoSectionError:
-            Config.config.add_section("wpm")
-            Config.config.set("wpm", "max_quote_width", "-1")
-            return -1
-        except configparser.NoOptionError:
-            Config.config.set("wpm", "max_quote_width", "-1")
-            return -1
-
-    @property
-    def confidence_interval_percent(self):
-        """Used to construct an x% confidence interval."""
-        try:
-            return int(Config.config.get("wpm", "confidence_interval_percent"))
-        except configparser.NoSectionError:
-            Config.config.add_section("wpm")
-            Config.config.set("wpm", "confidence_interval_percent", "95")
-            return 95
-        except configparser.NoOptionError:
-            Config.config.set("wpm", "confidence_interval_percent", "95")
-            return 95
-
-    @property
-    def tab_spaces(self):
-        """Used to construct an x% confidence interval."""
-        try:
-            return int(Config.config.get("wpm", "spaces_to_expand_tabs_to"))
-        except configparser.NoSectionError:
-            Config.config.add_section("wpm")
-            Config.config.set("wpm", "spaces_to_expand_tabs_to", "1")
-            return 1
-        except configparser.NoOptionError:
-            Config.config.set("wpm", "spaces_to_expand_tabs_to", "1")
-            return 1
-
-    @property
-    def background_color_256(self):
-        """Background color for 256-color terminalss."""
-        return int(Config.config.get("xterm-256color", "background"))
-
-    @property
-    def incorrect_color_256(self):
-        """Incorrectly type quote color for 256-color terminals."""
-        return (int(Config.config.get("xterm-256color", "incorrect_fg")),
-                int(Config.config.get("xterm-256color", "incorrect_bg")))
-
-    @property
-    def status_color_256(self):
-        """Top status bar color for 256-color terminals."""
-        return (int(Config.config.get("xterm-256color", "status_fg")),
-                int(Config.config.get("xterm-256color", "status_bg")))
-
-    @property
-    def correct_color_256(self):
-        """Color for correctly typed text for 256-color terminals."""
-        return (int(Config.config.get("xterm-256color", "correct_fg")),
-                int(Config.config.get("xterm-256color", "correct_bg")))
-
-    @property
-    def quote_color_256(self):
-        """Quote color for 256-color terminals."""
-        return (int(Config.config.get("xterm-256color", "quote_fg")),
-                int(Config.config.get("xterm-256color", "quote_bg")))
-
-    @property
-    def author_color_256(self):
-        """Author color for 256-color terminals."""
-        return (int(Config.config.get("xterm-256color", "author_fg")),
-                int(Config.config.get("xterm-256color", "author_bg")))
-
-    @property
-    def prompt_color_256(self):
-        """Prompt, or input, color for 256-color terminals."""
-        return (int(Config.config.get("xterm-256color", "prompt_fg")),
-                int(Config.config.get("xterm-256color", "prompt_bg")))
-
-    @property
-    def score_highlight_color_256(self):
-        """Highlighted score color for 256-color displays."""
-        return (int(Config.config.get("xterm-256color", "score_highlight_fg")),
-                int(Config.config.get("xterm-256color", "score_highlight_bg")))
-
-    @property
-    def background_color(self):
-        """Background color."""
-        return int(Config.config.get("xterm-colors", "background"))
-
-    @property
-    def incorrect_color(self):
-        """Color of incorrectly typed text."""
-        return (int(Config.config.get("xterm-colors", "incorrect_fg")),
-                int(Config.config.get("xterm-colors", "incorrect_bg")))
-
-    @property
-    def status_color(self):
-        """Top status bar color."""
-        return (int(Config.config.get("xterm-colors", "status_fg")),
-                int(Config.config.get("xterm-colors", "status_bg")))
-
-    @property
-    def correct_color(self):
-        """Color for correctly typed text."""
-        return (int(Config.config.get("xterm-colors", "correct_fg")),
-                int(Config.config.get("xterm-colors", "correct_bg")))
-
-    @property
-    def quote_color(self):
-        """Normal color for quote."""
-        return (int(Config.config.get("xterm-colors", "quote_fg")),
-                int(Config.config.get("xterm-colors", "quote_bg")))
-
-    @property
-    def author_color(self):
-        """Color for author."""
-        return (int(Config.config.get("xterm-colors", "author_fg")),
-                int(Config.config.get("xterm-colors", "author_bg")))
-
-    @property
-    def prompt_color(self):
-        """Color for the input field."""
-        return (int(Config.config.get("xterm-colors", "prompt_fg")),
-                int(Config.config.get("xterm-colors", "prompt_bg")))
-
-    @property
-    def score_highlight_color(self):
-        """Highlighted score color."""
-        return (int(Config.config.get("xterm-colors", "score_highlight_fg")),
-                int(Config.config.get("xterm-colors", "score_highlight_bg")))
+    def __getattr__(self, section):
+        """Returns object to look up section options."""
+        return SectionValues(section)

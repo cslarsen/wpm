@@ -37,7 +37,7 @@ class Screen(object):
         self.config = Config()
 
         # Make delay slower
-        os.environ.setdefault("ESCDELAY", self.config.escdelay)
+        os.environ.setdefault("ESCDELAY", self.config.curses.escdelay)
 
         # Use the preferred system encoding
         locale.setlocale(locale.LC_ALL, "")
@@ -68,7 +68,7 @@ class Screen(object):
 
             self.window = curses.newwin(self.lines, self.columns, 0, 0)
             self.window.keypad(True)
-            self.window.timeout(self.config.window_timeout)
+            self.window.timeout(self.config.curses.window_timeout)
             self.window.bkgd(" ", Screen.COLOR_BACKGROUND)
 
 
@@ -150,25 +150,19 @@ class Screen(object):
         hicolor = os.getenv("TERM").endswith("256color")
 
         if hicolor:
-            bg_col = self.config.background_color_256
-            curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color_256)
-            curses.init_pair(Screen.COLOR_BACKGROUND, bg_col, bg_col)
-            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color_256)
-            curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color_256)
-            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color_256)
-            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color_256)
-            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color_256)
-            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color_256)
+            color = self.config.xterm256colors
         else:
-            bg_col = self.config.background_color
-            curses.init_pair(Screen.COLOR_AUTHOR, *self.config.author_color)
-            curses.init_pair(Screen.COLOR_BACKGROUND, bg_col, bg_col)
-            curses.init_pair(Screen.COLOR_CORRECT, *self.config.correct_color)
-            curses.init_pair(Screen.COLOR_HISCORE, *self.config.score_highlight_color)
-            curses.init_pair(Screen.COLOR_INCORRECT, *self.config.incorrect_color)
-            curses.init_pair(Screen.COLOR_PROMPT, *self.config.prompt_color)
-            curses.init_pair(Screen.COLOR_QUOTE, *self.config.quote_color)
-            curses.init_pair(Screen.COLOR_STATUS, *self.config.status_color)
+            color = self.config.xtermcolors
+
+        bg = color.background
+        curses.init_pair(Screen.COLOR_AUTHOR, *color.author)
+        curses.init_pair(Screen.COLOR_BACKGROUND, bg, bg)
+        curses.init_pair(Screen.COLOR_CORRECT, *color.correct)
+        curses.init_pair(Screen.COLOR_HISCORE, *color.score)
+        curses.init_pair(Screen.COLOR_INCORRECT, *color.incorrect)
+        curses.init_pair(Screen.COLOR_PROMPT, *color.prompt)
+        curses.init_pair(Screen.COLOR_QUOTE, *color.quote)
+        curses.init_pair(Screen.COLOR_STATUS, *color.top_bar)
 
         # Rebind class variables
         Screen.COLOR_AUTHOR = curses.color_pair(Screen.COLOR_AUTHOR)
@@ -320,8 +314,8 @@ class Screen(object):
     def set_quote(self, quote):
         """Sets up variables used for a new quote."""
         # TODO: Move this stuff elsewhere
-        if self.config.max_quote_width > 0:
-            self.quote_columns = min(self.columns, self.config.max_quote_width)
+        if self.config.wpm.wrap_width > 0:
+            self.quote_columns = min(self.columns, self.config.wpm.wrap_width)
         else:
             self.quote_columns = self.columns
 
@@ -374,8 +368,9 @@ class Screen(object):
         if len(results) < 2:
             return
 
-        percent = self.config.confidence_interval_percent
-        alpha = 1 - (percent/100.0)
+        percent = self.config.wpm.confidence_level
+        assert(0.0 <= percent <= 1.0)
+        alpha = 1.0 - percent
         samples = len(results)
 
         wpm_avg, acc_avg = results.averages()
@@ -388,14 +383,14 @@ class Screen(object):
         acc_ci0, acc_ci1 = confidence_interval(acc_avg, acc_sd, samples, alpha)
         acc_pi0, acc_pi1 = prediction_interval(acc_avg, acc_sd, alpha)
 
-        msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd %d%% ci [%5.1f-%5.1f] [%5.1f-%5.1f] pi (n=%d)" % (
-                wpm_min, wpm_avg, wpm_max, wpm_sd, percent, wpm_ci0, wpm_ci1,
+        msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd %2d%% ci [%5.1f-%5.1f] [%5.1f-%5.1f] pi (n=%d)" % (
+                wpm_min, wpm_avg, wpm_max, wpm_sd, 100*percent, wpm_ci0, wpm_ci1,
                 wpm_pi0, wpm_pi1, samples)
         self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
 
-        msg = "acc %5.1f min %5.1f avg %5.1f max %5.1f sd %d%% ci [%5.1f %5.1f] [%5.1f %5.1f] pi (n=%d)" % (
-                100*acc_min, 100*acc_avg, 100*acc_max, 100*acc_sd, percent,
+        msg = "acc %5.1f min %5.1f avg %5.1f max %5.1f sd %2d%% ci [%5.1f %5.1f] [%5.1f %5.1f] pi (n=%d)" % (
+                100*acc_min, 100*acc_avg, 100*acc_max, 100*acc_sd, 100*percent,
                 100*acc_ci0, 100*acc_ci1, 100*acc_pi0, 100*acc_pi1, samples)
         self.cheight += 1
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)

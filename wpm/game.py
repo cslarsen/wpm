@@ -85,7 +85,7 @@ class GameManager(object):
 
     def run(self, to_front=None):
         """Starts the main game loop."""
-        self.set_tab_spaces(self.config.tab_spaces)
+        self.set_tab_spaces(self.config.wpm.tab_spaces)
 
         if to_front:
             self.quotes.put_to_front(to_front)

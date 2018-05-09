@@ -116,7 +116,8 @@ def print_stats(stats):
     table = []
 
     config = wpm.config.Config()
-    percent = config.confidence_interval_percent
+    percent = config.wpm.confidence_level
+    assert(0.0 <= percent <= 1.0)
 
     for tag in sorted(stats.games.keys()):
         name = tag if tag is not None else "n/a"
@@ -133,7 +134,7 @@ def print_stats(stats):
                 wpm_avg, acc_avg = results.averages()
                 wpm_sd, acc_sd = results.stddevs()
 
-                alpha = 1 - (percent/100.0)
+                alpha = 1.0 - percent
                 wpm_ci = confidence_interval(wpm_avg, wpm_sd, len(results), alpha)
                 wpm_pi = prediction_interval(wpm_avg, wpm_sd, alpha)
 
@@ -154,7 +155,7 @@ def print_stats(stats):
         width = 0
 
     head0 = "Tag          Games    WPM                                     Accuracy"
-    head1 = "                      avg     sd     %d%% ci      %d%% pi       avg     sd   " % (percent, percent)
+    head1 = "                      avg     sd     %2d%% ci      %2d%% pi       avg     sd   " % (100*percent, 100*percent)
 
     print("="*len(head1))
     print(head0)
@@ -212,10 +213,14 @@ def main():
         print(error)
         sys.exit(1)
 
-    with wpm.game.GameManager(quotes, stats) as gm:
-        try:
-            gm.run(to_front=text_ids)
-            gm.stats.save(opts.stats_file)
-        except KeyboardInterrupt:
-            gm.stats.save(opts.stats_file)
-            sys.exit(0)
+    try:
+        with wpm.game.GameManager(quotes, stats) as gm:
+            try:
+                gm.run(to_front=text_ids)
+                gm.stats.save(opts.stats_file)
+            except KeyboardInterrupt:
+                gm.stats.save(opts.stats_file)
+                sys.exit(0)
+    except wpm.error.WpmError as error:
+        print(error)
+        sys.exit(1)
