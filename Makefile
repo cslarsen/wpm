@@ -42,7 +42,7 @@ remove-prefixes:
 
 dist:
 	rm -rf dist/*
-	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist
+	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py bdist_wheel
 
 publish: dist
 	find dist -type f -exec gpg2 --detach-sign -a {} \;
@@ -50,11 +50,11 @@ publish: dist
 
 setup-pypi-test:
 	$(PYTHON) setup.py register -r pypitest
-	$(PYTHON) setup.py sdist upload -r pypitest
+	$(PYTHON) setup.py bdist_wheel upload -r pypitest
 
 setup-pypi-publish:
 	$(PYTHON) setup.py register -r pypi
-	$(PYTHON) setup.py sdist upload --sign -r pypi
+	$(PYTHON) setup.py bdist_wheel upload --sign -r pypi
 
 lint:
 	@$(PYFLAKES) `find . -name '*.py' -print`
