@@ -24,14 +24,15 @@ from wpm.error import ConfigError
 
 def int_tuple(s):
     """Parses a string containing a tuple of two ints."""
-    if (s[0] != "(") or (s[-1] != ")"):
-        raise ConfigError("Required format is (integer, integer): %s" % s)
-
-    values = s[1:-1].split(",")
-    if len(values) != 2:
-        raise ConfigError("Required format is (integer, integer): %s" % s)
-
     try:
+        if (s[0] != "(") or (s[-1] != ")"):
+            raise ValueError()
+
+        values = s[1:-1].split(",")
+
+        if len(values) != 2:
+            raise ValueError()
+
         return map(int, values)
     except ValueError:
         raise ConfigError("Required format is (integer, integer): %s" % s)
