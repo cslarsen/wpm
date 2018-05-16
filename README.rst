@@ -2,10 +2,11 @@ wpm — measure and improve your typing speed
 ===========================================
 |versions| |license| |pypi|
 
-``wpm`` is a UNIX terminal program for measuring and improving your typing
-speed, which is measured in words per minute (WPM). It depends only on standard
-Python libraries, particularly curses, and thus works with Python 2.7, 3+, PyPy
-and probably others.
+``wpm`` is a curses-based UNIX terminal program for measuring and improving your typing
+speed (measured in words per minute, or WPM).
+
+It depends only on standard Python libraries and therefore works with Python 2,
+3 and PyPy.
 
 Features
 --------
