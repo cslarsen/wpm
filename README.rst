@@ -90,13 +90,13 @@ How to improve your typing speed
 --------------------------------
 
 I believe that everyone can type at 100 WPM with enough practice. If you are
-currently typing slower than that, my suggestions are:
+currently typing slower than that, my suggestions are::
 
     * Learn to type without looking at the keyboard
     * Learn to use all your fingers
     * Sit up straight and type in a comfortable situation
 
-If you are consistently above 100 WPM:
+If you are consistently above 100 WPM::
 
     * Type words instead of characters
     * Train muscle memory
