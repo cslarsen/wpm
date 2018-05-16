@@ -103,9 +103,16 @@ class Config(object):
         if os.path.isfile(self.filename):
             self.load()
             self.add_defaults()
+            self.verify()
         else:
             self.add_defaults()
             self.save()
+
+    def verify(self):
+        """Verifies wpmrc values."""
+        level = self.wpm.confidence_level
+        if not (0 < level < 1):
+            raise ConfigError("The .wpmrc confidence level must be within [0, 1>")
 
     def load(self):
         """Loads ~/.wpmrc config settings."""

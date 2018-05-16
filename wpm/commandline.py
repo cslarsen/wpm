@@ -16,7 +16,7 @@ import codecs
 import os
 import sys
 
-from wpm.gauss import (prediction_interval, confidence_interval, phi_inv)
+from wpm.gauss import (prediction_interval, confidence_interval)
 import wpm
 import wpm.config
 import wpm.error
@@ -117,7 +117,6 @@ def print_stats(stats):
 
     config = wpm.config.Config()
     percent = config.wpm.confidence_level
-    assert(0.0 <= percent <= 1.0)
 
     for tag in sorted(stats.games.keys()):
         name = tag if tag is not None else "n/a"
