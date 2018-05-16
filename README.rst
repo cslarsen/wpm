@@ -81,10 +81,6 @@ Run outside of tmux, and use a really speedy terminal window. On my macOS
 system, I found the best latency using the built-in Terminal.app, which easily
 beats iTerm. I also found the Kitty terminal to provide very low latency.
 
-I also feel that running it under PyPy provides a little lower latency as well,
-but I haven't timed it. You can install it under PyPy with ``pypy -m pip
-install wpm``.
-
 On Linux, the ultimate typing latency is achieved if you open up one of the
 virtual consoles. For example, hit CTRL+ALT+F2 and log in, set your
 ``TERM=xterm-color`` and run ``wpm``. Many terms also have quite a high
