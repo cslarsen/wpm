@@ -98,17 +98,14 @@ currently typing slower than that, my suggestions are:
 
 If you are consistently above 100 WPM:
 
+* Focus on the next word
 * Type words instead of characters
 * Train muscle memory
-* Focus on the next word
 * Type hard parts slower
 * Raise your wrists
-* Use different fingers for same keys in different contexts
-* Type hard parts slower than the rest
-* Race live against others on TypeRacer
 
 Practice a little bit every few days, but don't overdo it. Stop when you're
-tired or are feeling unmotivated.
+tired or feeling unmotivated.
 
 Loading custom texts
 --------------------
