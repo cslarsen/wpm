@@ -199,8 +199,8 @@ curses         window_timeout                   20 Time in ms until giving up wa
 wpm            confidence_level               0.95 The confidence level for WPM statistics
 wpm            tab_spaces                        1 Number of spaces to expand tabs to
 wpm            wrap_width                       -1 If positive, wrap text at this width
-xterm256colors                                     Color codes for 256-color terminals
-xtermcolors                                        Color codes for ordinary terminals
+xterm256colors                                     Color codes for 256-color terminals (foreground, background)
+xtermcolors                                        Color codes for ordinary terminals (foreground, background)
 ============== =========================== ======= =============================================================================
 
 License
