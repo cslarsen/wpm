@@ -13,6 +13,13 @@ The quotes database is *not* covered by the AGPL!
 
 import collections
 import math
+import sys
+
+def unicode_chr(ordinal):
+    if sys.version_info.major >= 3:
+        return chr(ordinal)
+    else:
+        return unichr(ordinal)
 
 def histogram(values, slots):
     """Frequency counts values.
@@ -36,10 +43,10 @@ def histogram(values, slots):
     return low, width, histo
 
 def plot(slots, low, width, histo):
-    chars = [unichr(0x2580+n) for n in range(1,9)]
+    chars = [unicode_chr(0x2580+n) for n in range(1,9)]
     chars = ["_"] + chars
 
-    max_count = max([0] + histo.values())
+    max_count = max([0] + list(histo.values()))
 
     for slot in range(slots):
         count = histo[slot]
