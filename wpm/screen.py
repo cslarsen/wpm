@@ -20,6 +20,7 @@ import sys
 from wpm.config import Config
 from wpm.error import WpmError
 from wpm.gauss import confidence_interval, prediction_interval
+from wpm.histogram import histogram, plot
 
 class Screen(object):
     """Renders the terminal screen."""
@@ -266,6 +267,12 @@ class Screen(object):
             if x_pos >= 0 and (x_pos + len(text)) < self.columns:
                 self.window.addstr(y_pos, x_pos, text, color)
 
+    def addstr_u8(self, x_pos, y_pos, text, color=None):
+        """Wraps call around curses.window.addsr."""
+        if self.lines > y_pos >= 0:
+            if x_pos >= 0 and (x_pos + len(text)) < self.columns:
+                self.window.addstr(y_pos, x_pos, text.encode(self.encoding), color)
+
     def chgat(self, x_pos, y_pos, length, color):
         """Wraps call around curses.window.chgat."""
         if self.lines > y_pos >= 0:
@@ -353,6 +360,22 @@ class Screen(object):
         self.show_stats(stats)
         self.set_cursor(0, 2)
 
+    def show_histogram(self, stats):
+        results = stats.text_id_results(stats.tag, self.quote_id)
+        wpms = [x.wpm for x in results.results]
+
+        cols = self.columns // 4
+        low, width, histo = histogram(wpms, cols)
+
+        line = "".join(plot(cols, low, width, histo))
+
+        self.cheight += 2
+        xpos = ((self.columns - len(line)) // 2) - 1
+        color = Screen.COLOR_PROMPT
+        self.addstr(xpos - 6, self.cheight, "%5.1f" % min(wpms), color)
+        self.addstr(xpos + len(line) + 1, self.cheight, "%5.1f" % max(wpms), color)
+        self.addstr_u8(xpos, self.cheight, line, color)
+
     def show_help(self):
         """Shows help instructions on screen."""
         self.cheight += 1
@@ -395,6 +418,8 @@ class Screen(object):
         self.cheight += 1
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
         self.cheight += 1
+
+        self.show_histogram(stats)
 
     def show_score(self, head, wpm_score, stats):
         """Show score screen after typing has finished."""
