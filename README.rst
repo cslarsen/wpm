@@ -204,6 +204,14 @@ xterm256colors                                     Color codes for 256-color ter
 xtermcolors                                        Color codes for ordinary terminals (foreground, background)
 ============== =========================== ======= =============================================================================
 
+Development features
+--------------------
+
+You can enable certain unofficial features by seting the environment variable
+`WPM_DEVFEATURES=feature1:feature2:etc.`.
+
+Look in the file `wpm/devfeatures.py` for a list.
+
 License
 -------
 

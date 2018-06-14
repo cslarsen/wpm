@@ -21,6 +21,7 @@ from wpm.config import Config
 from wpm.error import WpmError
 from wpm.gauss import confidence_interval, prediction_interval
 from wpm.histogram import histogram, plot
+import wpm.devfeature as devfeature
 
 class Screen(object):
     """Renders the terminal screen."""
@@ -419,7 +420,8 @@ class Screen(object):
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
         self.cheight += 1
 
-        self.show_histogram(stats)
+        if devfeature.histogram:
+            self.show_histogram(stats)
 
     def show_score(self, head, wpm_score, stats):
         """Show score screen after typing has finished."""
