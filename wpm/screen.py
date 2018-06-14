@@ -18,6 +18,7 @@ import os
 import sys
 
 from wpm.config import Config
+from wpm.cps import wpm_to_cps
 from wpm.error import WpmError
 from wpm.gauss import confidence_interval, prediction_interval
 from wpm.histogram import histogram, plot
@@ -352,13 +353,13 @@ class Screen(object):
         self.addstr(0, self.cheight, (prompt + " ").encode(self.encoding),
                     Screen.COLOR_PROMPT)
 
-    def show_browser(self, head, stats):
+    def show_browser(self, head, stats, cps_flag):
         """Show quote browsing screen."""
         self.update_header(head)
         self.update_quote(Screen.COLOR_QUOTE)
         self.update_author()
         self.show_help()
-        self.show_stats(stats)
+        self.show_stats(stats, cps_flag)
         self.set_cursor(0, 2)
 
     def show_histogram(self, stats):
@@ -385,7 +386,7 @@ class Screen(object):
                     "Start typing, hit SPACE/ARROWS to browse or ESC to quit.",
                     Screen.COLOR_PROMPT)
 
-    def show_stats(self, stats):
+    def show_stats(self, stats, cps_flag):
         """Shows statistics for the current quote."""
         results = stats.text_id_results(stats.tag, self.quote_id)
 
@@ -407,8 +408,22 @@ class Screen(object):
         acc_ci0, acc_ci1 = confidence_interval(acc_avg, acc_sd, samples, alpha)
         acc_pi0, acc_pi1 = prediction_interval(acc_avg, acc_sd, alpha)
 
-        msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd %2d%% ci [%5.1f-%5.1f] [%5.1f-%5.1f] pi (n=%d)" % (
-                wpm_min, wpm_avg, wpm_max, wpm_sd, 100*percent, wpm_ci0, wpm_ci1,
+        if cps_flag:
+            wpm_avg = wpm_to_cps(wpm_avg)
+            wpm_sd = wpm_to_cps(wpm_sd)
+            wpm_min = wpm_to_cps(wpm_min)
+            wpm_max = wpm_to_cps(wpm_max)
+            wpm_ci0 = wpm_to_cps(wpm_ci0)
+            wpm_ci1 = wpm_to_cps(wpm_ci1)
+            wpm_pi0 = wpm_to_cps(wpm_pi0)
+            wpm_pi1 = wpm_to_cps(wpm_pi1)
+
+
+        if cps_flag:
+            msg = "cps %5.1f min %5.1f avg %5.1f max %5.1f sd %2d%% ci [%5.1f-%5.1f] [%5.1f-%5.1f] pi (n=%d)"
+        else:
+            msg = "wpm %5.1f min %5.1f avg %5.1f max %5.1f sd %2d%% ci [%5.1f-%5.1f] [%5.1f-%5.1f] pi (n=%d)"
+        msg %= (wpm_min, wpm_avg, wpm_max, wpm_sd, 100*percent, wpm_ci0, wpm_ci1,
                 wpm_pi0, wpm_pi1, samples)
         self.cheight += 2
         self.addstr(0, self.cheight, msg, Screen.COLOR_CORRECT)
@@ -423,21 +438,26 @@ class Screen(object):
         if devfeature.histogram:
             self.show_histogram(stats)
 
-    def show_score(self, head, wpm_score, stats):
+    def show_score(self, head, wpm_score, stats, cps_flag):
         """Show score screen after typing has finished."""
         self.update_header(head)
         self.update_quote(Screen.COLOR_CORRECT)
         self.update_author()
 
         # Highlight score
-        score = "You scored %.1f wpm!" % wpm_score
+        if cps_flag:
+            wpm_score = wpm_to_cps(wpm_score)
+            score = "You scored %.1f cps!" % wpm_score
+        else:
+            score = "You scored %.1f wpm!" % wpm_score
+
         self.update_prompt(score)
         if len(score) < self.columns:
             self.chgat(11, self.cheight, len(str("%.1f" % wpm_score)),
                        Screen.COLOR_HISCORE)
 
         self.show_help()
-        self.show_stats(stats)
+        self.show_stats(stats, cps_flag)
         self.set_cursor(0, 2)
 
     def highlight_progress(self, position, incorrect):

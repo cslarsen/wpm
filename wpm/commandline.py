@@ -16,6 +16,7 @@ import codecs
 import os
 import sys
 
+from wpm.cps import wpm_to_cps
 from wpm.gauss import (prediction_interval, confidence_interval)
 import wpm
 import wpm.config
@@ -47,6 +48,9 @@ The format is
     argp.add_argument("-s", "--stats", default=False, action="store_true",
                       help="Shows score statistics grouped by tags")
 
+    argp.add_argument("--cps", default=False, action="store_true",
+                      help="Shows CPS instead of WPM in stats")
+
     argp.add_argument("--stats-file", default="~/.wpm.csv", type=str,
                       help="File to record score history to (CSV format)")
 
@@ -59,7 +63,7 @@ The format is
     opts = argp.parse_args()
 
     if opts.version:
-        print("WPM v%s" % wpm.__version__)
+        print("wpm v%s" % wpm.__version__)
         print(wpm.__copyright__)
         print("Source code (sans quotes) distributed under the %s" % wpm.__license__)
         sys.exit(0)
@@ -111,7 +115,7 @@ def load_plain_text_quote(quotes, filename):
         quotes.append([author, title, text, text_id])
         return wpm.quotes.Quotes(quotes, database=database)
 
-def print_stats(stats):
+def print_stats(stats, cps):
     """Prints table of game results."""
     table = []
 
@@ -130,30 +134,34 @@ def print_stats(stats):
                 else:
                     label = "n-%d" % last_n
 
-                wpm_avg, acc_avg = results.averages()
-                wpm_sd, acc_sd = results.stddevs()
+                avg, acc_avg = results.averages()
+                sd, acc_sd = results.stddevs()
+
+                if cps:
+                    avg = wpm_to_cps(avg)
+                    sd = wpm_to_cps(sd)
 
                 alpha = 1.0 - percent
-                wpm_ci = confidence_interval(wpm_avg, wpm_sd, len(results), alpha)
-                wpm_pi = prediction_interval(wpm_avg, wpm_sd, alpha)
+                ci = confidence_interval(avg, sd, len(results), alpha)
+                pi = prediction_interval(avg, sd, alpha)
 
                 table.append([name,
                               label,
-                              wpm_avg,
-                              wpm_sd,
+                              avg,
+                              sd,
                               100.0*acc_avg,
                               100.0*acc_sd,
-                              wpm_ci[0],
-                              wpm_ci[1],
-                              wpm_pi[0],
-                              wpm_pi[1]])
+                              ci[0],
+                              ci[1],
+                              pi[0],
+                              pi[1]])
 
     if table:
         width = max(max(len(e[0]) for e in table), 11)
     else:
         width = 0
 
-    head0 = "Tag          Games    WPM                                     Accuracy"
+    head0 = "Tag          Gajes    %s                                     Accuracy" % ("CPS" if cps else "WPM")
     head1 = "                      avg     sd     %2d%% ci      %2d%% pi       avg     sd   " % (100*percent, 100*percent)
 
     print("="*len(head1))
@@ -162,9 +170,9 @@ def print_stats(stats):
     print("-"*len(head1))
 
     for entry in table:
-        label, count, wpm_avg, wpm_sd, acc_avg, acc_sd, ci0, ci1, pi0, pi1 = entry
+        label, count, avg, sd, acc_avg, acc_sd, ci0, ci1, pi0, pi1 = entry
         print("%-*s   %6s  %5.1f  %5.1f   %5.1f-%5.1f %5.1f-%5.1f %5.1f%%  %5.1f%%" %
-              (width, label, count, wpm_avg, wpm_sd, ci0, ci1, pi0, pi1, acc_avg, acc_sd))
+              (width, label, count, avg, sd, ci0, ci1, pi0, pi1, acc_avg, acc_sd))
 
     print("="*len(head1))
 
@@ -184,6 +192,11 @@ def main():
     """Main entry point for command line invocation."""
     try:
         opts = parse_args()
+
+        config = wpm.config.Config()
+        if config.wpm.cps:
+            opts.cps = True
+
         stats = load_stats(opts.stats_file, opts.tag)
 
         if opts.load_json is not None:
@@ -195,7 +208,7 @@ def main():
             quotes = wpm.quotes.Quotes.load()
 
         if opts.stats:
-            print_stats(stats)
+            print_stats(stats, opts.cps)
             return
 
         if opts.search:
@@ -213,7 +226,7 @@ def main():
         sys.exit(1)
 
     try:
-        with wpm.game.GameManager(quotes, stats) as gm:
+        with wpm.game.GameManager(quotes, stats, opts.cps) as gm:
             try:
                 gm.run(to_front=text_ids)
                 gm.stats.save(opts.stats_file)

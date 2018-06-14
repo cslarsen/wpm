@@ -1,8 +1,4 @@
 """
-Development features for wpm.
-
-To enable, set the environment variable ``WPM_DEVFEAUTRES=feature1:feature2``.
-
 This file is part of the wpm software.
 Copyright 2017, 2018 Christian Stigen Larsen
 
@@ -13,8 +9,6 @@ source software.
 The quotes database is *not* covered by the AGPL!
 """
 
-import os
-
-DEVFEATURES =os.getenv("WPM_DEVFEATURES", "").lower().split(":")
-
-histogram = "histogram" in DEVFEATURES
+def wpm_to_cps(wpm):
+    """Converts WPM to CPS."""
+    return (wpm/60.0)*5.0
