@@ -47,7 +47,7 @@ DEFAULTS = {
         "confidence_level": (float, 0.95, "Confidence level for statistics from 0.0 to 1.0"),
         "wrap_width": (int, -1, "Wrap text to this width"),
         "tab_spaces": (int, 1, "Expand tabs to N spaces"),
-        "cps": (int, 0, "Report CPS instead of WPM in stats"),
+        "cpm": (int, 0, "Report CPM instead of WPM in stats"),
     },
 
     "xterm256colors": {

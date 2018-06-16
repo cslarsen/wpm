@@ -23,10 +23,10 @@ from wpm.screen import Screen
 
 class GameManager(object):
     """The main game runner."""
-    def __init__(self, quotes, stats, cps_flag):
+    def __init__(self, quotes, stats, cpm_flag):
         self.config = Config()
         self.stats = stats
-        self.cps_flag = cps_flag
+        self.cpm_flag = cpm_flag
         self.average = self.stats.average(self.stats.tag, last_n=10)
         self.tab_spaces = None
 
@@ -113,9 +113,9 @@ class GameManager(object):
                 self.screen.show_score(head,
                                        self.wpm(self.elapsed),
                                        self.stats,
-                                       self.cps_flag)
+                                       self.cpm_flag)
             else:
-                self.screen.show_browser(head, self.stats, self.cps_flag)
+                self.screen.show_browser(head, self.stats, self.cpm_flag)
 
             self.screen.window.refresh()
             key = self.screen.get_key()
