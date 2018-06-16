@@ -198,7 +198,7 @@ Section        Name                        Default Description
 curses         escdelay                         15 Time in ms to wait for follow-up key after ESC
 curses         window_timeout                   20 Time in ms until giving up waiting for a keypress. If negative, wait forever.
 wpm            confidence_level               0.95 The confidence level for WPM statistics
-wpm            cps                               0 If positive, report CPS in stats instead of WPM
+wpm            cpm                               0 If positive, report CPM in stats instead of WPM
 wpm            tab_spaces                        1 Number of spaces to expand tabs to
 wpm            wrap_width                       -1 If positive, wrap text at this width
 xterm256colors                                     Color codes for 256-color terminals (foreground, background)
