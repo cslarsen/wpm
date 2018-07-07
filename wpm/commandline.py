@@ -161,7 +161,7 @@ def print_stats(stats, cpm):
     else:
         width = 0
 
-    head0 = "Tag          Gajes    %s                                     Accuracy" % ("CPM" if cpm else "WPM")
+    head0 = "Tag          Games    %s                                     Accuracy" % ("CPM" if cpm else "WPM")
     head1 = "                      avg     sd     %2d%% ci      %2d%% pi       avg     sd   " % (100*percent, 100*percent)
 
     if cpm:
