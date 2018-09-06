@@ -13,7 +13,9 @@ The quotes database is *not* covered by the AGPL!
 
 import argparse
 import codecs
+import math
 import os
+import random
 import sys
 
 from wpm.convert import wpm_to_cpm
@@ -59,6 +61,9 @@ The format is
 
     argp.add_argument("--search", default=None, type=str,
                       help="Put quotes/authors/titles matching case-insensitive text query first")
+
+    argp.add_argument("--short", default=False, action="store_true",
+                      help="Starts wpm with short texts")
 
     opts = argp.parse_args()
 
@@ -196,6 +201,36 @@ def search(quotes, query):
         if (query in text) or (query in author) or (query in title):
             yield quote.text_id
 
+
+def short_quotes_first(quotes, cutoff=0.2):
+    """Returns text IDs of all quotes with shorter ones first (but still
+    randomized)."""
+
+    cutoff = cutoff / 0.5  # find absolute cutoff percentage based on avg (0.5)
+    words = 0
+
+    def word_length(text):
+        return len(text.split(" "))
+
+    # Find average number of words first
+    for quote in iter(quotes):
+        quote = wpm.quotes.Quote.from_tuple(quote)
+        words += word_length(quote.text)
+
+    avg = words / len(quotes)
+    threshold = int(math.ceil(avg * cutoff))
+
+    # Put short quotes i a randomized, starting bucket
+    short = []
+    for quote in iter(quotes):
+        quote = wpm.quotes.Quote.from_tuple(quote)
+        if word_length(quote.text) < threshold:
+            short.append(quote.text_id)
+
+    random.shuffle(short)
+    return short
+
+
 def main():
     """Main entry point for command line invocation."""
     try:
@@ -219,12 +254,16 @@ def main():
             print_stats(stats, opts.cpm)
             return
 
+        text_ids = None
+
         if opts.search:
             text_ids = list(search(quotes, opts.search.lower()))
 
             if not text_ids:
                 print("No quotes matching %r" % opts.search)
                 sys.exit(1)
+        elif opts.short:
+            text_ids = short_quotes_first(quotes)
         elif opts.id is not None:
             text_ids = [opts.id]
         else:

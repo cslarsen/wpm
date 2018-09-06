@@ -82,13 +82,17 @@ class RandomIterator(object):
         front = []
         back = []
 
+        # Calculate indices: Maps quote's text_id to internal index
+        tid = {}
         for index in range(len(self.quotes)):
             quote = self[index]
+            tid[quote.text_id] = index
 
-            if quote.text_id in text_ids:
-                front.append(index)
-            else:
-                back.append(index)
+        # Preserve text_ids order in front
+        front = [tid[i] for i in text_ids]
+        random.shuffle(front)
+        back = [tid[i] for i in (set(tid.keys()) - set(text_ids))]
+        # The whole quote indexes stuff badly needs rafactoring
 
         random.shuffle(back)
         self.indices = front + back
