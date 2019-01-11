@@ -8,3 +8,5 @@ GPATH
 GRTAGS
 GTAGS
 stats
+.mypy_cache/
+.vscode/

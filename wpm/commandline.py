@@ -51,7 +51,7 @@ The format is
     argp.add_argument("--cpm", default=False, action="store_true",
                       help="Shows CPM instead of WPM in stats")
 
-    argp.add_argument("--stats-file", default="~/.wpm.csv", type=str,
+    argp.add_argument("--stats-file", default="~/.config/wpm/wpm.csv", type=str,
                       help="File to record score history to (CSV format)")
 
     argp.add_argument("--id", "-i", default=None, type=int,
