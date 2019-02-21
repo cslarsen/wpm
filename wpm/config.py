@@ -71,6 +71,17 @@ DEFAULTS = {
         "score": (int_tuple, (curses.COLOR_YELLOW, curses.COLOR_RED), ""),
         "top_bar": (int_tuple, (curses.COLOR_CYAN, curses.COLOR_BLUE), ""),
     },
+
+    "monochromecolors": {
+        "author": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "background": (int, curses.COLOR_BLACK, ""),
+        "correct": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "incorrect": (int_tuple, (curses.COLOR_BLACK, curses.COLOR_WHITE), ""),
+        "prompt": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "quote": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "score": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+        "top_bar": (int_tuple, (curses.COLOR_WHITE, curses.COLOR_BLACK), ""),
+    },
 }
 
 class SectionValues(object):

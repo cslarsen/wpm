@@ -36,8 +36,10 @@ class Screen(object):
     COLOR_QUOTE = 7
     COLOR_STATUS = 8
 
-    def __init__(self):
+    def __init__(self, monochrome):
         self.config = Config()
+
+        self.monochrome = monochrome
 
         # Make delay slower
         os.environ.setdefault("ESCDELAY", self.config.curses.escdelay)
@@ -152,7 +154,9 @@ class Screen(object):
         """Sets up curses color pairs."""
         hicolor = os.getenv("TERM").endswith("256color")
 
-        if hicolor:
+        if self.monochrome:
+            color = self.config.monochromecolors
+        elif hicolor:
             color = self.config.xterm256colors
         else:
             color = self.config.xtermcolors
