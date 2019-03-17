@@ -65,6 +65,9 @@ The format is
     argp.add_argument("--short", default=False, action="store_true",
                       help="Starts wpm with short texts")
 
+    argp.add_argument("--hard", default=False, action="store_true", 
+                      help="Typos will restart the game")
+
     opts = argp.parse_args()
 
     if opts.version:
@@ -275,7 +278,7 @@ def main():
     try:
         with wpm.game.GameManager(quotes, stats, opts.cpm) as gm:
             try:
-                gm.run(to_front=text_ids)
+                gm.run(to_front=text_ids, hard_flag=opts.hard)
                 gm.stats.save(opts.stats_file)
             except KeyboardInterrupt:
                 gm.stats.save(opts.stats_file)

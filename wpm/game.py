@@ -84,7 +84,7 @@ class GameManager(object):
         """Has user finished a quote?"""
         return (self.start is not None) and (self.stop is not None)
 
-    def run(self, to_front=None):
+    def run(self, to_front=None, hard_flag=False):
         """Starts the main game loop."""
         self.set_tab_spaces(self.config.wpm.tab_spaces)
 
@@ -119,7 +119,7 @@ class GameManager(object):
 
             self.screen.window.refresh()
             key = self.screen.get_key()
-            self.handle_key(key)
+            self.handle_key(key, hard_flag)
 
     def wpm(self, elapsed):
         """Words per minute."""
@@ -221,7 +221,7 @@ class GameManager(object):
                 for inc in range(self.incorrect + 1):
                     self.screen.highlight_progress(self.position, inc)
 
-    def handle_key(self, key):
+    def handle_key(self, key, hard_flag):
         """Dispatches actions based on key and current mode."""
         # TODO: Refactor this mess of a function
         if key is None:
@@ -241,7 +241,7 @@ class GameManager(object):
                 # Exit program
                 raise KeyboardInterrupt()
 
-        if Screen.is_escape(key):
+        if Screen.is_escape(key) or (hard_flag and self.position < len(self.quote.text) and self.quote.text[self.position] != key):
             self.reset()
             return
 
