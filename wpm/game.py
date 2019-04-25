@@ -234,7 +234,7 @@ class GameManager(object):
         # Browse mode
         if self.start is None or (self.start is not None and
                                   self.stop is not None):
-            if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
+            if key in ("\t", "KEY_LEFT", "KEY_RIGHT"):
                 self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
             elif Screen.is_escape(key):
