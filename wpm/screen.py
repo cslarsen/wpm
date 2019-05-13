@@ -150,7 +150,7 @@ class Screen(object):
 
     def set_colors(self):
         """Sets up curses color pairs."""
-        hicolor = os.getenv("TERM").endswith("256color")
+        hicolor = os.getenv("TERM").endswith("256color") if os.getenv("TERM") else None
 
         if hicolor:
             color = self.config.xterm256colors

@@ -254,4 +254,6 @@ class Stats(object):
                 game[0] = 1 + race
                 writer.writerow(game)
 
+        if os.path.exists(filename):
+                os.remove(filename)
         os.rename(filename + ".tmp", filename)

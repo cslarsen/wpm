@@ -12,6 +12,7 @@ The quotes database is *not* covered by the AGPL!
 """
 
 import os
+import sys
 import runpy
 
 from setuptools import setup
@@ -26,7 +27,9 @@ _VERSION = get_version()
 
 setup(
     name="wpm",
-    scripts=["scripts/wpm"],
+    entry_points = {
+        "console_scripts": ['wpm = wpm.commandline:main']
+    },
     version=_VERSION,
     description="Console app for measuring typing speed in words per minute (WPM)",
     author="Christian Stigen Larsen",
@@ -35,6 +38,7 @@ setup(
     package_dir={"wpm": "wpm"},
     package_data={"wpm": ["data/examples.json.gz"]},
     include_package_data=True,
+    install_requires=(["windows-curses"] if sys.platform.startswith("win") else []),
     url="https://github.com/cslarsen/wpm",
     download_url="https://github.com/cslarsen/wpm/tarball/v%s" % _VERSION,
     license="https://www.gnu.org/licenses/agpl-3.0.html",
@@ -42,7 +46,7 @@ setup(
     zip_safe=True,
     test_suite="tests",
     keywords=["wpm", "typing", "typist"],
-    platforms=["unix", "linux", "osx", "cygwin"],
+    platforms=["unix", "linux", "osx", "cygwin", "win32"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
