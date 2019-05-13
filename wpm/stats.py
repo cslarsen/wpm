@@ -224,10 +224,11 @@ class Stats(object):
             reader = csv.reader(file_obj)
 
             for row in reader:
-                result = parse(row)
-                tag = result[-1]
-                games[tag].append(result[:-1])
-                current_tag = tag
+                if len(row) == 9:
+                    result = parse(row)
+                    tag = result[-1]
+                    games[tag].append(result[:-1])
+                    current_tag = tag
 
         return Stats(current_tag, games)
 
