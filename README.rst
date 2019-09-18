@@ -37,7 +37,7 @@ install it from the source repository with
 
 .. code:: bash
 
-    $ python setup.py install [--user]
+    $ pip install . [--user]
 
 To just test the app without installing, type ``make run``.
 
