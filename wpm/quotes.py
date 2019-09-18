@@ -91,7 +91,7 @@ class RandomIterator(object):
         # Preserve text_ids order in front
         front = [tid[i] for i in text_ids]
         random.shuffle(front)
-        back = [tid[i] for i in (set(tid.keys()) - set(text_ids))]
+        back = [tid[i] for i in set(tid.keys()) - set(text_ids)]
         # The whole quote indexes stuff badly needs rafactoring
 
         random.shuffle(back)

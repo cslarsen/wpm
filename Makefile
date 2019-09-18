@@ -1,6 +1,6 @@
 GPG := gpg
 PYFLAKES := pyflakes
-PYLINT := pylint
+PYLINT := python3 -m pylint
 PYPY := pypy
 PYTHON := python
 PYTHON3 := python3

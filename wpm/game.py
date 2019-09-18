@@ -33,6 +33,7 @@ class GameManager(object):
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
+        self.cheight = 0
 
         self.start = None
         self.stop = None
@@ -43,6 +44,8 @@ class GameManager(object):
 
         self.screen = Screen(monochrome)
         self.set_quote(self.quotes.next())
+
+        self.now = time.time()
 
     def __enter__(self):
         return self
@@ -236,7 +239,7 @@ class GameManager(object):
             if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
                 self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
-            elif Screen.is_escape(key):
+            if Screen.is_escape(key):
                 # Exit program
                 raise KeyboardInterrupt()
 
@@ -280,7 +283,7 @@ class GameManager(object):
             self.position += 1
 
             # Reset edit buffer on a correctly finished word
-            if key == " " or key == "\n":
+            if key in (" ", "\n"):
                 self.screen.clear_prompt()
                 self._edit = ""
             else:

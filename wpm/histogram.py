@@ -18,8 +18,7 @@ import sys
 def unicode_chr(ordinal):
     if sys.version_info.major >= 3:
         return chr(ordinal)
-    else:
-        return unichr(ordinal)
+    return unichr(ordinal)  # pylint: disable=undefined-variable
 
 def histogram(values, slots):
     """Frequency counts values.
@@ -29,7 +28,7 @@ def histogram(values, slots):
     """
     histo = collections.defaultdict(int)
 
-    if len(values) == 0:
+    if not values:
         return 0, 1 / float(slots), histo
 
     low = math.floor(min(values))
@@ -43,7 +42,8 @@ def histogram(values, slots):
     return low, width, histo
 
 def plot(slots, low, width, histo):
-    chars = [unicode_chr(0x2580+n) for n in range(1,9)]
+    # pylint: disable=unused-argument
+    chars = [unicode_chr(0x2580 + n) for n in range(1, 9)]
     chars = ["_"] + chars
 
     max_count = max([0] + list(histo.values()))

@@ -200,7 +200,7 @@ class Screen(object):
         """Checks for backspace key."""
         if len(key) > 1:
             return key == "KEY_BACKSPACE"
-        elif ord(key) in (curses.ascii.BS, curses.ascii.DEL):
+        if ord(key) in (curses.ascii.BS, curses.ascii.DEL):
             return True
         return False
 
@@ -223,11 +223,11 @@ class Screen(object):
             if isinstance(key, int):
                 if key == curses.KEY_BACKSPACE:
                     return "KEY_BACKSPACE"
-                elif key == curses.KEY_LEFT:
+                if key == curses.KEY_LEFT:
                     return "KEY_LEFT"
-                elif key == curses.KEY_RIGHT:
+                if key == curses.KEY_RIGHT:
                     return "KEY_RIGHT"
-                elif key == curses.KEY_RESIZE:
+                if key == curses.KEY_RESIZE:
                     return "KEY_RESIZE"
                 return None
             return key
@@ -254,11 +254,11 @@ class Screen(object):
             if isinstance(key, int):
                 if key == curses.KEY_BACKSPACE:
                     return "KEY_BACKSPACE"
-                elif key == curses.KEY_LEFT:
+                if key == curses.KEY_LEFT:
                     return "KEY_LEFT"
-                elif key == curses.KEY_RIGHT:
+                if key == curses.KEY_RIGHT:
                     return "KEY_RIGHT"
-                elif key == curses.KEY_RESIZE:
+                if key == curses.KEY_RESIZE:
                     return "KEY_RESIZE"
                 return None
             return key.decode("ascii")
@@ -398,7 +398,7 @@ class Screen(object):
             return
 
         percent = self.config.wpm.confidence_level
-        assert(0.0 <= percent <= 1.0)
+        assert 0.0 <= percent <= 1.0
         alpha = 1.0 - percent
         samples = len(results)
 

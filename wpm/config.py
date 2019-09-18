@@ -93,7 +93,7 @@ class SectionValues(object):
 
     def __getattr__(self, name):
         options = DEFAULTS[self.section]
-        convert, default, doc = options[name]
+        convert = options[name][0]
         value = Config.config.get(self.section, name)
         try:
             return convert(value)
@@ -123,7 +123,7 @@ class Config(object):
     def verify(self):
         """Verifies wpmrc values."""
         level = self.wpm.confidence_level
-        if not (0 < level < 1):
+        if not 0 < level < 1:
             raise ConfigError("The .wpmrc confidence level must be within [0, 1>")
 
     def load(self):
@@ -141,7 +141,7 @@ class Config(object):
             if not Config.config.has_section(section):
                 Config.config.add_section(section)
 
-            for name, (type, default, doc) in sorted(values.items()):
+            for name, (_, default, _) in sorted(values.items()):
                 if not Config.config.has_option(section, name):
                     Config.config.set(section, name, str(default))
 

@@ -269,8 +269,6 @@ def main():
             text_ids = short_quotes_first(quotes)
         elif opts.id is not None:
             text_ids = [opts.id]
-        else:
-            text_ids = []
     except wpm.error.WpmError as error:
         print(error)
         sys.exit(1)
