@@ -17,7 +17,6 @@ import curses
 import time
 
 from wpm.config import Config
-from wpm.error import WpmError
 from wpm.record import Recorder
 from wpm.screen import Screen
 
