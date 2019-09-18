@@ -3,7 +3,7 @@ PYPY := pypy
 PYTHON3 := python3
 PYFLAKES := pyflakes
 PYLINT := pylint
-GPG := gpg2
+GPG := gpg
 
 default: test
 
