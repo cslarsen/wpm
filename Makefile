@@ -11,7 +11,10 @@ default: test
 test:
 	$(PYTHON) setup.py test
 
-check: test
+check: test lint pylint tox
+
+tox:
+	$(PYTHON3) -m tox
 
 run:
 	PYTHONPATH=. $(PYTHON) wpm
@@ -64,10 +67,10 @@ setup-pypi-publish:
 	$(PYTHON) setup.py sdist bdist_wheel upload --sign -r pypi
 
 lint:
-	@$(PYFLAKES) `find . -name '*.py' -print`
+	$(PYFLAKES) wpm
 
 pylint:
-	@$(PYLINT) wpm/*.py
+	$(PYLINT) --exit-zero wpm/*.py
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;
