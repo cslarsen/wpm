@@ -1,9 +1,10 @@
-PYTHON := python
-PYPY := pypy
-PYTHON3 := python3
+GPG := gpg
 PYFLAKES := pyflakes
 PYLINT := pylint
-GPG := gpg
+PYPY := pypy
+PYTHON := python
+PYTHON3 := python3
+TWINE := python3 -m twine
 
 default: test
 
@@ -52,7 +53,7 @@ dist-sign: dist
 	find dist -type f -exec $(GPG) --detach-sign -a {} \;
 
 publish: dist-sign
-	twine upload dist/*
+	$(TWINE) upload dist/*
 
 setup-pypi-test:
 	$(PYTHON) setup.py register -r pypitest
