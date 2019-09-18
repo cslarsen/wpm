@@ -20,16 +20,6 @@ Features
   format. Loads fine in Excel as well.
 - Launches quickly in your terminal window for "in-between moments"
 
-Demo
-----
-
-.. image:: https://asciinema.org/a/Ipk7ft1048SEMTbXzzlOo0VUb.png
-  :width: 480 px
-  :height: 230 px
-  :alt: Screen recording of WPM in action
-  :target: https://asciinema.org/a/Ipk7ft1048SEMTbXzzlOo0VUb?size=medium&autoplay=1
-
-
 How to install
 --------------
 
