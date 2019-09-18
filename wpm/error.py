@@ -16,5 +16,5 @@ class WpmError(RuntimeError):
     pass
 
 class ConfigError(WpmError):
-    """Incorrect .wpmrc option."""
+    """Incorrect wpmrc option."""
     pass

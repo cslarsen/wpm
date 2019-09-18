@@ -16,6 +16,7 @@ import csv
 import datetime
 import math
 import os
+from .config import get_config_directory
 
 class Timestamp(object):
     """Methods for dealing with timestamps."""
@@ -200,7 +201,7 @@ class Stats(object):
         """Loads stats from a CSV file."""
 
         if filename is None:
-            filename = os.path.expanduser("~/.wpm.csv")
+            filename = os.path.join(get_config_directory(), "wpm.csv")
 
         games = collections.defaultdict(list)
         current_tag = None

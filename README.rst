@@ -142,7 +142,7 @@ zero-based integer will be used.
 Format of race history
 ----------------------
 
-wpm will save scores in a CSV file in `~/.wpm.csv`. This file can be loaded
+wpm will save scores in a CSV file in `~/.config/wpm/wpm.csv`. This file can be loaded
 directly into Excel. It uses the same format as TypeRacer, with the addition of
 a few extra columns at the end. That means is should be possible to use
 existing TypeRacer score history tools with this file with minor modifications.
@@ -164,7 +164,7 @@ tag        str      A user supplied tag for that score (e.g., keyboard)
 ========== ======== =======================================================
 
 Should there be any problem saving or loading the score history, it will copy
-the existing file into `~/.wpm.csv.backup` and create a new one.
+the existing file into `~/.config/wpm/wpm.csv.backup` and create a new one.
 
 Tagging races
 -------------
@@ -185,10 +185,10 @@ grouped by each tag. It shows things like the average over time, along with
 confidence and prediction intervals. An item like `n-10` means "the last 10
 games".
 
-The ~/.wpmrc file
+The wpmrc file
 -----------------
 
-The first time you start wpm, it writes a `.wpmrc` file to your home directory.
+The first time you start wpm, it writes a `wpmrc` file to `~/.config/wpm/wpmrc`.
 It contains user settings that you can change. They are given in the table
 below.
 
