@@ -23,7 +23,7 @@ from wpm.screen import Screen
 
 class GameManager(object):
     """The main game runner."""
-    def __init__(self, quotes, stats, cpm_flag):
+    def __init__(self, quotes, stats, cpm_flag, monochrome):
         self.config = Config()
         self.stats = stats
         self.cpm_flag = cpm_flag
@@ -42,7 +42,7 @@ class GameManager(object):
         self.num_quotes = len(quotes)
         self.quotes = quotes.random_iterator()
 
-        self.screen = Screen()
+        self.screen = Screen(monochrome)
         self.set_quote(self.quotes.next())
 
     def __enter__(self):

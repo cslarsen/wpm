@@ -37,6 +37,9 @@ runpypy:
 stats:
 	@PYTHONPATH=. $(PYTHON) wpm --stats
 
+monochrome:
+	@PYTHONPATH=. $(PYTHON) wpm --monochrome
+
 remove-prefixes:
 	PYTHONPATH=. $(PYTHON) tools/remove-prefixes.py
 
