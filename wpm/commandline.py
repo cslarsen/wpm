@@ -276,9 +276,9 @@ def main():
         sys.exit(1)
 
     try:
-        with wpm.game.GameManager(quotes, stats, opts.cpm) as gm:
+        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.hard) as gm:
             try:
-                gm.run(to_front=text_ids, hard_flag=opts.hard)
+                gm.run(to_front=text_ids)
                 gm.stats.save(opts.stats_file)
             except KeyboardInterrupt:
                 gm.stats.save(opts.stats_file)

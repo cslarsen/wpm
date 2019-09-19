@@ -23,10 +23,11 @@ from wpm.screen import Screen
 
 class GameManager(object):
     """The main game runner."""
-    def __init__(self, quotes, stats, cpm_flag):
+    def __init__(self, quotes, stats, cpm_flag, hard_flag):
         self.config = Config()
         self.stats = stats
         self.cpm_flag = cpm_flag
+        self.hard_flag = hard_flag
         self.average = self.stats.average(self.stats.tag, last_n=10)
         self.tab_spaces = None
 
@@ -84,7 +85,7 @@ class GameManager(object):
         """Has user finished a quote?"""
         return (self.start is not None) and (self.stop is not None)
 
-    def run(self, to_front=None, hard_flag=False):
+    def run(self, to_front=None):
         """Starts the main game loop."""
         self.set_tab_spaces(self.config.wpm.tab_spaces)
 
@@ -119,7 +120,7 @@ class GameManager(object):
 
             self.screen.window.refresh()
             key = self.screen.get_key()
-            self.handle_key(key, hard_flag)
+            self.handle_key(key)
 
     def wpm(self, elapsed):
         """Words per minute."""
@@ -221,7 +222,7 @@ class GameManager(object):
                 for inc in range(self.incorrect + 1):
                     self.screen.highlight_progress(self.position, inc)
 
-    def handle_key(self, key, hard_flag):
+    def handle_key(self, key):
         """Dispatches actions based on key and current mode."""
         # TODO: Refactor this mess of a function
         if key is None:
@@ -234,14 +235,14 @@ class GameManager(object):
         # Browse mode
         if self.start is None or (self.start is not None and
                                   self.stop is not None):
-            if key in ("\t", "KEY_LEFT", "KEY_RIGHT"):
+            if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
                 self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
             elif Screen.is_escape(key):
                 # Exit program
                 raise KeyboardInterrupt()
 
-        if Screen.is_escape(key) or (hard_flag and self.position < len(self.quote.text) and self.quote.text[self.position] != key):
+        if Screen.is_escape(key):
             self.reset()
             return
 
@@ -290,6 +291,8 @@ class GameManager(object):
             # Finished typing?
             if self.position == len(self.quote.text):
                 self.mark_finished()
+        elif self.hard_flag:
+            self.reset()
         elif self.incorrect + self.position < len(self.quote.text):
             self.incorrect += 1
             self.total_incorrect += 1
