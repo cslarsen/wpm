@@ -15,6 +15,6 @@ The quotes database is *not* covered by the AGPL!
 
 import os
 
-DEVFEATURES =os.getenv("WPM_DEVFEATURES", "").lower().split(":")
+DEVFEATURES = os.getenv("WPM_DEVFEATURES", "").lower().split(":")
 
 histogram = "histogram" in DEVFEATURES

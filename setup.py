@@ -39,6 +39,7 @@ setup(
     download_url="https://github.com/cslarsen/wpm/tarball/v%s" % _VERSION,
     license="https://www.gnu.org/licenses/agpl-3.0.html",
     long_description=open("README.rst").read(),
+    install_requires=["setuptools"],
     zip_safe=True,
     test_suite="tests",
     keywords=["wpm", "typing", "typist"],

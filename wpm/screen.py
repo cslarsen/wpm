@@ -36,8 +36,10 @@ class Screen(object):
     COLOR_QUOTE = 7
     COLOR_STATUS = 8
 
-    def __init__(self):
+    def __init__(self, monochrome):
         self.config = Config()
+
+        self.monochrome = monochrome
 
         # Make delay slower
         os.environ.setdefault("ESCDELAY", self.config.curses.escdelay)
@@ -48,6 +50,10 @@ class Screen(object):
 
         self.screen = curses.initscr()
         self.screen.nodelay(True)
+
+        # Flag controls whether we should redraw the screen or not. This is
+        # used to reduce CPU usage in the browsing screen.
+        self.redraw = True
 
         min_lines = 12
         if self.lines < min_lines:
@@ -152,7 +158,9 @@ class Screen(object):
         """Sets up curses color pairs."""
         hicolor = os.getenv("TERM").endswith("256color")
 
-        if hicolor:
+        if self.monochrome:
+            color = self.config.monochromecolors
+        elif hicolor:
             color = self.config.xterm256colors
         else:
             color = self.config.xtermcolors
@@ -196,7 +204,7 @@ class Screen(object):
         """Checks for backspace key."""
         if len(key) > 1:
             return key == "KEY_BACKSPACE"
-        elif ord(key) in (curses.ascii.BS, curses.ascii.DEL):
+        if ord(key) in (curses.ascii.BS, curses.ascii.DEL):
             return True
         return False
 
@@ -219,11 +227,11 @@ class Screen(object):
             if isinstance(key, int):
                 if key == curses.KEY_BACKSPACE:
                     return "KEY_BACKSPACE"
-                elif key == curses.KEY_LEFT:
+                if key == curses.KEY_LEFT:
                     return "KEY_LEFT"
-                elif key == curses.KEY_RIGHT:
+                if key == curses.KEY_RIGHT:
                     return "KEY_RIGHT"
-                elif key == curses.KEY_RESIZE:
+                if key == curses.KEY_RESIZE:
                     return "KEY_RESIZE"
                 return None
             return key
@@ -250,11 +258,11 @@ class Screen(object):
             if isinstance(key, int):
                 if key == curses.KEY_BACKSPACE:
                     return "KEY_BACKSPACE"
-                elif key == curses.KEY_LEFT:
+                if key == curses.KEY_LEFT:
                     return "KEY_LEFT"
-                elif key == curses.KEY_RIGHT:
+                if key == curses.KEY_RIGHT:
                     return "KEY_RIGHT"
-                elif key == curses.KEY_RESIZE:
+                if key == curses.KEY_RESIZE:
                     return "KEY_RESIZE"
                 return None
             return key.decode("ascii")
@@ -355,12 +363,15 @@ class Screen(object):
 
     def show_browser(self, head, stats, cpm_flag):
         """Show quote browsing screen."""
+        if not self.redraw:
+            return
         self.update_header(head)
         self.update_quote(Screen.COLOR_QUOTE)
         self.update_author()
         self.show_help()
         self.show_stats(stats, cpm_flag)
         self.set_cursor(0, 2)
+        self.redraw = False
 
     def show_histogram(self, stats):
         results = stats.text_id_results(stats.tag, self.quote_id)
@@ -394,7 +405,7 @@ class Screen(object):
             return
 
         percent = self.config.wpm.confidence_level
-        assert(0.0 <= percent <= 1.0)
+        assert 0.0 <= percent <= 1.0
         alpha = 1.0 - percent
         samples = len(results)
 
@@ -440,6 +451,9 @@ class Screen(object):
 
     def show_score(self, head, wpm_score, stats, cpm_flag):
         """Show score screen after typing has finished."""
+        if not self.redraw:
+            return
+
         self.update_header(head)
         self.update_quote(Screen.COLOR_CORRECT)
         self.update_author()
@@ -459,6 +473,7 @@ class Screen(object):
         self.show_help()
         self.show_stats(stats, cpm_flag)
         self.set_cursor(0, 2)
+        self.redraw = False
 
     def highlight_progress(self, position, incorrect):
         """Colors finished and incorrectly typed parts of the quote."""
@@ -498,6 +513,7 @@ class Screen(object):
 
     def clear(self):
         """Clears the screen."""
+        self.redraw = True
         self.window.clear()
 
     def deinit(self):

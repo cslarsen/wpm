@@ -1,15 +1,20 @@
-PYTHON := python
-PYPY := pypy
-PYTHON3 := python3
+GPG := gpg
 PYFLAKES := pyflakes
-PYLINT := pylint
+PYLINT := python3 -m pylint
+PYPY := pypy
+PYTHON := python
+PYTHON3 := python3
+TWINE := python3 -m twine
 
 default: test
 
 test:
 	$(PYTHON) setup.py test
 
-check: test
+check: test lint pylint tox
+
+tox:
+	$(PYTHON3) -m tox
 
 run:
 	PYTHONPATH=. $(PYTHON) wpm
@@ -40,30 +45,35 @@ runpypy:
 stats:
 	@PYTHONPATH=. $(PYTHON) wpm --stats
 
+monochrome:
+	@PYTHONPATH=. $(PYTHON) wpm --monochrome
+
 remove-prefixes:
 	PYTHONPATH=. $(PYTHON) tools/remove-prefixes.py
 
 dist:
 	rm -rf dist/*
-	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py bdist_wheel
+	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist bdist_wheel
 
-publish: dist
-	find dist -type f -exec gpg2 --detach-sign -a {} \;
-	twine upload dist/*
+dist-sign: dist
+	find dist -type f -exec $(GPG) --detach-sign -a {} \;
+
+publish: dist-sign
+	$(TWINE) upload dist/*
 
 setup-pypi-test:
 	$(PYTHON) setup.py register -r pypitest
-	$(PYTHON) setup.py bdist_wheel upload -r pypitest
+	$(PYTHON) setup.py sdist bdist_wheel upload -r pypitest
 
 setup-pypi-publish:
 	$(PYTHON) setup.py register -r pypi
-	$(PYTHON) setup.py bdist_wheel upload --sign -r pypi
+	$(PYTHON) setup.py sdist bdist_wheel upload --sign -r pypi
 
 lint:
-	@$(PYFLAKES) `find . -name '*.py' -print`
+	$(PYFLAKES) wpm
 
 pylint:
-	@$(PYLINT) wpm/*.py
+	$(PYLINT) --exit-zero wpm/*.py
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;

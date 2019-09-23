@@ -17,13 +17,14 @@ import curses
 import time
 
 from wpm.config import Config
-from wpm.error import WpmError
 from wpm.record import Recorder
 from wpm.screen import Screen
 
 class GameManager(object):
     """The main game runner."""
-    def __init__(self, quotes, stats, cpm_flag, hard_flag):
+
+    def __init__(self, quotes, stats, cpm_flag, monochrome, hard_flag):
+
         self.config = Config()
         self.stats = stats
         self.cpm_flag = cpm_flag
@@ -35,6 +36,7 @@ class GameManager(object):
         self.position = 0
         self.incorrect = 0
         self.total_incorrect = 0
+        self.cheight = 0
 
         self.start = None
         self.stop = None
@@ -43,8 +45,10 @@ class GameManager(object):
         self.num_quotes = len(quotes)
         self.quotes = quotes.random_iterator()
 
-        self.screen = Screen()
+        self.screen = Screen(monochrome)
         self.set_quote(self.quotes.next())
+
+        self.now = time.time()
 
     def __enter__(self):
         return self
@@ -71,6 +75,7 @@ class GameManager(object):
 
     def set_quote(self, quote):
         """Sets current quote."""
+        self.screen.redraw = True
         self.quote = quote
         self.recorder = Recorder()
         self.screen.set_quote(self.quote)
@@ -199,6 +204,8 @@ class GameManager(object):
 
     def resize(self):
         """Handles a resized terminal."""
+        self.screen.redraw = True
+
         max_y, max_x = self.screen.window.getmaxyx()
         self.screen.clear()
 
@@ -238,7 +245,7 @@ class GameManager(object):
             if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
                 self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
-            elif Screen.is_escape(key):
+            if Screen.is_escape(key):
                 # Exit program
                 raise KeyboardInterrupt()
 
@@ -282,7 +289,7 @@ class GameManager(object):
             self.position += 1
 
             # Reset edit buffer on a correctly finished word
-            if key == " " or key == "\n":
+            if key in (" ", "\n"):
                 self.screen.clear_prompt()
                 self._edit = ""
             else:

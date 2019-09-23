@@ -40,9 +40,6 @@ def loadurl(url):
 
     return html
 
-def get_texts():
-    return loadurl("http://www.typeracerdata.com/texts")
-
 def get_text(text_id):
     url = "http://typeracerdata.com/text?id=%s" % text_id
     html = loadurl(url)

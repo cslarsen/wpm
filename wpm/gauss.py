@@ -42,7 +42,7 @@ def erf_inv(z, steps=300):
 
     The value z must be inside <-1, 1>.
     """
-    if not (-1 < z < 1):
+    if not -1 < z < 1:
         raise ValueError(z)
 
     res = 0

@@ -1,0 +1,15 @@
+[MASTER]
+
+disable = 
+  bad-continuation,
+  invalid-name,
+  line-too-long,
+  missing-docstring,
+  too-few-public-methods,
+  too-many-arguments,
+  too-many-instance-variables,
+  too-many-locals,
+  too-many-public-methods,
+  try-except-raise,
+  unnecessary-pass,
+  useless-object-inheritance,
