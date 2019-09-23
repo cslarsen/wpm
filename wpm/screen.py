@@ -51,6 +51,10 @@ class Screen(object):
         self.screen = curses.initscr()
         self.screen.nodelay(True)
 
+        # Flag controls whether we should redraw the screen or not. This is
+        # used to reduce CPU usage in the browsing screen.
+        self.redraw = True
+
         min_lines = 12
         if self.lines < min_lines:
             curses.endwin()
@@ -359,12 +363,15 @@ class Screen(object):
 
     def show_browser(self, head, stats, cpm_flag):
         """Show quote browsing screen."""
+        if not self.redraw:
+            return
         self.update_header(head)
         self.update_quote(Screen.COLOR_QUOTE)
         self.update_author()
         self.show_help()
         self.show_stats(stats, cpm_flag)
         self.set_cursor(0, 2)
+        self.redraw = False
 
     def show_histogram(self, stats):
         results = stats.text_id_results(stats.tag, self.quote_id)
@@ -444,6 +451,9 @@ class Screen(object):
 
     def show_score(self, head, wpm_score, stats, cpm_flag):
         """Show score screen after typing has finished."""
+        if not self.redraw:
+            return
+
         self.update_header(head)
         self.update_quote(Screen.COLOR_CORRECT)
         self.update_author()
@@ -463,6 +473,7 @@ class Screen(object):
         self.show_help()
         self.show_stats(stats, cpm_flag)
         self.set_cursor(0, 2)
+        self.redraw = False
 
     def highlight_progress(self, position, incorrect):
         """Colors finished and incorrectly typed parts of the quote."""
@@ -502,6 +513,7 @@ class Screen(object):
 
     def clear(self):
         """Clears the screen."""
+        self.redraw = True
         self.window.clear()
 
     def deinit(self):

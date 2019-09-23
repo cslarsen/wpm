@@ -72,6 +72,7 @@ class GameManager(object):
 
     def set_quote(self, quote):
         """Sets current quote."""
+        self.screen.redraw = True
         self.quote = quote
         self.recorder = Recorder()
         self.screen.set_quote(self.quote)
@@ -200,6 +201,8 @@ class GameManager(object):
 
     def resize(self):
         """Handles a resized terminal."""
+        self.screen.redraw = True
+
         max_y, max_x = self.screen.window.getmaxyx()
         self.screen.clear()
 
