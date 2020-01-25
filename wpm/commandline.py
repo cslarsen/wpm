@@ -56,6 +56,9 @@ The format is
     argp.add_argument("--stats-file", default="~/.wpm.csv", type=str,
                       help="File to record score history to (CSV format)")
 
+    argp.add_argument("--config-file", default="~/.wpmrc", type=str,
+                      help="File to store configuration.")
+
     argp.add_argument("--id", "-i", default=None, type=int,
                       help="If specified, jumps to given text ID on start.")
 
@@ -239,7 +242,7 @@ def main():
     try:
         opts = parse_args()
 
-        config = wpm.config.Config()
+        config = wpm.config.Config(opts.config_file)
         if config.wpm.cpm:
             opts.cpm = True
 

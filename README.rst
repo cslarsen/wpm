@@ -175,12 +175,13 @@ grouped by each tag. It shows things like the average over time, along with
 confidence and prediction intervals. An item like `n-10` means "the last 10
 games".
 
-The ~/.wpmrc file
+The .wpmrc file
 -----------------
 
 The first time you start wpm, it writes a `.wpmrc` file to your home directory.
-It contains user settings that you can change. They are given in the table
-below.
+You can specify a custom config file location with the `--config-file=...`
+option. The `.wpmrc` file contains user settings that you can change. The user
+settings are given in the table below.
 
 ============== =========================== ======= =============================================================================
 Section        Name                        Default Description
