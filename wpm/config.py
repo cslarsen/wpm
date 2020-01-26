@@ -107,10 +107,11 @@ class Config(object):
     # pylint: disable=too-many-public-methods
 
     config = None
+    persist = True
 
-    def __init__(self):
+    def __init__(self, filename="~/.wpmrc"):
         Config.config = configparser.ConfigParser()
-        self.filename = os.path.expanduser("~/.wpmrc")
+        self.filename = os.path.abspath(os.path.expanduser(filename))
 
         if os.path.isfile(self.filename):
             self.load()
@@ -118,7 +119,8 @@ class Config(object):
             self.verify()
         else:
             self.add_defaults()
-            self.save()
+            if self.persist:
+                self.save()
 
     def verify(self):
         """Verifies wpmrc values."""
@@ -127,16 +129,16 @@ class Config(object):
             raise ConfigError("The .wpmrc confidence level must be within [0, 1>")
 
     def load(self):
-        """Loads ~/.wpmrc config settings."""
+        """Loads config settings."""
         Config.config.read(self.filename)
 
     def save(self):
-        """Saves settings to ~/.wpmrc"""
+        """Saves settings"""
         with open(self.filename, "wt") as file_obj:
             Config.config.write(file_obj)
 
     def add_defaults(self):
-        """Adds missing sections and options to your ~/.wpmrc file."""
+        """Adds missing sections and options to the config file."""
         for section, values in sorted(DEFAULTS.items()):
             if not Config.config.has_section(section):
                 Config.config.add_section(section)
