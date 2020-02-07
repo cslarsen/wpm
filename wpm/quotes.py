@@ -19,6 +19,7 @@ import json
 import os
 import random
 import sys
+import pickle
 
 import pkg_resources
 
@@ -97,6 +98,10 @@ class RandomIterator(object):
         random.shuffle(back)
         self.indices = front + back
         self.index = 0
+    
+    def set_indices(self, redlist):
+        self.indices = list(redlist)
+        random.shuffle(self.indices)
 
     @property
     def database(self):
@@ -110,12 +115,12 @@ class RandomIterator(object):
 
     def next(self):
         """Goes to next quote."""
-        self.index = (self.index + 1) % len(self.quotes)
+        self.index = (self.index + 1) % len(self.indices)
         return self.current()
 
     def previous(self):
         """Goes back to previous quote."""
-        self.index = (self.index - 1) % len(self.quotes)
+        self.index = (self.index - 1) % len(self.indices)
         return self.current()
 
 
@@ -144,6 +149,8 @@ class Quotes(object):
         return len(self.quotes)
 
     def __getitem__(self, index):
+        print("index: ", index, "len(quotes): ", len(self.quotes))
+        # exit(0)
         return self.quotes[index]
 
     def at(self, index):
@@ -205,6 +212,37 @@ class Quotes(object):
             quotes = json.load(file_obj)
             quotes = tuple(map(tuple, quotes))
             return Quotes(quotes, database)
+
+    # Could have also implemented this inside the load, but I didn't want to mix JSON stuff with this.
+    @staticmethod
+    def load_redlist(filename=None):
+        """Loads the dictionary of redlisted quotes."""
+        if filename is None:
+            filename = pkg_resources.resource_filename("wpm", "data/redlist.pickle")
+
+        # can also use os.open with O_CREATE etc.
+        try:
+            with open(filename, "rb") as file:
+                hey = pickle.load(file)
+                print(hey)
+                return hey
+                
+        except IOError:
+            with open(filename, "wb+") as file:
+                pickle.dump({}, file)
+            
+            with open(filename, "rb") as file:
+                return pickle.load(file)
+                
+
+    @staticmethod
+    def save_redlist(redlist, filename=None):
+        """Saves the dictionary of redlisted quotes."""
+        if filename is None:
+            filename = pkg_resources.resource_filename("wpm", "data/redlist.pickle")
+        
+        with open(filename, "wb") as file:
+            pickle.dump(redlist, file)
 
     def save(self, filename=None):
         """Saves current quotes to gzipped JSON file."""

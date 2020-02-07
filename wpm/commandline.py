@@ -65,12 +65,18 @@ The format is
     argp.add_argument("--short", default=False, action="store_true",
                       help="Starts wpm with short texts")
 
-
     argp.add_argument("--hard", default=False, action="store_true", 
                       help="Typos will restart the game")
 
     argp.add_argument("--monochrome", default=False, action="store_true",
                       help="Starts wpm with monochrome colors")
+                    
+    argp.add_argument("--redlist", default=False, action="store_true",
+                      help="Starts wpm with redlisted texts")
+
+    argp.add_argument("--flush_redlist", default=False, action="store_true",
+                      help="Starts wpm with redlisted texts")
+
 
 
     opts = argp.parse_args()
@@ -79,6 +85,10 @@ The format is
         print("wpm v%s" % wpm.__version__)
         print(wpm.__copyright__)
         print("Source code (sans quotes) distributed under the %s" % wpm.__license__)
+        sys.exit(0)
+    
+    if opts.flush_redlist:
+        wpm.quotes.Quotes.save_redlist({})
         sys.exit(0)
 
     opts.stats_file = os.path.expanduser(opts.stats_file)
@@ -279,7 +289,7 @@ def main():
         sys.exit(1)
 
     try:
-        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.monochrome, opts.hard) as gm:
+        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.monochrome, opts.hard, opts.redlist) as gm:
             try:
                 gm.run(to_front=text_ids)
                 gm.stats.save(opts.stats_file)

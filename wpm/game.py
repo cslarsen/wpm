@@ -15,22 +15,29 @@ The quotes database is *not* covered by the AGPL!
 
 import curses
 import time
+import pickle # remove this if you choose to not double unpickle
 
 from wpm.config import Config
 from wpm.record import Recorder
 from wpm.screen import Screen
+from wpm.quotes import Quotes
 
 class GameManager(object):
     """The main game runner."""
 
-    def __init__(self, quotes, stats, cpm_flag, monochrome, hard_flag):
+    def __init__(self, quotes, stats, cpm_flag, monochrome, hard_flag, redlist_flag):
 
         self.config = Config()
         self.stats = stats
         self.cpm_flag = cpm_flag
         self.hard_flag = hard_flag
+        self.redlist_flag = redlist_flag
         self.average = self.stats.average(self.stats.tag, last_n=10)
         self.tab_spaces = None
+
+        # redlist
+        #if True: #can check the flag for this
+        self.redlist = Quotes.load_redlist()
 
         # Stats
         self.position = 0
@@ -44,6 +51,9 @@ class GameManager(object):
         self._edit = ""
         self.num_quotes = len(quotes)
         self.quotes = quotes.random_iterator()
+
+        if self.redlist_flag:
+            self.quotes.set_indices(self.redlist)
 
         self.screen = Screen(monochrome)
         self.set_quote(self.quotes.next())
@@ -120,6 +130,18 @@ class GameManager(object):
                                        self.wpm(self.elapsed),
                                        self.stats,
                                        self.cpm_flag)
+                
+                if self.redlist_flag and self.wpm(self.elapsed) > 90: # TODO Replace True with the flag information and 90 with a customizable wpm
+                            # check if you can use the already loaded dictionary from commandline
+                            # if not, unpickle it in this file and save it here. (chose this, double unpcickling)
+
+                    # decrement/remove the index from the dictionary
+                    self.redlist[self.quote.text_id] -= 1
+                    if self.redlist[self.quote.text_id] <= 0:
+                        self.redlist.pop(self.quote.text_id)
+                    Quotes.save_redlist(self.redlist) # if it's okay, save_redlist could be moved to here out of quotes.
+                
+
             else:
                 self.screen.show_browser(head, self.stats, self.cpm_flag)
 
@@ -245,6 +267,15 @@ class GameManager(object):
             if key in (" ", "KEY_LEFT", "KEY_RIGHT"):
                 self.reset(direction=-1 if key == "KEY_LEFT" else 1)
                 return
+            
+            if key in ("KEY_UP"):
+                if self.quotes.text_id in self.redlist:
+                    self.redlist[self.quotes.text_id] += 1
+                else:
+                    self.redlist[self.quotes.text_id] = 3
+                Quotes.save_redlist(self.redlist)
+                return
+
             if Screen.is_escape(key):
                 # Exit program
                 raise KeyboardInterrupt()
