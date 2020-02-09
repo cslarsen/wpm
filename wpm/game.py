@@ -39,6 +39,10 @@ class GameManager(object):
         #if True: #can check the flag for this
         self.redlist = Quotes.load_redlist()
 
+        if redlist_flag and not self.redlist:
+            print("Redlist is empty")
+            exit(0)
+
         # Stats
         self.position = 0
         self.incorrect = 0
@@ -82,6 +86,24 @@ class GameManager(object):
                        self.quotes.database)
 
         self.average = self.stats.average(self.stats.tag, last_n=10)
+
+        if self.redlist_flag and self.wpm(self.elapsed) > 90: # TODO Replace True with the flag information and 90 with a customizable wpm
+            # check if you can use the already loaded dictionary from commandline
+            # if not, unpickle it in this file and save it here. (chose this, double unpcickling)
+
+            # # decrement/remove the index from the dictionary
+            # if len(list(self.redlist)) == 0:
+            #     exit(69)
+            # else:
+            #     exit(70)
+            if self.quotes.text_id not in self.redlist:
+                return
+            self.redlist[self.quotes.text_id] -= 1
+            if self.redlist[self.quotes.text_id] <= 0:
+                self.redlist.pop(self.quotes.text_id)
+            Quotes.save_redlist(self.redlist) # if it's okay, save_redlist could be moved to here out of quotes.
+
+
 
     def set_quote(self, quote):
         """Sets current quote."""
@@ -131,17 +153,6 @@ class GameManager(object):
                                        self.stats,
                                        self.cpm_flag)
                 
-                if self.redlist_flag and self.wpm(self.elapsed) > 90: # TODO Replace True with the flag information and 90 with a customizable wpm
-                            # check if you can use the already loaded dictionary from commandline
-                            # if not, unpickle it in this file and save it here. (chose this, double unpcickling)
-
-                    # decrement/remove the index from the dictionary
-                    self.redlist[self.quote.text_id] -= 1
-                    if self.redlist[self.quote.text_id] <= 0:
-                        self.redlist.pop(self.quote.text_id)
-                    Quotes.save_redlist(self.redlist) # if it's okay, save_redlist could be moved to here out of quotes.
-                
-
             else:
                 self.screen.show_browser(head, self.stats, self.cpm_flag)
 

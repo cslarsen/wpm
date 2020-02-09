@@ -149,8 +149,6 @@ class Quotes(object):
         return len(self.quotes)
 
     def __getitem__(self, index):
-        print("index: ", index, "len(quotes): ", len(self.quotes))
-        # exit(0)
         return self.quotes[index]
 
     def at(self, index):
@@ -223,9 +221,7 @@ class Quotes(object):
         # can also use os.open with O_CREATE etc.
         try:
             with open(filename, "rb") as file:
-                hey = pickle.load(file)
-                print(hey)
-                return hey
+                return pickle.load(file)
                 
         except IOError:
             with open(filename, "wb+") as file:
