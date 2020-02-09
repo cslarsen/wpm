@@ -24,7 +24,7 @@ from wpm.quotes import Quotes
 class GameManager(object):
     """The main game runner."""
 
-    def __init__(self, quotes, stats, cpm_flag, monochrome, hard_flag, redlist_flag):
+    def __init__(self, quotes, stats, cpm_flag, monochrome, hard_flag, redlist_flag, redlist_threshold):
 
         self.config = Config()
         self.stats = stats
@@ -35,7 +35,7 @@ class GameManager(object):
         self.tab_spaces = None
 
         self.redlist = Quotes.load_redlist()
-
+        self.redlist_threshold = redlist_threshold
         if redlist_flag and not self.redlist:
             print("Redlist is empty")
             exit(0)
@@ -84,7 +84,7 @@ class GameManager(object):
 
         self.average = self.stats.average(self.stats.tag, last_n=10)
 
-        if self.redlist_flag and self.wpm(self.elapsed) > 90:
+        if self.redlist_flag and self.wpm(self.elapsed) > self.redlist_threshold:
             if self.quotes.text_id not in self.redlist:
                 return
             self.redlist[self.quotes.text_id] -= 1

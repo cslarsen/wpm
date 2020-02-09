@@ -191,6 +191,7 @@ wpm            confidence_level               0.95 The confidence level for WPM 
 wpm            cpm                               0 If positive, report CPM in stats instead of WPM
 wpm            tab_spaces                        1 Number of spaces to expand tabs to
 wpm            wrap_width                       -1 If positive, wrap text at this width
+wpm            redlist_threshold                90 Minimum WPM to pass redlisted text
 xterm256colors                                     Color codes for 256-color terminals (foreground, background)
 xtermcolors                                        Color codes for ordinary terminals (foreground, background)
 ============== =========================== ======= =============================================================================
