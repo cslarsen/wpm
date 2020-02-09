@@ -24,12 +24,11 @@ from wpm.quotes import Quotes
 class GameManager(object):
     """The main game runner."""
 
-    def __init__(self, quotes, stats, cpm_flag, monochrome, hard_flag, redlist_flag, redlist_threshold):
+    def __init__(self, quotes, stats, cpm_flag, monochrome, redlist_flag, redlist_threshold):
 
         self.config = Config()
         self.stats = stats
         self.cpm_flag = cpm_flag
-        self.hard_flag = hard_flag
         self.redlist_flag = redlist_flag
         self.average = self.stats.average(self.stats.tag, last_n=10)
         self.tab_spaces = None
@@ -328,8 +327,6 @@ class GameManager(object):
             # Finished typing?
             if self.position == len(self.quote.text):
                 self.mark_finished()
-        elif self.hard_flag:
-            self.reset()
         elif self.incorrect + self.position < len(self.quote.text):
             self.incorrect += 1
             self.total_incorrect += 1
