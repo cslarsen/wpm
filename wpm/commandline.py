@@ -65,8 +65,13 @@ The format is
     argp.add_argument("--short", default=False, action="store_true",
                       help="Starts wpm with short texts")
 
+
+    argp.add_argument("--hard", default=False, action="store_true", 
+                      help="Typos will restart the game")
+
     argp.add_argument("--monochrome", default=False, action="store_true",
                       help="Starts wpm with monochrome colors")
+
 
     opts = argp.parse_args()
 
@@ -274,7 +279,7 @@ def main():
         sys.exit(1)
 
     try:
-        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.monochrome) as gm:
+        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.monochrome, opts.hard) as gm:
             try:
                 gm.run(to_front=text_ids)
                 gm.stats.save(opts.stats_file)

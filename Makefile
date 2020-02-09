@@ -30,6 +30,9 @@ profile:
 help:
 	PYTHONPATH=. $(PYTHON) wpm --help
 
+hard:
+	PYTHONPATH=. $(PYTHON) wpm --hard
+
 dump:
 	PYTHONPATH=. $(PYTHON) tools/dumpdiffs.py
 
