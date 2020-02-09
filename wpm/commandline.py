@@ -67,6 +67,14 @@ The format is
 
     argp.add_argument("--monochrome", default=False, action="store_true",
                       help="Starts wpm with monochrome colors")
+                    
+    argp.add_argument("--redlist", default=False, action="store_true",
+                      help="Starts wpm with redlisted texts. To redlist a text, press the \"up\" arrow key. To remove a texts from the redlist, complete each text fast enough or run wpm --flush_redlist.")
+
+    argp.add_argument("--flush_redlist", default=False, action="store_true",
+                      help="Cleans the redlist.")
+
+
 
     opts = argp.parse_args()
 
@@ -74,6 +82,10 @@ The format is
         print("wpm v%s" % wpm.__version__)
         print(wpm.__copyright__)
         print("Source code (sans quotes) distributed under the %s" % wpm.__license__)
+        sys.exit(0)
+    
+    if opts.flush_redlist:
+        wpm.quotes.Quotes.save_redlist({})
         sys.exit(0)
 
     opts.stats_file = os.path.expanduser(opts.stats_file)
@@ -243,6 +255,8 @@ def main():
         if config.wpm.cpm:
             opts.cpm = True
 
+        redlist_threshold = config.wpm.redlist_threshold
+
         stats = load_stats(opts.stats_file, opts.tag)
 
         if opts.load_json is not None:
@@ -274,7 +288,7 @@ def main():
         sys.exit(1)
 
     try:
-        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.monochrome) as gm:
+        with wpm.game.GameManager(quotes, stats, opts.cpm, opts.monochrome, opts.redlist, redlist_threshold) as gm:
             try:
                 gm.run(to_front=text_ids)
                 gm.stats.save(opts.stats_file)

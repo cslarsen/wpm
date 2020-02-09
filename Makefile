@@ -30,6 +30,12 @@ profile:
 help:
 	PYTHONPATH=. $(PYTHON) wpm --help
 
+redlist:
+	PYTHONPATH=. $(PYTHON) wpm --redlist
+
+flush_redlist:
+	PYTHONPATH=. $(PYTHON) wpm --flush_redlist	
+
 dump:
 	PYTHONPATH=. $(PYTHON) tools/dumpdiffs.py
 
