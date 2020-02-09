@@ -15,7 +15,6 @@ The quotes database is *not* covered by the AGPL!
 
 import curses
 import time
-import pickle # remove this if you choose to not double unpickle
 
 from wpm.config import Config
 from wpm.record import Recorder
@@ -35,8 +34,6 @@ class GameManager(object):
         self.average = self.stats.average(self.stats.tag, last_n=10)
         self.tab_spaces = None
 
-        # redlist
-        #if True: #can check the flag for this
         self.redlist = Quotes.load_redlist()
 
         if redlist_flag and not self.redlist:
@@ -87,21 +84,13 @@ class GameManager(object):
 
         self.average = self.stats.average(self.stats.tag, last_n=10)
 
-        if self.redlist_flag and self.wpm(self.elapsed) > 90: # TODO Replace True with the flag information and 90 with a customizable wpm
-            # check if you can use the already loaded dictionary from commandline
-            # if not, unpickle it in this file and save it here. (chose this, double unpcickling)
-
-            # # decrement/remove the index from the dictionary
-            # if len(list(self.redlist)) == 0:
-            #     exit(69)
-            # else:
-            #     exit(70)
+        if self.redlist_flag and self.wpm(self.elapsed) > 90:
             if self.quotes.text_id not in self.redlist:
                 return
             self.redlist[self.quotes.text_id] -= 1
             if self.redlist[self.quotes.text_id] <= 0:
                 self.redlist.pop(self.quotes.text_id)
-            Quotes.save_redlist(self.redlist) # if it's okay, save_redlist could be moved to here out of quotes.
+            Quotes.save_redlist(self.redlist)
 
 
 
@@ -152,7 +141,6 @@ class GameManager(object):
                                        self.wpm(self.elapsed),
                                        self.stats,
                                        self.cpm_flag)
-                
             else:
                 self.screen.show_browser(head, self.stats, self.cpm_flag)
 
