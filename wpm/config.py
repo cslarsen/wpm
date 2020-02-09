@@ -48,6 +48,7 @@ DEFAULTS = {
         "wrap_width": (int, -1, "Wrap text to this width"),
         "tab_spaces": (int, 1, "Expand tabs to N spaces"),
         "cpm": (int, 0, "Report CPM instead of WPM in stats"),
+        "redlist_threshold": (int, 90, "Minimum WPM to pass redlisted text"),
     },
 
     "xterm256colors": {
