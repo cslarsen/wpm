@@ -30,9 +30,6 @@ profile:
 help:
 	PYTHONPATH=. $(PYTHON) wpm --help
 
-hard:
-	PYTHONPATH=. $(PYTHON) wpm --hard
-
 redlist:
 	PYTHONPATH=. $(PYTHON) wpm --redlist
 
