@@ -24,6 +24,7 @@ from wpm.gauss import confidence_interval, prediction_interval
 from wpm.histogram import histogram, plot
 import wpm.devfeature as devfeature
 
+
 class Screen(object):
     """Renders the terminal screen."""
 
@@ -101,21 +102,24 @@ class Screen(object):
     def _word_wrap(text, width):
         """Returns lengths of lines that can be printed without wrapping."""
         lengths = []
-        while len(text) > width:
-            try:
-                end = text[:width + 1].rindex(" ")
-            except ValueError:
-                break
+        texts = text.splitlines()
+        for text in texts:
+            while len(text) > width:
+                try:
+                    end = text[:width + 1].rindex(" ")
+                except ValueError:
+                    break
 
-            # We can't divide the input nicely, so just display it as-is
-            if end == -1:
-                return [len(text)]
+                # We can't divide the input nicely, so just display it as-is
+                if end == -1:
+                    lengths += [len(text)]
+                    break
 
-            lengths.append(end)
-            text = text[end + 1:]
+                lengths.append(end)
+                text = text[end + 1:]
 
-        if text:
-            lengths.append(len(text))
+            if text:
+                lengths.append(len(text))
 
         return lengths
 
@@ -197,6 +201,13 @@ class Screen(object):
         """Checks for escape key."""
         if len(key) == 1:
             return ord(key) == curses.ascii.ESC
+        return False
+
+    @staticmethod
+    def is_newline(key):
+        """Checks for enter key."""
+        if len(key) == 1:
+            return ord(key) == curses.ascii.NL
         return False
 
     @staticmethod
@@ -291,6 +302,7 @@ class Screen(object):
 
     def set_cursor(self, x_pos, y_pos):
         """Sets cursor position."""
+
         if (y_pos < self.lines) and (x_pos < self.columns):
             self.window.move(y_pos, x_pos)
 
@@ -347,7 +359,7 @@ class Screen(object):
 
         # Remember (x, y) position for each quote offset.
         self.quote_coords = []
-        for offset in range(len(self.quote)+1):
+        for offset in range(len(self.quote) + 1):
             x_pos, y_pos = Screen._screen_coords(self.quote_lengths, offset)
             self.quote_coords.append((x_pos, y_pos))
         self.quote_coords = tuple(self.quote_coords)
@@ -494,7 +506,6 @@ class Screen(object):
     def show_keystroke(self, head, position, incorrect, typed, key):
         """Updates the screen while typing."""
         self.update_header(head)
-
         if key and (position + incorrect) <= len(self.quote):
             self.highlight_progress(position, incorrect)
             self.update_prompt("> " + typed)
