@@ -200,6 +200,13 @@ class Screen(object):
         return False
 
     @staticmethod
+    def is_start_of_header(key):
+        """Checks for start of header key."""
+        if len(key) == 1:
+            return ord(key) == curses.ascii.SOH
+        return False
+
+    @staticmethod
     def is_backspace(key):
         """Checks for backspace key."""
         if len(key) > 1:
