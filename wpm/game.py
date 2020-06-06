@@ -252,13 +252,18 @@ class GameManager(object):
 
         self.recorder.add(self.elapsed, key, self.position, self.incorrect)
 
+        if Screen.is_start_of_header(key):
+            self.position -= (len(self._edit) - self.incorrect)
+            self.incorrect = 0
+            self._edit = ""
+            return
+
         if Screen.is_backspace(key):
             if self.incorrect:
                 self.incorrect -= 1
-                self._edit = self._edit[:-1]
             elif self._edit:
                 self.position -= 1
-                self._edit = self._edit[:-1]
+            self._edit = self._edit[:-1]
             return
 
         if self.stop is not None:
