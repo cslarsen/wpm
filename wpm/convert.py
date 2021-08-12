@@ -15,4 +15,4 @@ def wpm_to_cps(wpm):
 
 def wpm_to_cpm(wpm):
     """Converts WPM to CPM (characters per minute)."""
-    return wpm*60.0
+    return wpm*5.0
